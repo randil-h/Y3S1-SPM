@@ -1,0 +1,52 @@
+[
+  {
+    "question": "What is the chemical symbol for water?",
+    "answers": ["H2O", "O2", "CO2", "NaCl"],
+    "correctAnswer": "H2O"
+  },
+  {
+    "question": "What planet is known as the Red Planet?",
+    "answers": ["Mars", "Earth", "Venus", "Jupiter"],
+    "correctAnswer": "Mars"
+  },
+  {
+    "question": "What force keeps us on the ground?",
+    "answers": ["Gravity", "Magnetism", "Friction", "Tension"],
+    "correctAnswer": "Gravity"
+  },
+  {
+    "question": "Which gas do plants absorb from the atmosphere?",
+    "answers": ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
+    "correctAnswer": "Carbon Dioxide"
+  },
+  {
+    "question": "What is the boiling point of water?",
+    "answers": ["100°C", "0°C", "50°C", "150°C"],
+    "correctAnswer": "100°C"
+  },
+  {
+    "question": "Which part of the cell contains the genetic material?",
+    "answers": ["Nucleus", "Cytoplasm", "Mitochondria", "Ribosome"],
+    "correctAnswer": "Nucleus"
+  },
+  {
+    "question": "What is the most abundant gas in Earth's atmosphere?",
+    "answers": ["Oxygen", "Nitrogen", "Carbon Dioxide", "Argon"],
+    "correctAnswer": "Nitrogen"
+  },
+  {
+    "question": "Which planet is closest to the sun?",
+    "answers": ["Mercury", "Venus", "Earth", "Mars"],
+    "correctAnswer": "Mercury"
+  },
+  {
+    "question": "What is the main gas found in the air we breathe?",
+    "answers": ["Oxygen", "Nitrogen", "Carbon Dioxide", "Helium"],
+    "correctAnswer": "Nitrogen"
+  },
+  {
+    "question": "Which element is essential for bone health?",
+    "answers": ["Calcium", "Iron", "Potassium", "Sodium"],
+    "correctAnswer": "Calcium"
+  }
+]
