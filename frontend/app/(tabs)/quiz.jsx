@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import questionsData from '../assets/quiz/questions.json';
+import questionsData from '../../assets/quiz/questions.json';
 
 const Quiz = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
