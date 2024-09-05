@@ -1,12 +1,19 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, Modal, TextInput, Button, ScrollView } from 'react-native';
 import { useNavigation, useRouter } from 'expo-router';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../../FirebaseConfig';
 
 const QuizPage = () => {
     const router = useRouter();
     const [quizzes, setQuizzes] = useState([]);
+    const [selectedQuiz, setSelectedQuiz] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [newQuizName, setNewQuizName] = useState('');
+    const [quizInstructions, setQuizInstructions] = useState('');
+    const [questions, setQuestions] = useState([]);
+    const [newQuestion, setNewQuestion] = useState('');
+    const [newAnswer, setNewAnswer] = useState('');
     const navigation = useNavigation();
 
     useLayoutEffect(() => {
@@ -60,11 +67,45 @@ const QuizPage = () => {
         );
     };
 
+    const handleEdit = async () => {
+        if (selectedQuiz && newQuizName.trim() && quizInstructions.trim() && questions.length > 0) {
+            try {
+                await updateDoc(doc(db, 'quizzes', selectedQuiz.id), {
+                    quizName: newQuizName,
+                    quizInstructions: quizInstructions,
+                    questions: questions,
+                });
+                setQuizzes((prevQuizzes) =>
+                    prevQuizzes.map((quiz) =>
+                        quiz.id === selectedQuiz.id ? { ...quiz, quizName: newQuizName, quizInstructions, questions } : quiz
+                    )
+                );
+                setIsModalVisible(false);
+            } catch (error) {
+                console.error('Error updating quiz: ', error);
+            }
+        }
+    };
+
+    const addQuestion = () => {
+        if (newQuestion.trim() && newAnswer.trim()) {
+            setQuestions([...questions, { question: newQuestion, answer: newAnswer }]);
+            setNewQuestion('');
+            setNewAnswer('');
+        }
+    };
+
     const renderQuizItem = ({ item }) => (
         <View style={styles.quizItemContainer}>
             <TouchableOpacity
                 style={styles.quizItem}
-                onPress={() => router.push(`screens/teacher/assessment/QuizDetails/${item.quizName}`)}
+                onPress={() => {
+                    setSelectedQuiz(item);
+                    setNewQuizName(item.quizName);
+                    setQuizInstructions(item.quizInstructions || '');
+                    setQuestions(item.questions || []);
+                    setIsModalVisible(true);
+                }}
             >
                 <Text style={styles.quizText}>{item.quizName}</Text>
             </TouchableOpacity>
@@ -91,6 +132,7 @@ const QuizPage = () => {
             >
                 <Text style={styles.buttonText}>Add Quiz</Text>
             </TouchableOpacity>
+
         </View>
     );
 };
@@ -144,6 +186,59 @@ const styles = StyleSheet.create({
     deleteButtonText: {
         color: 'white',
         fontSize: 16,
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    modalContent: {
+        width: '80%',
+        padding: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 15,
+    },
+    subTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        marginVertical: 10,
+    },
+    quizTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        marginVertical: 5,
+    },
+    quizName: {
+        fontSize: 16,
+        marginBottom: 10,
+    },
+    quizInstructions: {
+        fontSize: 16,
+        marginBottom: 20,
+    },
+    questionContainer: {
+        marginBottom: 10,
+    },
+    questionText: {
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    answerText: {
+        fontSize: 14,
+        color: 'grey',
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        width: '100%',
+        marginTop: 15,
     },
 });
 
