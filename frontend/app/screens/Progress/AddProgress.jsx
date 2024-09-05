@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView  } from 'react-native';
 import { useRouter } from 'expo-router';
 import {Picker} from "react-native-web";
+import firestore from '@react-native-firebase/firestore';
 
 const AddProgress = () => {
     const [studentName, setStudentName] = useState('');
@@ -11,30 +12,40 @@ const AddProgress = () => {
     const [maths, setMaths] = useState('');
     const [english, setEnglish] = useState('');
     const [geography, setGeography] = useState('');
-    const [history, setHistory] = useState('');
+    const [hist, setHistory] = useState('');
     const [science, setScience] = useState('');
 
     const router = useRouter();
 
-    const handleSubmit = () => {
-        if (!studentName || !studentID || !studentClass || !courseworkProgress || !maths || !english || !geography || !history || !science) {
+    const handleSubmit = async () => {
+        if (!studentName || !studentID || !studentClass || !courseworkProgress || !maths || !english || !geography || !hist || !science) {
             Alert.alert('Error', 'Please fill in all fields');
             return;
         }
 
-        Alert.alert('Success', `Student ${studentName}'s progress added successfully`);
-        // Reset form fields
-        setStudentName('');
-        setStudentID('');
-        setStudentClass('');
-        setMaths('');
-        setEnglish('');
-        setGeography('');
-        setHistory('');
-        setScience('');
-        setCourseworkProgress('');
-        // Navigate back to the previous screen
-        router.back();
+        try {
+            // Add data to Firestore
+            await firestore().collection('spm').add({
+                studentName,
+                studentID,
+                studentClass,
+                courseworkProgress,
+                maths,
+                english,
+                geography,
+                hist,
+                science,
+                createdAt: firestore.FieldValue.serverTimestamp(), // Optional: Timestamp of the document creation
+            });
+
+            Alert.alert('Success', `Student ${studentName}'s progress added successfully`);
+
+            // Navigate back to the previous screen
+            router.back();
+        } catch (error) {
+            Alert.alert('Error', 'Failed to add progress');
+            console.error(error);
+        }
     };
 
     return (
@@ -89,7 +100,7 @@ const AddProgress = () => {
                         style={styles.inputSmall}
                         placeholder="History"
                         keyboardType="numeric"
-                        value={history}
+                        value={hist}
                         onChangeText={setHistory}
                     />
                     <TextInput

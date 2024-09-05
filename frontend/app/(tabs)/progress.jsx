@@ -19,7 +19,7 @@ const Progress = () => {
 
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => handleButtonPress('View Progress')}
+                onPress={() => router.push('/screens/Progress/ViewProgress')}
                 accessibilityLabel="View Student Progress"
                 accessibilityHint="Navigates to the page where you can view detailed student progress"
                 accessibilityRole="button"
