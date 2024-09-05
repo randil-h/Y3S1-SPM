@@ -1,47 +1,194 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, Platform } from 'react-native';
+import { useRouter } from 'expo-router';
+import { BlurView } from "expo-blur";
+import * as Haptics from 'expo-haptics';
+import { Audio } from 'expo-av';
+import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
+
+const beepSound = require('../../assets/sounds/beep.mp3'); // Ensure this path is correct
 
 const Teacher = () => {
-    const navigation = useNavigation();
+    const router = useRouter();
+    const [hapticInterval, setHapticInterval] = useState(null);
+    const [sound, setSound] = useState(null);
+    const [buttonLayouts, setButtonLayouts] = useState({});
+    const [fingerPosition, setFingerPosition] = useState({ x: 0, y: 0 });
+    const [isFeedbackActive, setIsFeedbackActive] = useState(false);
+
+    const loadSound = async () => {
+        try {
+            const { sound } = await Audio.Sound.createAsync(beepSound);
+            setSound(sound);
+        } catch (error) {
+            console.error('Error loading sound:', error);
+        }
+    };
+
+    const playSound = async () => {
+        try {
+            if (sound) {
+                await sound.playAsync(); // Play the sound
+            }
+        } catch (error) {
+            console.error('Error playing sound:', error);
+        }
+    };
+
+    const startFeedback = async () => {
+        if (!isFeedbackActive) {
+            setIsFeedbackActive(true);
+            await loadSound(); // Ensure the sound is loaded before starting feedback
+            const intervalId = setInterval(() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
+                playSound();
+            }, 300); // Adjust the interval to match the haptic feedback
+            setHapticInterval(intervalId);
+        }
+    };
+
+    const stopFeedback = () => {
+        if (hapticInterval) {
+            clearInterval(hapticInterval);
+            setHapticInterval(null);
+        }
+        if (sound) {
+            sound.stopAsync(); // Stop the sound
+        }
+        setIsFeedbackActive(false);
+    };
+
+    const handleGestureEvent = (event) => {
+        const { absoluteX, absoluteY } = event.nativeEvent;
+        setFingerPosition({ x: absoluteX, y: absoluteY });
+
+        // Check if the touch is within any button bounds
+        let isInsideButton = false;
+        Object.keys(buttonLayouts).forEach((key) => {
+            const { x, y, width, height } = buttonLayouts[key];
+            if (
+                absoluteX >= x &&
+                absoluteX <= x + width &&
+                absoluteY >= y &&
+                absoluteY <= y + height
+            ) {
+                isInsideButton = true;
+            }
+        });
+
+        if (isInsideButton) {
+            startFeedback();
+        } else {
+            stopFeedback();
+        }
+    };
+
+    const handleButtonLayout = (key) => (event) => {
+        const { x, y, width, height } = event.nativeEvent.layout;
+        setButtonLayouts((prevLayouts) => ({
+            ...prevLayouts,
+            [key]: { x, y, width, height }
+        }));
+    };
+
+    const handleGestureEnd = () => {
+        stopFeedback();
+    };
 
     return (
-        <View style={styles.container}>
-            <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate('AddQuiz')}
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <PanGestureHandler
+                onGestureEvent={handleGestureEvent}
+                onHandlerStateChange={(event) => {
+                    if (event.nativeEvent.state === 5) { // GestureHandlerState.END
+                        handleGestureEnd();
+                    }
+                }}
             >
-                <Text style={styles.buttonText}>Add Quiz</Text>
-            </TouchableOpacity>
-            <Text style={styles.text}>Teacher</Text>
-        </View>
+                <View style={styles.container}>
+                    <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
+
+                    {/* Fixed top view with Home and BG */}
+                    <View style={styles.topView}>
+                        {Platform.OS === 'ios' && (
+                            <BlurView
+                                intensity={80}
+                                tint="extraLight"
+                                style={styles.blurView}
+                            />
+                        )}
+                    </View>
+
+                    {/* Centered buttons */}
+                    <View style={styles.buttonColumn}>
+                        <TouchableOpacity
+                            style={styles.circleButton}
+                            onLayout={handleButtonLayout('addQuiz')}
+                            onPress={() => router.push('screens/teacher/assessment/AddQuiz')}
+                        >
+                            <Text style={styles.buttonText}>Add Quiz</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.circleButton}
+                            onLayout={handleButtonLayout('addCourse')}
+                            onPress={() => router.push('screens/teacher/coursework/AddCourse')}
+                        >
+                            <Text style={styles.buttonText}>Add Course</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </PanGestureHandler>
+        </GestureHandlerRootView>
     );
-};
+}
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F5FCFF',
     },
-    button: {
+    topView: {
+        width: '100%',
         position: 'absolute',
-        top: 60,
-        right: 20,
-        backgroundColor: '#007BFF',
-        paddingVertical: 10,
-        paddingHorizontal: 15,
-        borderRadius: 5,
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1,
+        paddingVertical: 12,
+    },
+    blurView: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: StatusBar.currentHeight || 50,
+        zIndex: 1,
+    },
+    buttonColumn: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 36,
+        marginTop: StatusBar.currentHeight || 50 + 16,
+    },
+    circleButton: {
+        width: 240,
+        height: 240,
+        borderStyle: 'solid',
+        borderWidth: 3,
+        borderColor: '#b2df67',
+        borderRadius: 120,
+        backgroundColor: '#7aa631',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 10,
     },
     buttonText: {
+        fontWeight: 'bold',
         color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    text: {
-        fontSize: 24,
-        fontWeight: 'bold',
+        fontSize: 26,
+        textAlign: 'center',
     },
 });
 
