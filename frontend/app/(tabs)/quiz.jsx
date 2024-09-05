@@ -1,12 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import questionsData from '../../assets/quiz/questions.json';
+import {db} from "../../FirebaseConfig";
+import {collection, getDocs} from "firebase/firestore";
 
 const Quiz = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [isCorrect, setIsCorrect] = useState(false);
-    const [backgroundColor, setBackgroundColor] = useState('#F5FCFF'); // Default background color
+    const [backgroundColor, setBackgroundColor] = useState('#F5FCFF');
+    const [quizData, setQuizData] = useState(null);
+
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "quizzes"));
+                let quizList = [];
+
+                querySnapshot.forEach((doc) => {
+                    const quiz = doc.data();
+                    quizList.push(quiz);
+                });
+
+                if (quizList.length > 0) {
+                    setQuizData(quizList[0]);
+                }
+
+                console.log(quizList);
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+            }
+        }
+
+        fetchData();
+    }, []);
 
     const currentQuestion = questionsData[currentQuestionIndex];
 
@@ -15,22 +43,22 @@ const Quiz = () => {
         if (selectedAnswer !== null) {
             timer = setTimeout(() => {
                 handleNextQuestion();
-            }, 5000); // Wait for 5 seconds before moving to the next question
+            }, 5000);
         }
         return () => clearTimeout(timer);
     }, [selectedAnswer]);
 
     const handleAnswerSelection = (answer) => {
         setSelectedAnswer(answer);
-        const correct = answer === currentQuestion.correctAnswer;
+        const correct = answer === currentQuestion.correctAnswerIndex;
         setIsCorrect(correct);
-        setBackgroundColor(correct ? '#00FF00' : '#FF0000'); // Green for correct, red for incorrect
+        setBackgroundColor(correct ? '#00FF00' : '#FF0000');
     };
 
     const handleNextQuestion = () => {
         setSelectedAnswer(null);
         setIsCorrect(false);
-        setBackgroundColor('#F5FCFF'); // Reset background color
+        setBackgroundColor('#F5FCFF');
         if (currentQuestionIndex < questionsData.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
