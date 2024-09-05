@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView  } from 'react-native';
 import { useRouter } from 'expo-router';
 import {Picker} from "react-native-web";
-import firestore from '@react-native-firebase/firestore';
+import { collection, addDoc } from "firebase/firestore";
+import {db} from "../../../FirebaseConfig"; // Import from Firebase Firestore
+
 
 const AddProgress = () => {
     const [studentName, setStudentName] = useState('');
@@ -18,14 +20,16 @@ const AddProgress = () => {
     const router = useRouter();
 
     const handleSubmit = async () => {
+        console.log('Submitting data...');
         if (!studentName || !studentID || !studentClass || !courseworkProgress || !maths || !english || !geography || !hist || !science) {
+            console.log('Validation failed');
             Alert.alert('Error', 'Please fill in all fields');
             return;
         }
 
         try {
-            // Add data to Firestore
-            await firestore().collection('spm').add({
+            console.log('Adding document to Firestore...');
+            const docRef = await addDoc(collection(db, 'progress'), {
                 studentName,
                 studentID,
                 studentClass,
@@ -35,16 +39,14 @@ const AddProgress = () => {
                 geography,
                 hist,
                 science,
-                createdAt: firestore.FieldValue.serverTimestamp(), // Optional: Timestamp of the document creation
+                createdAt: new Date(),
             });
-
+            console.log('Document written with ID: ', docRef.id);
             Alert.alert('Success', `Student ${studentName}'s progress added successfully`);
-
-            // Navigate back to the previous screen
             router.back();
         } catch (error) {
+            console.error('Error adding document: ', error);
             Alert.alert('Error', 'Failed to add progress');
-            console.error(error);
         }
     };
 
