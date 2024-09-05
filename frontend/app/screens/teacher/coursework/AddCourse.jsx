@@ -141,7 +141,7 @@ const AddCourse = () => {
             <Modal
                 visible={isModalVisible}
                 transparent={true}
-                animationType="slide"
+                animationType="fade"
                 onRequestClose={() => setIsModalVisible(false)}
             >
                 <TouchableWithoutFeedback onPress={() => setIsModalVisible(false)}>
@@ -151,6 +151,7 @@ const AddCourse = () => {
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Course Name"
+                                    placeholderTextColor="#efefef"
                                     value={courseName}
                                     onChangeText={(text) => setCourseName(text)}
                                 />
@@ -158,6 +159,7 @@ const AddCourse = () => {
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Subject"
+                                    placeholderTextColor="#efefef"
                                     value={subject}
                                     onChangeText={(text) => setSubject(text)}
                                 />
@@ -259,9 +261,9 @@ const styles = StyleSheet.create({
     },
     levelItem: {
         backgroundColor: '#bababa',
-        paddingVertical: 10,
+        paddingVertical: 15,
         paddingHorizontal: 20,
-        borderRadius: 20,
+        borderRadius: 30,
         marginRight: 10,
     },
     selectedLevel: {
