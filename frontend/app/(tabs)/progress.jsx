@@ -13,9 +13,6 @@ const Progress = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title} accessibilityRole="header">
-                Student Progress
-            </Text>
 
             <TouchableOpacity
                 style={styles.button}
@@ -53,9 +50,10 @@ const Progress = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
+        flexDirection: 'column',
+        justifyContent: 'space-around', // Space between buttons
         alignItems: 'center',
-        backgroundColor: '#FFFFFF', // High contrast background color
+        marginTop: 20,
         padding: 20,
     },
     title: {
@@ -65,12 +63,11 @@ const styles = StyleSheet.create({
         marginBottom: 40,
     },
     button: {
-        backgroundColor: '#007BFF', // High contrast button color
-        paddingVertical: 15,
-        paddingHorizontal: 30,
-        borderRadius: 10,
-        marginVertical: 10,
-        width: '80%', // Make buttons wider
+        backgroundColor: '#007BFF', // Default color, will be overridden by specific button styles
+        width: 180, // Set width and height to make the button round
+        height: 180,
+        borderRadius: 90, // Half of width/height to make it round
+        justifyContent: 'center', // Center the text vertically
         alignItems: 'center',
     },
     buttonText: {

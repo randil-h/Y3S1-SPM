@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView  } from 'react-native';
 import { useRouter } from 'expo-router';
-import {Picker} from "react-native-web";
+import { Picker } from '@react-native-picker/picker';
 import { collection, addDoc } from "firebase/firestore";
 import {db} from "../../../FirebaseConfig"; // Import from Firebase Firestore
 
@@ -54,25 +54,28 @@ const AddProgress = () => {
         <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.formContainer}>
             <Text style={styles.formTitle}>Add Student Progress</Text>
-
+            <Text style={styles.pickerLabel}>Student Name</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Student Name"
                 value={studentName}
                 onChangeText={setStudentName}
             />
+            <Text style={styles.pickerLabel}>Student ID</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Student ID"
                 value={studentID}
                 onChangeText={setStudentID}
             />
+            <Text style={styles.pickerLabel}>Student's Class</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Student Class"
                 value={studentClass}
                 onChangeText={setStudentClass}
             />
+            <Text style={styles.pickerLabel}>Grades</Text>
             <View style={styles.inputContainer}>
                 <View style={styles.inputGroupLeft}>
                     <TextInput
@@ -158,6 +161,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
+        marginTop:20,
     },
     pickerContainer: {
         width: '100%',
@@ -186,7 +190,7 @@ const styles = StyleSheet.create({
         borderColor: '#ddd',
         borderRadius: 5,
         backgroundColor: '#fff',
-        height: 65 / 2, // Height for Maths, English, Geography
+        height: 135 / 3, // Height for Maths, English, Geography
     },
     inputSmall: {
         width: '100%',
@@ -196,7 +200,7 @@ const styles = StyleSheet.create({
         borderColor: '#ddd',
         borderRadius: 5,
         backgroundColor: '#fff',
-        height: 65 / 3, // One-third of the height of inputLarge
+        height: 90 / 2, // One-third of the height of inputLarge
     },
     picker: {
         height: 50,
