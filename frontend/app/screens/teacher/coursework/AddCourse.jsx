@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const Teacher = () => {
+const AddCourse = () => {
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Teacher</Text>
+            <Text style={styles.text}>Add Course</Text>
         </View>
     );
 };
@@ -22,4 +22,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Teacher;
+export default AddCourse;
