@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, StatusBar, FlatList, Alert, TouchableOpacity } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { BlurView } from 'expo-blur';
-import { addDoc, collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { View, Text, TextInput, Button, StyleSheet, StatusBar, FlatList, Alert, TouchableOpacity, Pressable, Dimensions } from 'react-native';
+import { addDoc, collection, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../../FirebaseConfig'; // Make sure FirebaseConfig is correct
+
+const { width } = Dimensions.get('window'); // Get screen width for horizontal layout
 
 const AddCourse = () => {
     const [courseName, setCourseName] = useState('');
@@ -23,7 +23,7 @@ const AddCourse = () => {
         }
     };
 
-    // Save course to Firestore
+    // Save or update course to Firestore
     const saveCourse = async () => {
         console.log("Saving Course with the following data:");
         console.log({ courseName, subject, level });
@@ -78,6 +78,37 @@ const AddCourse = () => {
         setSelectedCourseId(course.id);
     };
 
+    // Handle course deletion
+    const handleDelete = async (id) => {
+        try {
+            await deleteDoc(doc(db, 'courses', id));
+            console.log("Course deleted successfully!");
+            Alert.alert('Success', 'Course deleted successfully!');
+            fetchCourses(); // Refresh the course list
+        } catch (error) {
+            console.error("Error deleting course:", error);
+            Alert.alert('Error', 'Failed to delete the course.');
+        }
+    };
+
+    // Clear selected course
+    const clearSelection = () => {
+        setCourseName('');
+        setSubject('');
+        setLevel('1');
+        setSelectedCourseId(null);
+    };
+
+    // Horizontal level selector
+    const renderLevelItem = ({ item }) => (
+        <TouchableOpacity
+            style={[styles.levelItem, level === item ? styles.selectedLevel : {}]}
+            onPress={() => setLevel(item)}
+        >
+            <Text style={styles.levelText}>{item}</Text>
+        </TouchableOpacity>
+    );
+
     useEffect(() => {
         fetchCourses();
     }, []);
@@ -103,23 +134,27 @@ const AddCourse = () => {
 
                 <View style={styles.pickerContainer}>
                     <Text style={styles.label}>Select Level</Text>
-                    <Picker
-                        selectedValue={level}
-                        style={styles.picker}
-                        onValueChange={(itemValue) => setLevel(itemValue)}
-                    >
-                        <Picker.Item label="1" value="1" />
-                        <Picker.Item label="2" value="2" />
-                        <Picker.Item label="3" value="3" />
-                        <Picker.Item label="4" value="4" />
-                        <Picker.Item label="5" value="5" />
-                    </Picker>
+                    <FlatList
+                        data={['1', '2', '3', '4', '5']}
+                        horizontal
+                        renderItem={renderLevelItem}
+                        keyExtractor={(item) => item}
+                        contentContainerStyle={styles.levelList}
+                    />
                 </View>
 
                 <Button
                     title={selectedCourseId ? "Update Course" : "Save Course"}
                     onPress={saveCourse}
                 />
+
+                {selectedCourseId && (
+                    <Button
+                        title="Clear"
+                        onPress={clearSelection}
+                        color="#e74c3c"
+                    />
+                )}
             </View>
 
             <View style={styles.listContainer}>
@@ -127,13 +162,18 @@ const AddCourse = () => {
                     data={courses}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
-                        <TouchableOpacity onPress={() => handleCoursePress(item)}>
-                            <View style={styles.courseItem}>
-                                <Text style={styles.courseText}>Course Name: {item.courseName}</Text>
-                                <Text style={styles.courseText}>Subject: {item.subject}</Text>
-                                <Text style={styles.courseText}>Level: {item.level}</Text>
-                            </View>
-                        </TouchableOpacity>
+                        <View style={styles.courseItem}>
+                            <TouchableOpacity onPress={() => handleCoursePress(item)}>
+                                <View>
+                                    <Text style={styles.courseText}>Course Name: {item.courseName}</Text>
+                                    <Text style={styles.courseText}>Subject: {item.subject}</Text>
+                                    <Text style={styles.courseText}>Level: {item.level}</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <Pressable style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
+                                <Text style={styles.deleteButtonText}>Delete</Text>
+                            </Pressable>
+                        </View>
                     )}
                 />
             </View>
@@ -163,10 +203,21 @@ const styles = StyleSheet.create({
         width: '100%',
         marginBottom: 20,
     },
-    picker: {
-        height: 50,
-        width: '100%',
+    levelList: {
+        flexDirection: 'row',
+    },
+    levelItem: {
         backgroundColor: '#bababa',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 20,
+        marginRight: 10,
+    },
+    selectedLevel: {
+        backgroundColor: '#007BFF',
+    },
+    levelText: {
+        color: '#fff',
     },
     label: {
         fontSize: 16,
@@ -186,10 +237,23 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 5,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     courseText: {
         fontSize: 16,
         marginBottom: 5,
+    },
+    deleteButton: {
+        backgroundColor: '#e74c3c',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+    },
+    deleteButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
     },
 });
 
