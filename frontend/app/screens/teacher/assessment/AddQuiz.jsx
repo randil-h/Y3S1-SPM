@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Switch, Button, ScrollView, Alert, TouchableOpacity, SafeAreaView } from 'react-native';
+import firestore, {addDoc, collection} from '@react-native-firebase/firestore';
+import {db} from "../../../../FirebaseConfig";
 
 const AddQuiz = () => {
     const [quizName, setQuizName] = useState('');
@@ -36,7 +38,7 @@ const AddQuiz = () => {
         setQuestions(newQuestions);
     };
 
-    const handleSubmitQuiz = () => {
+    const handleSubmitQuiz = async () => {
         const incompleteQuestions = questions.some(
             (q) => q.questionText === '' || q.answers.includes('') || q.correctAnswerIndex === null
         );
@@ -46,15 +48,26 @@ const AddQuiz = () => {
             return;
         }
 
-        console.log('Quiz submitted:', { quizName, quizInstructions, questions });
-        setIsSubmitted(true);
-        Alert.alert('Quiz Submitted', 'Your quiz has been submitted successfully.');
+        try {
+            const docRef = await addDoc(collection(db, 'quizzes'), {
+                quizName,
+                quizInstructions,
+                questions,
+                createdAt: firestore.FieldValue.serverTimestamp(),
+            });
+
+            console.log('Quiz submitted:', { quizName, quizInstructions, questions });
+            setIsSubmitted(true);
+            Alert.alert('Quiz Submitted', 'Your quiz has been submitted successfully.');
+        } catch (error) {
+            console.error('Error submitting quiz:', error);
+            Alert.alert('Submission Error', 'There was an error submitting your quiz. Please try again.');
+        }
     };
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.topBar}>
-            </View>
+            <View style={styles.topBar}></View>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <TextInput
                     style={styles.openTextField}
@@ -253,21 +266,26 @@ const styles = StyleSheet.create({
         backgroundColor: '#007BFF',
         padding: 10,
         borderRadius: 8,
+        width: '45%',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     submitButtonText: {
         color: '#FFF',
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
     },
     addQuestionButton: {
-        marginBottom: 10,
         backgroundColor: '#28A745',
         padding: 10,
         borderRadius: 8,
+        width: '45%',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     addQuestionButtonText: {
         color: '#FFF',
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
     },
 });

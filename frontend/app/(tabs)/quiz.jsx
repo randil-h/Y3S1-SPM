@@ -1,22 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import questionsData from '../../assets/quiz/questions.json';
+import questionsData from '../assets/quiz/questions.json';
 
 const Quiz = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [isCorrect, setIsCorrect] = useState(false);
+    const [backgroundColor, setBackgroundColor] = useState('#F5FCFF'); // Default background color
 
     const currentQuestion = questionsData[currentQuestionIndex];
 
+    useEffect(() => {
+        let timer;
+        if (selectedAnswer !== null) {
+            timer = setTimeout(() => {
+                handleNextQuestion();
+            }, 5000); // Wait for 5 seconds before moving to the next question
+        }
+        return () => clearTimeout(timer);
+    }, [selectedAnswer]);
+
     const handleAnswerSelection = (answer) => {
         setSelectedAnswer(answer);
-        setIsCorrect(answer === currentQuestion.correctAnswer);
+        const correct = answer === currentQuestion.correctAnswer;
+        setIsCorrect(correct);
+        setBackgroundColor(correct ? '#00FF00' : '#FF0000'); // Green for correct, red for incorrect
     };
 
     const handleNextQuestion = () => {
         setSelectedAnswer(null);
         setIsCorrect(false);
+        setBackgroundColor('#F5FCFF'); // Reset background color
         if (currentQuestionIndex < questionsData.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
@@ -25,7 +39,7 @@ const Quiz = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor }]}>
             <View style={styles.questionContainer}>
                 <Text style={styles.questionText} accessibilityLabel={`Question: ${currentQuestion.question}`}>
                     {currentQuestion.question}
