@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, AccessibilityInfo } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router'; // Import useRouter
 
 // Example function to handle button presses
 const handleButtonPress = (action) => {
@@ -8,15 +9,14 @@ const handleButtonPress = (action) => {
 };
 
 const Progress = () => {
+    const router = useRouter(); // Initialize router
+
     return (
         <View style={styles.container}>
-            <Text style={styles.title} accessibilityRole="header">
-                Student Progress
-            </Text>
 
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => handleButtonPress('View Progress')}
+                onPress={() => router.push('/screens/Progress/ViewProgress')}
                 accessibilityLabel="View Student Progress"
                 accessibilityHint="Navigates to the page where you can view detailed student progress"
                 accessibilityRole="button"
@@ -26,12 +26,12 @@ const Progress = () => {
 
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => handleButtonPress('Add Student')}
+                onPress={() => router.push('/screens/Progress/AddProgress')} // Use router to navigate
                 accessibilityLabel="Add Student"
                 accessibilityHint="Navigates to the page where you can add new student information"
                 accessibilityRole="button"
             >
-                <Text style={styles.buttonText}>Add Student</Text>
+                <Text style={styles.buttonText}>Add Student Progress</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -50,9 +50,10 @@ const Progress = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
+        flexDirection: 'column',
+        justifyContent: 'space-around', // Space between buttons
         alignItems: 'center',
-        backgroundColor: '#FFFFFF', // High contrast background color
+        marginTop: 20,
         padding: 20,
     },
     title: {
@@ -62,12 +63,11 @@ const styles = StyleSheet.create({
         marginBottom: 40,
     },
     button: {
-        backgroundColor: '#007BFF', // High contrast button color
-        paddingVertical: 15,
-        paddingHorizontal: 30,
-        borderRadius: 10,
-        marginVertical: 10,
-        width: '80%', // Make buttons wider
+        backgroundColor: '#007BFF', // Default color, will be overridden by specific button styles
+        width: 180, // Set width and height to make the button round
+        height: 180,
+        borderRadius: 90, // Half of width/height to make it round
+        justifyContent: 'center', // Center the text vertically
         alignItems: 'center',
     },
     buttonText: {
