@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, StatusBar, FlatList, Alert, TouchableOpacity, Pressable, Dimensions } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, StatusBar, FlatList, Alert, TouchableOpacity, Pressable, Dimensions, Modal, TouchableWithoutFeedback } from 'react-native';
 import { addDoc, collection, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../../FirebaseConfig'; // Make sure FirebaseConfig is correct
 
@@ -11,6 +11,7 @@ const AddCourse = () => {
     const [level, setLevel] = useState('1');
     const [courses, setCourses] = useState([]);
     const [selectedCourseId, setSelectedCourseId] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility state
 
     // Fetch courses from Firestore
     const fetchCourses = async () => {
@@ -61,6 +62,7 @@ const AddCourse = () => {
             setSubject('');
             setLevel('1');
             setSelectedCourseId(null);
+            setIsModalVisible(false); // Close the modal
 
             // Refresh the course list
             fetchCourses();
@@ -76,19 +78,36 @@ const AddCourse = () => {
         setSubject(course.subject);
         setLevel(course.level);
         setSelectedCourseId(course.id);
+        setIsModalVisible(true); // Open modal for editing
     };
 
     // Handle course deletion
-    const handleDelete = async (id) => {
-        try {
-            await deleteDoc(doc(db, 'courses', id));
-            console.log("Course deleted successfully!");
-            Alert.alert('Success', 'Course deleted successfully!');
-            fetchCourses(); // Refresh the course list
-        } catch (error) {
-            console.error("Error deleting course:", error);
-            Alert.alert('Error', 'Failed to delete the course.');
-        }
+    const handleDelete = (id) => {
+        Alert.alert(
+            'Confirm Delete',
+            'Are you sure you want to delete this course?',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel'
+                },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            await deleteDoc(doc(db, 'courses', id));
+                            console.log("Course deleted successfully!");
+                            Alert.alert('Success', 'Course deleted successfully!');
+                            fetchCourses(); // Refresh the course list
+                        } catch (error) {
+                            console.error("Error deleting course:", error);
+                            Alert.alert('Error', 'Failed to delete the course.');
+                        }
+                    }
+                }
+            ]
+        );
     };
 
     // Clear selected course
@@ -97,6 +116,7 @@ const AddCourse = () => {
         setSubject('');
         setLevel('1');
         setSelectedCourseId(null);
+        setIsModalVisible(false); // Close the modal
     };
 
     // Horizontal level selector
@@ -117,45 +137,65 @@ const AddCourse = () => {
         <View style={styles.container}>
             <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
 
-            <View style={styles.formContainer}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Course Name"
-                    value={courseName}
-                    onChangeText={(text) => setCourseName(text)}
-                />
+            {/* Modal for adding/editing course */}
+            <Modal
+                visible={isModalVisible}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setIsModalVisible(false)}
+            >
+                <TouchableWithoutFeedback onPress={() => setIsModalVisible(false)}>
+                    <View style={styles.modalContainer}>
+                        <TouchableWithoutFeedback>
+                            <View style={styles.modalContent}>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Course Name"
+                                    value={courseName}
+                                    onChangeText={(text) => setCourseName(text)}
+                                />
 
-                <TextInput
-                    style={styles.input}
-                    placeholder="Subject"
-                    value={subject}
-                    onChangeText={(text) => setSubject(text)}
-                />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Subject"
+                                    value={subject}
+                                    onChangeText={(text) => setSubject(text)}
+                                />
 
-                <View style={styles.pickerContainer}>
-                    <Text style={styles.label}>Select Level</Text>
-                    <FlatList
-                        data={['1', '2', '3', '4', '5']}
-                        horizontal
-                        renderItem={renderLevelItem}
-                        keyExtractor={(item) => item}
-                        contentContainerStyle={styles.levelList}
-                    />
-                </View>
+                                <View style={styles.pickerContainer}>
+                                    <Text style={styles.label}>Select Level</Text>
+                                    <FlatList
+                                        data={['1', '2', '3', '4', '5']}
+                                        horizontal
+                                        renderItem={renderLevelItem}
+                                        keyExtractor={(item) => item}
+                                        contentContainerStyle={styles.levelList}
+                                    />
+                                </View>
 
-                <Button
-                    title={selectedCourseId ? "Update Course" : "Save Course"}
-                    onPress={saveCourse}
-                />
+                                <Button
+                                    title={selectedCourseId ? "Update Course" : "Save Course"}
+                                    onPress={saveCourse}
+                                />
 
-                {selectedCourseId && (
-                    <Button
-                        title="Clear"
-                        onPress={clearSelection}
-                        color="#e74c3c"
-                    />
-                )}
-            </View>
+                                {selectedCourseId && (
+                                    <Button
+                                        title="Clear"
+                                        onPress={clearSelection}
+                                        color="#e74c3c"
+                                    />
+                                )}
+
+                                <Button
+                                    title="Cancel"
+                                    onPress={() => setIsModalVisible(false)}
+                                    color="#ccc"
+                                />
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </View>
+                </TouchableWithoutFeedback>
+            </Modal>
 
             <View style={styles.listContainer}>
                 <FlatList
@@ -177,6 +217,17 @@ const AddCourse = () => {
                     )}
                 />
             </View>
+
+            {/* Floating '+' button */}
+            <TouchableOpacity
+                style={styles.floatingButton}
+                onPress={() => {
+                    clearSelection(); // Clear previous selection
+                    setIsModalVisible(true); // Show modal
+                }}
+            >
+                <Text style={styles.floatingButtonText}>+</Text>
+            </TouchableOpacity>
         </View>
     );
 };
@@ -249,11 +300,40 @@ const styles = StyleSheet.create({
         backgroundColor: '#e74c3c',
         paddingVertical: 5,
         paddingHorizontal: 10,
-        borderRadius: 5,
+        borderRadius: 20,
     },
     deleteButtonText: {
         color: '#fff',
         fontWeight: 'bold',
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    },
+    modalContent: {
+        width: width - 40,
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        elevation: 5,
+    },
+    floatingButton: {
+        position: 'absolute',
+        bottom: 40,
+        right: 40,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: '#529a25',
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+    },
+    floatingButtonText: {
+        color: '#fff',
+        fontSize: 24,
     },
 });
 
