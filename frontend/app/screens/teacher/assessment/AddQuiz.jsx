@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Switch, Button, ScrollView, Alert, TouchableOpacity, SafeAreaView } from 'react-native';
+import { collection, addDoc } from "firebase/firestore";
+import {db} from "../../../../FirebaseConfig";
 
 const AddQuiz = () => {
     const [quizName, setQuizName] = useState('');
@@ -36,7 +38,7 @@ const AddQuiz = () => {
         setQuestions(newQuestions);
     };
 
-    const handleSubmitQuiz = () => {
+    const handleSubmitQuiz = async () => {
         const incompleteQuestions = questions.some(
             (q) => q.questionText === '' || q.answers.includes('') || q.correctAnswerIndex === null
         );
@@ -46,10 +48,24 @@ const AddQuiz = () => {
             return;
         }
 
-        console.log('Quiz submitted:', { quizName, quizInstructions, questions });
-        setIsSubmitted(true);
-        Alert.alert('Quiz Submitted', 'Your quiz has been submitted successfully.');
+        const quizData = {
+            quizName,
+            quizInstructions,
+            questions,
+            createdAt: new Date(),
+        };
+
+        try {
+            const docRef = await addDoc(collection(db, 'quizzes'), quizData);
+            console.log('Quiz submitted with ID: ', docRef.id);
+            setIsSubmitted(true);
+            Alert.alert('Quiz Submitted', 'Your quiz has been submitted successfully.');
+        } catch (e) {
+            console.error('Error adding document: ', e);
+            Alert.alert('Submission Failed', 'There was an issue submitting your quiz. Please try again.');
+        }
     };
+
 
     return (
         <SafeAreaView style={styles.container}>
