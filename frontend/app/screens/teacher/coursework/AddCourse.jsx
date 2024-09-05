@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, StatusBar, FlatList, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, StatusBar, FlatList, Alert, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { BlurView } from 'expo-blur';
-import { addDoc, collection, getDocs } from 'firebase/firestore';
+import { addDoc, collection, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../../../../FirebaseConfig'; // Make sure FirebaseConfig is correct
 
 const AddCourse = () => {
@@ -10,6 +10,7 @@ const AddCourse = () => {
     const [subject, setSubject] = useState('');
     const [level, setLevel] = useState('1');
     const [courses, setCourses] = useState([]);
+    const [selectedCourseId, setSelectedCourseId] = useState(null);
 
     // Fetch courses from Firestore
     const fetchCourses = async () => {
@@ -34,18 +35,32 @@ const AddCourse = () => {
         }
 
         try {
-            await addDoc(collection(db, 'courses'), {
-                courseName,
-                subject,
-                level,
-            });
-            console.log("Course saved successfully!");
-            Alert.alert('Success', 'Course saved successfully!');
+            if (selectedCourseId) {
+                // Update existing course
+                const courseRef = doc(db, 'courses', selectedCourseId);
+                await updateDoc(courseRef, {
+                    courseName,
+                    subject,
+                    level,
+                });
+                console.log("Course updated successfully!");
+                Alert.alert('Success', 'Course updated successfully!');
+            } else {
+                // Add new course
+                await addDoc(collection(db, 'courses'), {
+                    courseName,
+                    subject,
+                    level,
+                });
+                console.log("Course saved successfully!");
+                Alert.alert('Success', 'Course saved successfully!');
+            }
 
             // Reset form
             setCourseName('');
             setSubject('');
             setLevel('1');
+            setSelectedCourseId(null);
 
             // Refresh the course list
             fetchCourses();
@@ -53,6 +68,14 @@ const AddCourse = () => {
             console.error("Error saving course:", error);
             Alert.alert('Error', 'Failed to save the course.');
         }
+    };
+
+    // Handle course selection
+    const handleCoursePress = (course) => {
+        setCourseName(course.courseName);
+        setSubject(course.subject);
+        setLevel(course.level);
+        setSelectedCourseId(course.id);
     };
 
     useEffect(() => {
@@ -93,7 +116,10 @@ const AddCourse = () => {
                     </Picker>
                 </View>
 
-                <Button title="Save Course" onPress={saveCourse} />
+                <Button
+                    title={selectedCourseId ? "Update Course" : "Save Course"}
+                    onPress={saveCourse}
+                />
             </View>
 
             <View style={styles.listContainer}>
@@ -101,11 +127,13 @@ const AddCourse = () => {
                     data={courses}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
-                        <View style={styles.courseItem}>
-                            <Text style={styles.courseText}>Course Name: {item.courseName}</Text>
-                            <Text style={styles.courseText}>Subject: {item.subject}</Text>
-                            <Text style={styles.courseText}>Level: {item.level}</Text>
-                        </View>
+                        <TouchableOpacity onPress={() => handleCoursePress(item)}>
+                            <View style={styles.courseItem}>
+                                <Text style={styles.courseText}>Course Name: {item.courseName}</Text>
+                                <Text style={styles.courseText}>Subject: {item.subject}</Text>
+                                <Text style={styles.courseText}>Level: {item.level}</Text>
+                            </View>
+                        </TouchableOpacity>
                     )}
                 />
             </View>
