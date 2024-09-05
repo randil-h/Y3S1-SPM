@@ -20,20 +20,17 @@ const ViewProgress = () => {
         }
     };
 
-    // Use useFocusEffect to re-fetch data whenever the screen is focused
     useFocusEffect(
         useCallback(() => {
             fetchData();
         }, [])
     );
 
-    // Function to delete a document
     const handleDelete = async (id) => {
         try {
             const progressDocRef = doc(db, 'progress', id);
             await deleteDoc(progressDocRef);
             Alert.alert('Success', 'Progress deleted successfully');
-            // Refresh the list after deletion
             setProgressData(progressData.filter(item => item.id !== id));
         } catch (error) {
             Alert.alert('Error', 'Failed to delete progress');
@@ -41,22 +38,11 @@ const ViewProgress = () => {
         }
     };
 
-    // Function to navigate to the update screen with the selected progress data
     const handleUpdate = (item) => {
+        console.log('Navigating to update progress with ID:', item.id);
         router.push({
             pathname: '/screens/Progress/UpdateProgress',
-            params: {
-                id: item.id,
-                studentName: item.studentName,
-                studentID: item.studentID,
-                studentClass: item.studentClass,
-                maths: item.maths,
-                english: item.english,
-                geography: item.geography,
-                hist: item.hist,
-                science: item.science,
-                courseworkProgress: item.courseworkProgress
-            }
+            params: { id: item.id }
         });
     };
 
@@ -78,11 +64,10 @@ const ViewProgress = () => {
                         <Text>Science Marks: {item.science}</Text>
                         <Text>Coursework Progress: {item.courseworkProgress}</Text>
 
-                        {/* Update and Delete buttons */}
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
                                 style={[styles.roundButton, styles.updateButton]}
-                                onPress={handleUpdate}
+                                onPress={() => handleUpdate(item)}
                             >
                                 <Text style={styles.buttonText}>Update</Text>
                             </TouchableOpacity>
@@ -93,7 +78,6 @@ const ViewProgress = () => {
                             >
                                 <Text style={styles.buttonText}>Delete</Text>
                             </TouchableOpacity>
-
                         </View>
                     </View>
                 )}

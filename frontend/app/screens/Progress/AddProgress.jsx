@@ -5,7 +5,6 @@ import { Picker } from '@react-native-picker/picker';
 import { collection, addDoc } from "firebase/firestore";
 import {db} from "../../../FirebaseConfig"; // Import from Firebase Firestore
 
-
 const AddProgress = () => {
     const [studentName, setStudentName] = useState('');
     const [studentID, setStudentID] = useState('');
@@ -42,107 +41,113 @@ const AddProgress = () => {
                 createdAt: new Date(),
             });
             console.log('Document written with ID: ', docRef.id);
-            Alert.alert('Success', `Student ${studentName}'s progress added successfully`);
+            Alert.alert('Success', `Student ${studentName}'s progress added successfully. Document ID: ${docRef.id}`);
+
+            // Navigate back to the previous screen
+            console.log('Navigating back...');
             router.back();
         } catch (error) {
             console.error('Error adding document: ', error);
-            Alert.alert('Error', 'Failed to add progress');
+            Alert.alert('Error', 'Failed to add progress: ' + error.message);
         }
     };
 
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.formContainer}>
-            <Text style={styles.formTitle}>Add Student Progress</Text>
-            <Text style={styles.pickerLabel}>Student Name</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Student Name"
-                value={studentName}
-                onChangeText={setStudentName}
-            />
-            <Text style={styles.pickerLabel}>Student ID</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Student ID"
-                value={studentID}
-                onChangeText={setStudentID}
-            />
-            <Text style={styles.pickerLabel}>Student's Class</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Student Class"
-                value={studentClass}
-                onChangeText={setStudentClass}
-            />
-            <Text style={styles.pickerLabel}>Grades</Text>
-            <View style={styles.inputContainer}>
-                <View style={styles.inputGroupLeft}>
-                    <TextInput
-                        style={styles.inputLarge}
-                        placeholder="Maths"
-                        keyboardType="numeric"
-                        value={maths}
-                        onChangeText={setMaths}
-                    />
-                    <TextInput
-                        style={styles.inputLarge}
-                        placeholder="English"
-                        keyboardType="numeric"
-                        value={english}
-                        onChangeText={setEnglish}
-                    />
-                    <TextInput
-                        style={styles.inputLarge}
-                        placeholder="Geography"
-                        keyboardType="numeric"
-                        value={geography}
-                        onChangeText={setGeography}
-                    />
-                </View>
-                <View style={styles.inputGroupRight}>
-                    <TextInput
-                        style={styles.inputSmall}
-                        placeholder="History"
-                        keyboardType="numeric"
-                        value={hist}
-                        onChangeText={setHistory}
-                    />
-                    <TextInput
-                        style={styles.inputSmall}
-                        placeholder="Science"
-                        keyboardType="numeric"
-                        value={science}
-                        onChangeText={setScience}
-                    />
-                </View>
-            </View>
-            <View style={styles.pickerContainer}>
-                <Text style={styles.pickerLabel}>Coursework Progress</Text>
-                <Picker
-                    selectedValue={courseworkProgress}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setCourseworkProgress(itemValue)}
-                >
-                    <Picker.Item label="Excellent" value="excellent" />
-                    <Picker.Item label="Good" value="good" />
-                    <Picker.Item label="Average" value="average" />
-                    <Picker.Item label="Need Improvement" value="need_improvement" />
-                </Picker>
-            </View>
+            <View style={styles.formContainer}>
+                <Text style={styles.formTitle}>Add Student Progress</Text>
 
-            {/* Container for buttons */}
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.roundButton} onPress={handleSubmit}>
-                    <Text style={styles.buttonText}>Submit</Text>
-                </TouchableOpacity>
+                {/* Input fields */}
+                <TextInput
+                    style={styles.input}
+                    placeholder="Student Name"
+                    value={studentName}
+                    onChangeText={setStudentName}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Student ID"
+                    value={studentID}
+                    onChangeText={setStudentID}
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Student Class"
+                    value={studentClass}
+                    onChangeText={setStudentClass}
+                />
 
-                <TouchableOpacity style={styles.roundButton} onPress={() => router.back()}>
-                    <Text style={styles.buttonText}>Close</Text>
-                </TouchableOpacity>
+                {/* Grades */}
+                <Text style={styles.pickerLabel}>Grades</Text>
+                <View style={styles.inputContainer}>
+                    <View style={styles.inputGroupLeft}>
+                        <TextInput
+                            style={styles.inputLarge}
+                            placeholder="Maths"
+                            keyboardType="numeric"
+                            value={maths}
+                            onChangeText={setMaths}
+                        />
+                        <TextInput
+                            style={styles.inputLarge}
+                            placeholder="English"
+                            keyboardType="numeric"
+                            value={english}
+                            onChangeText={setEnglish}
+                        />
+                        <TextInput
+                            style={styles.inputLarge}
+                            placeholder="Geography"
+                            keyboardType="numeric"
+                            value={geography}
+                            onChangeText={setGeography}
+                        />
+                    </View>
+                    <View style={styles.inputGroupRight}>
+                        <TextInput
+                            style={styles.inputSmall}
+                            placeholder="History"
+                            keyboardType="numeric"
+                            value={hist}
+                            onChangeText={setHistory}
+                        />
+                        <TextInput
+                            style={styles.inputSmall}
+                            placeholder="Science"
+                            keyboardType="numeric"
+                            value={science}
+                            onChangeText={setScience}
+                        />
+                    </View>
+                </View>
+
+                {/* Coursework Progress */}
+                <View style={styles.pickerContainer}>
+                    <Text style={styles.pickerLabel}>Coursework Progress</Text>
+                    <Picker
+                        selectedValue={courseworkProgress}
+                        style={styles.picker}
+                        onValueChange={(itemValue) => setCourseworkProgress(itemValue)}
+                    >
+                        <Picker.Item label="Excellent" value="excellent" />
+                        <Picker.Item label="Good" value="good" />
+                        <Picker.Item label="Average" value="average" />
+                        <Picker.Item label="Need Improvement" value="need_improvement" />
+                    </Picker>
+                </View>
+
+                {/* Buttons */}
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.roundButton} onPress={handleSubmit}>
+                        <Text style={styles.buttonText}>Submit</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.roundButton} onPress={() => router.back()}>
+                        <Text style={styles.buttonText}>Close</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-        </View>
-</ScrollView>
+        </ScrollView>
     );
 };
 
