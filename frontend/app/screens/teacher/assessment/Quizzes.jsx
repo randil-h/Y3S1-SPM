@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, Modal, TextInput, Button, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, Modal, ScrollView } from 'react-native';
 import { useNavigation, useRouter } from 'expo-router';
-import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../../../FirebaseConfig';
 
 const QuizPage = () => {
@@ -9,11 +9,6 @@ const QuizPage = () => {
     const [quizzes, setQuizzes] = useState([]);
     const [selectedQuiz, setSelectedQuiz] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [newQuizName, setNewQuizName] = useState('');
-    const [quizInstructions, setQuizInstructions] = useState('');
-    const [questions, setQuestions] = useState([]);
-    const [newQuestion, setNewQuestion] = useState('');
-    const [newAnswer, setNewAnswer] = useState('');
     const navigation = useNavigation();
 
     useLayoutEffect(() => {
@@ -67,43 +62,12 @@ const QuizPage = () => {
         );
     };
 
-    const handleEdit = async () => {
-        if (selectedQuiz && newQuizName.trim() && quizInstructions.trim() && questions.length > 0) {
-            try {
-                await updateDoc(doc(db, 'quizzes', selectedQuiz.id), {
-                    quizName: newQuizName,
-                    quizInstructions: quizInstructions,
-                    questions: questions,
-                });
-                setQuizzes((prevQuizzes) =>
-                    prevQuizzes.map((quiz) =>
-                        quiz.id === selectedQuiz.id ? { ...quiz, quizName: newQuizName, quizInstructions, questions } : quiz
-                    )
-                );
-                setIsModalVisible(false);
-            } catch (error) {
-                console.error('Error updating quiz: ', error);
-            }
-        }
-    };
-
-    const addQuestion = () => {
-        if (newQuestion.trim() && newAnswer.trim()) {
-            setQuestions([...questions, { question: newQuestion, answer: newAnswer }]);
-            setNewQuestion('');
-            setNewAnswer('');
-        }
-    };
-
     const renderQuizItem = ({ item }) => (
         <View style={styles.quizItemContainer}>
             <TouchableOpacity
                 style={styles.quizItem}
                 onPress={() => {
                     setSelectedQuiz(item);
-                    setNewQuizName(item.quizName);
-                    setQuizInstructions(item.quizInstructions || '');
-                    setQuestions(item.questions || []);
                     setIsModalVisible(true);
                 }}
             >
@@ -116,6 +80,43 @@ const QuizPage = () => {
                 <Text style={styles.deleteButtonText}>Delete</Text>
             </TouchableOpacity>
         </View>
+    );
+
+    const renderQuizModal = () => (
+        <Modal
+            visible={isModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setIsModalVisible(false)}
+        >
+            <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                    <ScrollView contentContainerStyle={styles.modalScrollContent}>
+                        <Text style={styles.modalTitle}>{selectedQuiz?.quizName}</Text>
+                        <Text style={styles.quizInstructions}>{selectedQuiz?.quizInstructions}</Text>
+                        {selectedQuiz?.questions.map((question, index) => (
+                            <View key={index} style={styles.questionContainer}>
+                                <Text style={styles.questionText}>Question {index + 1}: {question.questionText}</Text>
+                                {question.answers.map((answer, answerIndex) => (
+                                    <Text key={answerIndex} style={[
+                                        styles.answerText,
+                                        answerIndex === question.correctAnswerIndex ? styles.correctAnswer : null
+                                    ]}>
+                                        {answerIndex + 1}. {answer}
+                                    </Text>
+                                ))}
+                            </View>
+                        ))}
+                    </ScrollView>
+                    <TouchableOpacity
+                        style={styles.closeButton}
+                        onPress={() => setIsModalVisible(false)}
+                    >
+                        <Text style={styles.closeButtonText}>Close</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </Modal>
     );
 
     return (
@@ -132,7 +133,7 @@ const QuizPage = () => {
             >
                 <Text style={styles.buttonText}>Add Quiz</Text>
             </TouchableOpacity>
-
+            {renderQuizModal()}
         </View>
     );
 };
@@ -194,51 +195,55 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     modalContent: {
-        width: '80%',
+        width: '90%',
+        maxHeight: '80%',
         padding: 20,
         backgroundColor: 'white',
         borderRadius: 10,
-        alignItems: 'center',
+    },
+    modalScrollContent: {
+        paddingBottom: 20,
     },
     modalTitle: {
-        fontSize: 18,
+        fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 15,
-    },
-    subTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        marginVertical: 10,
-    },
-    quizTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        marginVertical: 5,
-    },
-    quizName: {
-        fontSize: 16,
-        marginBottom: 10,
+        textAlign: 'center',
     },
     quizInstructions: {
         fontSize: 16,
         marginBottom: 20,
+        fontStyle: 'italic',
     },
     questionContainer: {
-        marginBottom: 10,
+        marginBottom: 20,
     },
     questionText: {
-        fontSize: 16,
-        fontWeight: '500',
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 10,
     },
     answerText: {
-        fontSize: 14,
-        color: 'grey',
+        fontSize: 16,
+        marginLeft: 10,
+        marginBottom: 5,
     },
-    modalButtons: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        width: '100%',
-        marginTop: 15,
+    correctAnswer: {
+        color: 'green',
+        fontWeight: 'bold',
+    },
+    closeButton: {
+        backgroundColor: '#1e90ff',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        alignSelf: 'center',
+        marginTop: 20,
+    },
+    closeButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
     },
 });
 
