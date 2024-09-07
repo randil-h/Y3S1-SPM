@@ -51,9 +51,52 @@ const Home = () => {
                         </View>
                     </View>
                 </View>
+
+                {/* Card-like boxes */}
+                <View style={{ paddingHorizontal: 24 }}>
+                    <View style={styles.card}>
+                        <Text style={styles.cardTitle}>User Guide</Text>
+                        <Text style={styles.cardText}>Guidelines for using this app</Text>
+                    </View>
+                    <View style={styles.card}>
+                        <Text style={styles.cardTitle}>Accessibility</Text>
+                        <Text style={styles.cardText}>User accessibility features</Text>
+                    </View>
+                    <View style={styles.card}>
+                        <Text style={styles.cardTitle}>Settings</Text>
+                    </View>
+                </View>
             </ScrollView>
         </View>
     );
 }
+
+const styles = {
+    card: {
+        backgroundColor: '#fff',
+        borderRadius: 25,
+        paddingHorizontal: 20,
+        paddingVertical: 70,
+        marginBottom: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 3, // For Android shadow
+        alignItems: 'center', // Horizontally center the text
+        justifyContent: 'center', // Vertically center the text
+    },
+    cardTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 8,
+        textAlign: 'center', // Ensure the text is centered
+    },
+    cardText: {
+        fontSize: 14,
+        color: '#666',
+        textAlign: 'center', // Ensure the text is centered
+    },
+};
 
 export default Home;

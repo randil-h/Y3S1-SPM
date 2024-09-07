@@ -175,24 +175,26 @@ const AddCourse = () => {
                                     />
                                 </View>
 
-                                <Button
-                                    title={selectedCourseId ? "Update Course" : "Save Course"}
-                                    onPress={saveCourse}
-                                />
-
-                                {selectedCourseId && (
+                                <View style={styles.buttonRow}>
                                     <Button
-                                        title="Clear"
-                                        onPress={clearSelection}
-                                        color="#e74c3c"
+                                        title={selectedCourseId ? "Update Course" : "Save Course"}
+                                        onPress={saveCourse}
                                     />
-                                )}
 
-                                <Button
-                                    title="Cancel"
-                                    onPress={() => setIsModalVisible(false)}
-                                    color="#ccc"
-                                />
+                                    {selectedCourseId && (
+                                        <Button
+                                            title="Clear"
+                                            onPress={clearSelection}
+                                            color="#e74c3c"
+                                        />
+                                    )}
+
+                                    <Button
+                                        title="Cancel"
+                                        onPress={() => setIsModalVisible(false)}
+                                        color="#ccc"
+                                    />
+                                </View>
                             </View>
                         </TouchableWithoutFeedback>
                     </View>
@@ -336,6 +338,11 @@ const styles = StyleSheet.create({
     floatingButtonText: {
         color: '#fff',
         fontSize: 24,
+    },
+    buttonRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between', // Adjusts space between buttons
+        marginTop: 10, // Add some space above the buttons
     },
 });
 
