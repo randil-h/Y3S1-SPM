@@ -118,20 +118,20 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     roundButton: {
-        width: 100, // Width and height to make the button round
+        width: 100,
         height: 60,
-        borderRadius: 15, // Half of width/height to make it round
-        justifyContent: 'center', // Center text vertically
-        alignItems: 'center', // Center text horizontally
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     updateButton: {
-        backgroundColor: '#80AF81', // Green for Update
+        backgroundColor: '#80AF81',
     },
     closeButton: {
-        backgroundColor: '#F44336', // Red for Close
+        backgroundColor: '#F44336',
     },
     deleteButton: {
-        backgroundColor: '#FF5722', // Orange for Delete
+        backgroundColor: '#FF5722',
     },
     buttonText: {
         color: '#fff',

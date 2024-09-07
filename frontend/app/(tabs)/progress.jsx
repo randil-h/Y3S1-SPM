@@ -2,10 +2,10 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router'; // Import useRouter
 
-// Example function to handle button presses
+
 const handleButtonPress = (action) => {
     console.log(`${action} button pressed`);
-    // Implement navigation or other actions based on the button pressed
+
 };
 
 const Progress = () => {
@@ -26,7 +26,7 @@ const Progress = () => {
 
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => router.push('/screens/Progress/AddProgress')} // Use router to navigate
+                onPress={() => router.push('/screens/Progress/AddProgress')}
                 accessibilityLabel="Add Student"
                 accessibilityHint="Navigates to the page where you can add new student information"
                 accessibilityRole="button"
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#000000', // High contrast text color
+        color: '#000000',
         marginBottom: 40,
     },
     button: {
