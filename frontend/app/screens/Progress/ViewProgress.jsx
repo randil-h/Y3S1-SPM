@@ -119,13 +119,13 @@ const styles = StyleSheet.create({
     },
     roundButton: {
         width: 100, // Width and height to make the button round
-        height: 100,
-        borderRadius: 50, // Half of width/height to make it round
+        height: 60,
+        borderRadius: 15, // Half of width/height to make it round
         justifyContent: 'center', // Center text vertically
         alignItems: 'center', // Center text horizontally
     },
     updateButton: {
-        backgroundColor: '#4CAF50', // Green for Update
+        backgroundColor: '#80AF81', // Green for Update
     },
     closeButton: {
         backgroundColor: '#F44336', // Red for Close

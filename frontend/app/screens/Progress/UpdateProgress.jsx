@@ -224,13 +224,13 @@ const styles = StyleSheet.create({
     },
     roundButton: {
         width: 100,
-        height: 100,
-        borderRadius: 50,
+        height: 60,
+        borderRadius:15,
         justifyContent: 'center',
         alignItems: 'center',
     },
     updateButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#80AF81',
     },
     closeButton: {
         backgroundColor: '#F44336',

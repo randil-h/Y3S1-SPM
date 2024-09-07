@@ -56,6 +56,7 @@ const AddProgress = () => {
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.formContainer}>
                 <Text style={styles.formTitle}>Add Student Progress</Text>
+                <Text style={styles.pickerLabel}>Student Details</Text>
 
                 {/* Input fields */}
                 <TextInput
@@ -142,7 +143,7 @@ const AddProgress = () => {
                         <Text style={styles.buttonText}>Submit</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.roundButton} onPress={() => router.back()}>
+                    <TouchableOpacity style={styles.roundButton2} onPress={() => router.back()}>
                         <Text style={styles.buttonText}>Close</Text>
                     </TouchableOpacity>
                 </View>
@@ -229,12 +230,20 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     roundButton: {
-        backgroundColor: '#007BFF', // Change to your desired color
-        width: 120, // Set width and height to make the button round
-        height: 120,
-        borderRadius: 60, // Half of width/height to make it round
-        justifyContent: 'center', // Center the text vertically
-        alignItems: 'center', // Center the text horizontally
+        backgroundColor: '#80AF81',
+        width: 120,
+        height: 60,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    roundButton2: {
+        backgroundColor: '#F44336',
+        width: 120,
+        height: 60,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     buttonText: {
         color: '#fff',
