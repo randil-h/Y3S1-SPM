@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, StatusBar, FlatList, Alert, TouchableOpacity, Pressable, Dimensions, Modal, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, StyleSheet, StatusBar, FlatList, Alert, TouchableOpacity, Pressable, Dimensions, Modal, TouchableWithoutFeedback } from 'react-native';
 import { addDoc, collection, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
-import { db } from '../../../../FirebaseConfig'; // Make sure FirebaseConfig is correct
+import { db } from '../../../../FirebaseConfig'; // Ensure FirebaseConfig is correct
 
 const { width } = Dimensions.get('window'); // Get screen width for horizontal layout
 
@@ -176,24 +176,28 @@ const AddCourse = () => {
                                 </View>
 
                                 <View style={styles.buttonRow}>
-                                    <Button
-                                        title={selectedCourseId ? "Update Course" : "Save Course"}
+                                    <TouchableOpacity
+                                        style={styles.saveButton}
                                         onPress={saveCourse}
-                                    />
+                                    >
+                                        <Text style={styles.buttonText}>{selectedCourseId ? "Update " : "Save Course"}</Text>
+                                    </TouchableOpacity>
 
                                     {selectedCourseId && (
-                                        <Button
-                                            title="Clear"
+                                        <TouchableOpacity
+                                            style={styles.clearButton}
                                             onPress={clearSelection}
-                                            color="#e74c3c"
-                                        />
+                                        >
+                                            <Text style={styles.clearButtonText}>×</Text>
+                                        </TouchableOpacity>
                                     )}
 
-                                    <Button
-                                        title="Cancel"
+                                    <TouchableOpacity
+                                        style={[styles.saveButton, { backgroundColor: '#ccc' }]}
                                         onPress={() => setIsModalVisible(false)}
-                                        color="#ccc"
-                                    />
+                                    >
+                                        <Text style={styles.buttonText}>Cancel</Text>
+                                    </TouchableOpacity>
                                 </View>
                             </View>
                         </TouchableWithoutFeedback>
@@ -241,11 +245,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F5FCFF',
     },
-    formContainer: {
-        paddingTop: 30,
-        paddingHorizontal: 20,
-        backgroundColor: '#efefef',
-    },
     input: {
         width: '100%',
         height: 40,
@@ -287,7 +286,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         padding: 15,
         marginBottom: 10,
-        borderRadius: 10,
+        borderRadius: 15,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -343,6 +342,34 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between', // Adjusts space between buttons
         marginTop: 10, // Add some space above the buttons
+    },
+    saveButton: {
+        flex: 1,
+        backgroundColor: '#007BFF',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 30,
+        marginRight: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    clearButton: {
+        backgroundColor: '#e74c3c',
+        width: 40,
+        height: 40,
+        marginRight: 10,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    clearButtonText: {
+        color: '#fff',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    buttonText: {
+        color: '#fff',
+        fontWeight: 'bold',
     },
 });
 
