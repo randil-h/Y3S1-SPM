@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView, State, TapGestureHandler } from 'react-native-gesture-handler';
+import Tts from 'react-native-tts';
 import questionsData from '../../assets/quiz/questions.json';
 
 const Quiz = () => {
@@ -12,6 +13,19 @@ const Quiz = () => {
     const [tapTimeout, setTapTimeout] = useState(null);
 
     const currentQuestion = questionsData[currentQuestionIndex];
+
+    useEffect(() => {
+        Tts.setDefaultLanguage('en-US');
+        Tts.setDefaultRate(0.5);
+
+        return () => {
+            Tts.stop();
+        };
+    }, []);
+
+    useEffect(() => {
+        readQuestionAndAnswers();
+    }, [currentQuestionIndex]);
 
     useEffect(() => {
         let timer;
@@ -27,17 +41,31 @@ const Quiz = () => {
         setSelectedAnswer(answer);
         const correct = answer === currentQuestion.correctAnswer;
         setIsCorrect(correct);
-        setBackgroundColor(correct ? '#00FF00' : '#FF0000'); // Green for correct, red for incorrect
+        setBackgroundColor(correct ? '#00FF00' : '#FF0000');
+
+        // Read out if the answer is correct or incorrect
+        Tts.speak(correct ? 'Correct!' : 'Incorrect. Try again.');
+    };
+
+    const readQuestionAndAnswers = () => {
+        const textToRead = `${currentQuestion.question}. 
+            Answer 1: ${currentQuestion.answers[0]}. 
+            Answer 2: ${currentQuestion.answers[1]}. 
+            Answer 3: ${currentQuestion.answers[2]}. 
+            Answer 4: ${currentQuestion.answers[3]}.`;
+
+        Tts.speak(textToRead);
     };
 
     const handleNextQuestion = () => {
         setSelectedAnswer(null);
         setIsCorrect(false);
         setTapCount(0);
-        setBackgroundColor('#F5FCFF'); // Reset background color
+        setBackgroundColor('#F5FCFF');
         if (currentQuestionIndex < questionsData.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
+            Tts.speak('Quiz Completed');
             alert('Quiz Completed');
         }
     };
