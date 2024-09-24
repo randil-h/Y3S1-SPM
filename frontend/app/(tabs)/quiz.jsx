@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView, State, TapGestureHandler } from 'react-native-gesture-handler';
 import Tts from 'react-native-tts';
 import questionsData from '../../assets/quiz/questions.json';
+import * as Speech from "expo-speech";
 
 const Quiz = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -15,11 +16,8 @@ const Quiz = () => {
     const currentQuestion = questionsData[currentQuestionIndex];
 
     useEffect(() => {
-        Tts.setDefaultLanguage('en-US');
-        Tts.setDefaultRate(0.5);
-
         return () => {
-            Tts.stop();
+            Speech.stop();  // Stop any ongoing speech when the component unmounts
         };
     }, []);
 
@@ -44,7 +42,7 @@ const Quiz = () => {
         setBackgroundColor(correct ? '#00FF00' : '#FF0000');
 
         // Read out if the answer is correct or incorrect
-        Tts.speak(correct ? 'Correct!' : 'Incorrect. Try again.');
+        Speech.speak(correct ? 'Correct!' : 'Incorrect. Try again.');
     };
 
     const readQuestionAndAnswers = () => {
@@ -54,7 +52,7 @@ const Quiz = () => {
             Answer 3: ${currentQuestion.answers[2]}. 
             Answer 4: ${currentQuestion.answers[3]}.`;
 
-        Tts.speak(textToRead);
+        Speech.speak(textToRead);
     };
 
     const handleNextQuestion = () => {
@@ -65,7 +63,7 @@ const Quiz = () => {
         if (currentQuestionIndex < questionsData.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
-            Tts.speak('Quiz Completed');
+            Speech.speak('Quiz Completed');
             alert('Quiz Completed');
         }
     };
