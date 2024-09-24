@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView, State, TapGestureHandler } from 'react-native-gesture-handler';
-import Tts from 'react-native-tts';
 import questionsData from '../../assets/quiz/questions.json';
 import * as Speech from "expo-speech";
 
@@ -152,7 +151,7 @@ const styles = StyleSheet.create({
     },
     questionContainer: {
         position: 'absolute',
-        top: '40%',
+        top: '50%',
         left: 0,
         right: 0,
         alignItems: 'center',
@@ -190,25 +189,25 @@ const styles = StyleSheet.create({
     topLeft: {
         position: 'absolute',
         top: 50,
-        left: 20,
+        left: 0,
         backgroundColor: '#FF0000',
     },
     topRight: {
         position: 'absolute',
         top: 50,
-        right: 20,
+        right: 0,
         backgroundColor: '#478747',
     },
     bottomLeft: {
         position: 'absolute',
-        bottom: 120,
-        left: 20,
+        bottom: 20,
+        left: 0,
         backgroundColor: '#0000FF',
     },
     bottomRight: {
         position: 'absolute',
-        bottom: 120,
-        right: 20,
+        bottom: 20,
+        right: 0,
         backgroundColor: '#000000',
     },
     nextButton: {
