@@ -1,17 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import {GestureHandlerRootView, State, TapGestureHandler} from 'react-native-gesture-handler';
+import { GestureHandlerRootView, State, TapGestureHandler } from 'react-native-gesture-handler';
+import Tts from 'react-native-tts';
 import questionsData from '../../assets/quiz/questions.json';
 
 const Quiz = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [isCorrect, setIsCorrect] = useState(false);
-    const [backgroundColor, setBackgroundColor] = useState('#F5FCFF'); // Default background color
+    const [backgroundColor, setBackgroundColor] = useState('#F5FCFF');
     const [tapCount, setTapCount] = useState(0);
-    const [tapTimeout, setTapTimeOut] = useState(null);
+    const [tapTimeout, setTapTimeout] = useState(null);
 
     const currentQuestion = questionsData[currentQuestionIndex];
+
+    useEffect(() => {
+        Tts.setDefaultLanguage('en-US');
+        Tts.setDefaultRate(0.5);
+
+        return () => {
+            Tts.stop();
+        };
+    }, []);
+
+    useEffect(() => {
+        readQuestionAndAnswers();
+    }, [currentQuestionIndex]);
 
     useEffect(() => {
         let timer;
@@ -27,24 +41,32 @@ const Quiz = () => {
         setSelectedAnswer(answer);
         const correct = answer === currentQuestion.correctAnswer;
         setIsCorrect(correct);
-        setBackgroundColor(correct ? '#00FF00' : '#FF0000'); // Green for correct, red for incorrect
+        setBackgroundColor(correct ? '#00FF00' : '#FF0000');
+
+        // Read out if the answer is correct or incorrect
+        Tts.speak(correct ? 'Correct!' : 'Incorrect. Try again.');
+    };
+
+    const readQuestionAndAnswers = () => {
+        const textToRead = `${currentQuestion.question}. 
+            Answer 1: ${currentQuestion.answers[0]}. 
+            Answer 2: ${currentQuestion.answers[1]}. 
+            Answer 3: ${currentQuestion.answers[2]}. 
+            Answer 4: ${currentQuestion.answers[3]}.`;
+
+        Tts.speak(textToRead);
     };
 
     const handleNextQuestion = () => {
         setSelectedAnswer(null);
         setIsCorrect(false);
         setTapCount(0);
-        setBackgroundColor('#F5FCFF'); // Reset background color
+        setBackgroundColor('#F5FCFF');
         if (currentQuestionIndex < questionsData.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
+            Tts.speak('Quiz Completed');
             alert('Quiz Completed');
-        }
-    };
-
-    const handleFingerCount = (fingerCount) => {
-        if(fingerCount >= 1 && fingerCount <= 4) {
-            handleAnswerSelection(currentQuestion.answers[fingerCount - 1]);
         }
     };
 
@@ -57,8 +79,7 @@ const Quiz = () => {
 
             // Increment tap count
             const newTapCount = tapCount + 1;
-            setTapCount(newTapCount
-            );
+            setTapCount(newTapCount);
 
             // Set a timeout to finalize the selection after a short delay
             const timeout = setTimeout(() => {
@@ -68,23 +89,18 @@ const Quiz = () => {
 
                 // Reset tap count after the selection is made
                 setTapCount(0);
-            }, 1500); // 300ms delay to wait for additional taps
+            }, 500); // Short delay to wait for additional taps (adjusted to 500ms)
 
             // Save the timeout so we can clear it on subsequent taps
-            setTapTimeOut(timeout);
+            setTapTimeout(timeout);
         }
     };
 
     return (
         <GestureHandlerRootView style={[styles.container, { backgroundColor }]}>
-            <TapGestureHandler
-                onHandlerStateChange={handleTap}
-                numberOfTaps={1} // Detect up to 4 taps
-            >
+            <TapGestureHandler onHandlerStateChange={handleTap}>
                 <View style={styles.questionContainer}>
-                    <Text style={styles.questionText}>
-                        {currentQuestion.question}
-                    </Text>
+                    <Text style={styles.questionText}>{currentQuestion.question}</Text>
                 </View>
             </TapGestureHandler>
 
@@ -155,7 +171,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     answerButton: {
-        width: 150, // Larger button size
+        width: 150,
         height: 150,
         justifyContent: 'center',
         alignItems: 'center',
@@ -177,25 +193,25 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 50,
         left: 20,
-        backgroundColor: '#FF0000', // Red
+        backgroundColor: '#FF0000',
     },
     topRight: {
         position: 'absolute',
         top: 50,
         right: 20,
-        backgroundColor: '#478747', // Green
+        backgroundColor: '#478747',
     },
     bottomLeft: {
         position: 'absolute',
         bottom: 120,
         left: 20,
-        backgroundColor: '#0000FF', // Blue
+        backgroundColor: '#0000FF',
     },
     bottomRight: {
         position: 'absolute',
         bottom: 120,
         right: 20,
-        backgroundColor: '#000000', // Black
+        backgroundColor: '#000000',
     },
     nextButton: {
         position: 'absolute',

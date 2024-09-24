@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getAuth } from "firebase/auth";  // Import for Authentication
-import { getFirestore } from "firebase/firestore";  // Import for Firestore
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 import {firebase} from "@react-native-firebase/firestore";
 // Your web app's Firebase configuration
 const firebaseConfig = {

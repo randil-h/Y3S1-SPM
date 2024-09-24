@@ -17,7 +17,7 @@ const Progress = () => {
             <TouchableOpacity
                 style={styles.button}
                 onPress={() => router.push('/screens/Progress/ViewProgress')}
-                accessibilityLabel="View Student Progress"
+                accessibilityLabel="View Progress"
                 accessibilityHint="Navigates to the page where you can view detailed student progress"
                 accessibilityRole="button"
             >
@@ -63,16 +63,16 @@ const styles = StyleSheet.create({
         marginBottom: 40,
     },
     button: {
-        backgroundColor: '#007BFF', // Default color, will be overridden by specific button styles
-        width: 180, // Set width and height to make the button round
+        backgroundColor: '#80AF81',
+        width: 180,
         height: 180,
-        borderRadius: 90, // Half of width/height to make it round
-        justifyContent: 'center', // Center the text vertically
+        borderRadius: 90,
+        justifyContent: 'center',
         alignItems: 'center',
     },
     buttonText: {
         fontSize: 18,
-        color: '#FFFFFF', // High contrast text color
+        color: '#fff',
     },
 });
 

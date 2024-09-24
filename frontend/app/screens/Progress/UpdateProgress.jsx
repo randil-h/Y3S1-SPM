@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from "../../../FirebaseConfig";
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { db } from '../../../FirebaseConfig'; // Ensure the path to your Firebase config is correct
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
 const UpdateProgress = () => {
     const router = useRouter();
     const params = useLocalSearchParams();
+    console.log('Received params:', params);
+
     const [progressData, setProgressData] = useState({
         id: '',
         studentName: '',
@@ -21,23 +23,44 @@ const UpdateProgress = () => {
     });
 
     useEffect(() => {
-        if (params && params.id && params.id !== progressData.id) {
-            setProgressData({
-                id: params.id || '',
-                studentName: params.studentName || '',
-                studentID: params.studentID || '',
-                studentClass: params.studentClass || '',
-                maths: params.maths || '',
-                english: params.english || '',
-                geography: params.geography || '',
-                hist: params.hist || '',
-                science: params.science || '',
-                courseworkProgress: params.courseworkProgress || '',
-            });
-        }
-    }, [params]);
+        console.log('Params in useEffect:', params);
+        console.log('ID from params:', params?.id);
+
+        const fetchData = async () => {
+            if (params?.id) {
+                try {
+                    console.log('Fetching document with ID:', params.id);
+                    const docRef = doc(db, 'progress', params.id);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        setProgressData({ id: params.id, ...docSnap.data() });
+                        console.log('Document data:', docSnap.data());
+                    } else {
+                        console.log('No such document!');
+                        Alert.alert('Error', 'No such document!');
+                    }
+                } catch (error) {
+                    console.error('Error fetching document: ', error);
+                    Alert.alert('Error', 'Failed to fetch progress data');
+                }
+            } else {
+                console.log('No ID found in params');
+                Alert.alert('Error', 'No document ID found');
+            }
+        };
+
+        fetchData();
+    }, [params?.id]);
 
     const handleUpdate = async () => {
+        console.log('Update initiated. Document ID:', progressData.id);
+        if (!progressData.id) {
+            console.log('No ID found in progressData');
+            Alert.alert('Error', 'No document ID found');
+            return;
+        }
+
         try {
             const progressDocRef = doc(db, 'progress', progressData.id);
             await updateDoc(progressDocRef, {
@@ -51,11 +74,12 @@ const UpdateProgress = () => {
                 science: progressData.science,
                 courseworkProgress: progressData.courseworkProgress,
             });
+            console.log('Document successfully updated');
             Alert.alert('Success', 'Progress updated successfully');
-            router.back(); // Navigate back to the ViewProgress screen
+            router.back();
         } catch (error) {
-            Alert.alert('Error', 'Failed to update progress');
             console.error('Error updating document: ', error);
+            Alert.alert('Error', 'Failed to update progress');
         }
     };
 
@@ -65,7 +89,6 @@ const UpdateProgress = () => {
             [field]: value
         }));
     };
-
 
     return (
         <ScrollView style={styles.container}>
@@ -194,23 +217,23 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between', // Space out buttons horizontally
-        alignItems: 'center', // Center buttons vertically
+        justifyContent: 'space-between',
+        alignItems: 'center',
         marginTop: 20,
-        paddingHorizontal: 20, // Adjust if necessary
+        paddingHorizontal: 20,
     },
     roundButton: {
-        width: 100, // Width and height to make the button round
-        height: 100,
-        borderRadius: 50, // Half of width/height to make it round
-        justifyContent: 'center', // Center text vertically
-        alignItems: 'center', // Center text horizontally
+        width: 100,
+        height: 60,
+        borderRadius:15,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     updateButton: {
-        backgroundColor: '#4CAF50', // Green for Update
+        backgroundColor: '#80AF81',
     },
     closeButton: {
-        backgroundColor: '#F44336', // Red for Close
+        backgroundColor: '#F44336',
     },
     buttonText: {
         color: '#fff',
