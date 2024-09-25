@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView, State, TapGestureHandler } from 'react-native-gesture-handler';
 import questionsData from '../../assets/quiz/questions.json';
+import * as Speech from "expo-speech";
 
 const Quiz = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -12,6 +13,16 @@ const Quiz = () => {
     const [tapTimeout, setTapTimeout] = useState(null);
 
     const currentQuestion = questionsData[currentQuestionIndex];
+
+    useEffect(() => {
+        return () => {
+            Speech.stop();  // Stop any ongoing speech when the component unmounts
+        };
+    }, []);
+
+    useEffect(() => {
+        readQuestionAndAnswers();
+    }, [currentQuestionIndex]);
 
     useEffect(() => {
         let timer;
@@ -27,17 +38,31 @@ const Quiz = () => {
         setSelectedAnswer(answer);
         const correct = answer === currentQuestion.correctAnswer;
         setIsCorrect(correct);
-        setBackgroundColor(correct ? '#00FF00' : '#FF0000'); // Green for correct, red for incorrect
+        setBackgroundColor(correct ? '#00FF00' : '#FF0000');
+
+        // Read out if the answer is correct or incorrect
+        Speech.speak(correct ? 'Correct!' : 'Incorrect. Try again.');
+    };
+
+    const readQuestionAndAnswers = () => {
+        const textToRead = `${currentQuestion.question}. 
+            Answer 1: ${currentQuestion.answers[0]}. 
+            Answer 2: ${currentQuestion.answers[1]}. 
+            Answer 3: ${currentQuestion.answers[2]}. 
+            Answer 4: ${currentQuestion.answers[3]}.`;
+
+        Speech.speak(textToRead);
     };
 
     const handleNextQuestion = () => {
         setSelectedAnswer(null);
         setIsCorrect(false);
         setTapCount(0);
-        setBackgroundColor('#F5FCFF'); // Reset background color
+        setBackgroundColor('#F5FCFF');
         if (currentQuestionIndex < questionsData.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
+            Speech.speak('Quiz Completed');
             alert('Quiz Completed');
         }
     };
@@ -126,7 +151,7 @@ const styles = StyleSheet.create({
     },
     questionContainer: {
         position: 'absolute',
-        top: '40%',
+        top: '50%',
         left: 0,
         right: 0,
         alignItems: 'center',
@@ -164,25 +189,25 @@ const styles = StyleSheet.create({
     topLeft: {
         position: 'absolute',
         top: 50,
-        left: 20,
+        left: 0,
         backgroundColor: '#FF0000',
     },
     topRight: {
         position: 'absolute',
         top: 50,
-        right: 20,
+        right: 0,
         backgroundColor: '#478747',
     },
     bottomLeft: {
         position: 'absolute',
-        bottom: 120,
-        left: 20,
+        bottom: 20,
+        left: 0,
         backgroundColor: '#0000FF',
     },
     bottomRight: {
         position: 'absolute',
-        bottom: 120,
-        right: 20,
+        bottom: 20,
+        right: 0,
         backgroundColor: '#000000',
     },
     nextButton: {
