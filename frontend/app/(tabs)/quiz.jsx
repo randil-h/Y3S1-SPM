@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView, State, TapGestureHandler } from 'react-native-gesture-handler';
 import questionsData from '../../assets/quiz/questions.json';
 import * as Speech from "expo-speech";
+import {useFocusEffect} from "@react-navigation/native";
+import {Camera} from "expo-camera";
 
 const Quiz = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -11,10 +13,19 @@ const Quiz = () => {
     const [backgroundColor, setBackgroundColor] = useState('#F5FCFF');
     const [tapCount, setTapCount] = useState(0);
     const [tapTimeout, setTapTimeout] = useState(null);
+    const [gesture, setGesture] = useState(null);
+    const [hasPermission, setHasPermission] = useState(null);
+    const [cameraRef, setCameraRef] = useState(null);
+    const [type, setType] = useState(Camera.Constants.Type.back);
 
     const currentQuestion = questionsData[currentQuestionIndex];
 
     useEffect(() => {
+        (async () => {
+            const { status } = await Camera.requestCameraPermissionsAsync();
+            setHasPermission(status === 'granted');
+        })();
+
         return () => {
             Speech.stop();  // Stop any ongoing speech when the component unmounts
         };
@@ -67,6 +78,17 @@ const Quiz = () => {
         }
     };
 
+    useFocusEffect(
+        useCallback(() => {
+            // Do nothing on focus
+
+            return () => {
+                // Stop any ongoing speech when the user leaves the screen
+                Speech.stop();
+            };
+        }, [])
+    );
+
     const handleTap = (event) => {
         if (event.nativeEvent.state === State.ACTIVE) {
             // Clear the previous timeout if it exists, to avoid premature answer selection
@@ -88,10 +110,17 @@ const Quiz = () => {
                 setTapCount(0);
             }, 500); // Short delay to wait for additional taps (adjusted to 500ms)
 
-            // Save the timeout so we can clear it on subsequent taps
+            // Save the timeout ,so we can clear it on subsequent taps
             setTapTimeout(timeout);
         }
     };
+    if (hasPermission === null) {
+        return <Text>Requesting camera permission...</Text>;
+    }
+    if (hasPermission === false) {
+        return <Text>No access to camera</Text>;
+    }
+
 
     return (
         <GestureHandlerRootView style={[styles.container, { backgroundColor }]}>
@@ -100,7 +129,15 @@ const Quiz = () => {
                     <Text style={styles.questionText}>{currentQuestion.question}</Text>
                 </View>
             </TapGestureHandler>
-
+            <View style={styles.cameraContainer}>
+                <Camera
+                    style={styles.camera}
+                    type={type} // Use front-facing camera
+                    ref={ref => {
+                        setCameraRef(ref);
+                    }}
+                />
+            </View>
             <View style={styles.answersContainer}>
                 <TouchableOpacity
                     style={[styles.answerButton, styles.topLeft]}
@@ -148,6 +185,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#F5FCFF',
+    },
+    cameraContainer: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        width: 100,
+        height: 150,
+        zIndex: 1,
+        borderRadius: 10,
+        overflow: 'hidden',
+    },
+    camera: {
+        flex: 1,
     },
     questionContainer: {
         position: 'absolute',
