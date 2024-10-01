@@ -1,10 +1,17 @@
 // ProgressSummary.js
-import React, { useState, useCallback } from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from "../../../FirebaseConfig";
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics'; // Import Haptics
+import { Audio } from 'expo-av';
+
+const beepSound = require('../../../assets/sounds/soft_beep.mp3'); // Path to the sound file
+
+// Load sound effect
+
 
 const ProgressSummary = () => {
     const [progressData, setProgressData] = useState([]);
@@ -12,6 +19,7 @@ const ProgressSummary = () => {
     const [studentsNeedingImprovement, setStudentsNeedingImprovement] = useState([]);
     const [averageScores, setAverageScores] = useState({});
     const router = useRouter();
+    const [sound, setSound] = useState();
 
     // Define the subjects array
     const subjects = ['maths', 'english', 'geography', 'hist', 'science'];
@@ -27,7 +35,25 @@ const ProgressSummary = () => {
         };
         return subjectNames[key] || key;
     };
+// Load sound effect
+    const playSound = async () => {
+        try {
+            const { sound } = await Audio.Sound.createAsync(beepSound);
+            setSound(sound);
+            await sound.playAsync(); // Play the sound
+        } catch (error) {
+            console.error("Error loading or playing sound: ", error);
+        }
+    };
 
+    // Cleanup the sound effect
+    useEffect(() => {
+        return sound
+            ? () => {
+                sound.unloadAsync();
+            }
+            : undefined;
+    }, [sound]);
     // Fetch data from Firestore
     const fetchData = async () => {
         try {
@@ -93,7 +119,12 @@ const ProgressSummary = () => {
         });
         setAverageScores(averages);
     };
-
+    // Handle button press with sound and haptic feedback
+    const handleViewProgress = async () => {
+        await playSound();
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        router.push('/screens/Progress/ViewProgress');
+    };
     return (
         <ScrollView style={styles.container} accessible={true}>
             <Text style={styles.title} accessible={true}>
@@ -179,7 +210,7 @@ const ProgressSummary = () => {
             {/* Navigation Button */}
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => router.push('/screens/Progress/ViewProgress')}
+                onPress={handleViewProgress}
                 accessibilityLabel="View Detailed Progress"
                 accessibilityHint="Navigates to the page where you can view detailed student progress"
                 accessibilityRole="button"
