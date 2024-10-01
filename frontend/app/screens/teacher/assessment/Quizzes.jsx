@@ -3,6 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, Modal, Scrol
 import { useNavigation, useRouter } from 'expo-router';
 import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../../FirebaseConfig';
+import RNHTMLtoPDF from 'react-native-html-to-pdf'; // Import the PDF generation library
+import { PermissionsAndroid, Platform } from 'react-native';
+import {query} from "@react-native-firebase/firestore";
+import {where} from "@tensorflow/tfjs-core";
 
 const QuizPage = () => {
     const router = useRouter();
@@ -36,6 +40,82 @@ const QuizPage = () => {
             setQuizzes(quizList);
         } catch (error) {
             console.error('Error fetching data: ', error);
+        }
+    };
+
+    const fetchQuizAttempts = async (quizId) => {
+        try {
+            const attemptsQuery = query(collection(db, 'quiz_attempts'), where('quiz_id', '==', quizId));
+            const attemptsSnapshot = await getDocs(attemptsQuery);
+            const attemptsList = attemptsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            return attemptsList;
+        } catch (error) {
+            console.error("Error fetching quiz attempts:", error);
+            return [];
+        }
+    };
+
+    const handleLongPress = async (quiz) => {
+        const quizAttempts = await fetchQuizAttempts(quiz.id);
+
+        if (quizAttempts.length === 0) {
+            Alert.alert('No data', 'No quiz attempts found for this quiz.');
+            return;
+        }
+
+        // Generate HTML report and create PDF
+        const reportHTML = generateReportHTML(quiz, quizAttempts);
+        const pdfFilePath = await createPDF(reportHTML, quiz.name);
+
+        if (pdfFilePath) {
+            Alert.alert('PDF Generated', `PDF report for quiz "${quiz.name}" has been generated and saved to ${pdfFilePath}.`);
+        }
+    };
+
+    const generateReportHTML = (quiz, attempts) => {
+        let html = `<h1>Report for Quiz: ${quiz.name}</h1>`;
+        html += `<p><strong>Instructions:</strong> ${quiz.instructions}</p>`;
+        html += `<p><strong>Total Attempts:</strong> ${attempts.length}</p>`;
+
+        attempts.forEach((attempt, index) => {
+            html += `
+        <h2>Attempt ${index + 1}</h2>
+        <p><strong>User ID:</strong> ${attempt.user_id}</p>
+        <p><strong>Score:</strong> ${attempt.score}</p>
+        <p><strong>Time Taken:</strong> ${attempt.time_taken} seconds</p>
+      `;
+        });
+
+        return html;
+    };
+
+    const createPDF = async (htmlContent, quizName) => {
+        try {
+            const options = {
+                html: htmlContent,
+                fileName: `${quizName}_Report`,
+                directory: 'Documents',
+            };
+
+            const file = await RNHTMLtoPDF.convert(options);
+            return file.filePath;
+        } catch (error) {
+            console.error("Error generating PDF:", error);
+            return null;
+        }
+    };
+
+    const sharePDF = async (pdfFilePath) => {
+        try {
+            const shareOptions = {
+                title: 'Share Quiz Report',
+                url: `file://${pdfFilePath}`, // Use the file URL for sharing
+                type: 'application/pdf',
+            };
+
+            await Share.open(shareOptions);
+        } catch (error) {
+            console.error('Error sharing PDF:', error);
         }
     };
 
@@ -98,6 +178,7 @@ const QuizPage = () => {
                     setSelectedQuiz(item);
                     setIsModalVisible(true);
                 }}
+                onLongPress={() => handleLongPress(item)}
             >
                 <Text style={styles.quizText}>{item.quizName}</Text>
             </TouchableOpacity>
