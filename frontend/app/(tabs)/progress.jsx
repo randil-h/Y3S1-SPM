@@ -1,20 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router'; // Import useRouter
 import * as Haptics from 'expo-haptics'; // Import Haptics
+import { Audio } from 'expo-av';
 
-const handleButtonPress = (action) => {
-    console.log(`${action} button pressed`);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Trigger haptic feedback
-
-};
+const beepSound = require('../../assets/sounds/soft_beep.mp3'); // Path to the sound file
 
 const Progress = () => {
     const router = useRouter(); // Initialize router
+    const [sound, setSound] = useState();
+
+    // Load sound effect
+    async function playSound() {
+        try {
+            const { sound } = await Audio.Sound.createAsync(beepSound); // Use the required sound file
+            setSound(sound);
+            await sound.playAsync(); // Play the sound
+        } catch (error) {
+            console.error("Error loading or playing sound: ", error);
+        }
+    }
+
+    // Cleanup the sound effect
+    useEffect(() => {
+        return sound
+            ? () => {
+                sound.unloadAsync();
+            }
+            : undefined;
+    }, [sound]);
+
+    const handleButtonPress = async (action) => {
+        console.log(`${action} button pressed`);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Trigger haptic feedback
+        await playSound(); // Play the sound
+    };
 
     return (
         <View style={styles.container}>
-
             <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
@@ -65,12 +88,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 20,
         padding: 20,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#000000',
-        marginBottom: 40,
     },
     button: {
         backgroundColor: '#fff', // Card-like white background
