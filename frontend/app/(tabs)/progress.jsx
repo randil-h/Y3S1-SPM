@@ -36,7 +36,7 @@ const Progress = () => {
 
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => handleButtonPress('Progress Summary')}
+                onPress={() => router.push('/screens/Progress/ProgressSummary')}
                 accessibilityLabel="Display Progress Summary"
                 accessibilityHint="Navigates to the page where you can view a summary of student progress"
                 accessibilityRole="button"
@@ -63,16 +63,25 @@ const styles = StyleSheet.create({
         marginBottom: 40,
     },
     button: {
-        backgroundColor: '#80AF81',
-        width: 180,
+        backgroundColor: '#fff', // Card-like white background
+        width: 280,
         height: 180,
-        borderRadius: 90,
+        borderRadius: 25, // Card-like rounded corners
         justifyContent: 'center',
         alignItems: 'center',
+        shadowColor: '#000', // Shadow for depth
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 3, // Android shadow
+        paddingHorizontal: 20, // Padding similar to card style
+        paddingVertical: 20,
     },
     buttonText: {
         fontSize: 18,
-        color: '#fff',
+        fontWeight: 'bold', // Similar to card title
+        color: '#666', // Gray text like card
+        textAlign: 'center', // Centered text
     },
 });
 
