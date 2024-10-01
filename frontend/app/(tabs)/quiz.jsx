@@ -11,6 +11,7 @@ const Quiz = () => {
     const [backgroundColor, setBackgroundColor] = useState('#F5FCFF');
     const [tapCount, setTapCount] = useState(0);
     const [tapTimeout, setTapTimeout] = useState(null);
+    const [isSpeaking, setIsSpeaking] = useState(false);
 
     const currentQuestion = questionsData[currentQuestionIndex];
 
@@ -19,15 +20,15 @@ const Quiz = () => {
         Tts.setDefaultLanguage('en-UK');
         Tts.setDefaultRate(0.5);
 
-        // Add a listener for TTS progress
-        const progressListener = Tts.addEventListener('tts-progress', (event) => {
-            console.log('TTS progress:', event);
+        // Add a listener for TTS finish event
+        const finishListener = Tts.addEventListener('tts-finish', () => {
+            setIsSpeaking(false);
         });
 
         // Clean up on component unmount
         return () => {
             Tts.stop();
-            progressListener.remove(); // Remove the listener to prevent memory leaks
+            finishListener.remove(); // Remove the listener to prevent memory leaks
         };
     }, []);
 
@@ -40,11 +41,13 @@ const Quiz = () => {
         let timer;
         if (selectedAnswer !== null) {
             timer = setTimeout(() => {
-                handleNextQuestion();
+                if (!isSpeaking) { // Only navigate when TTS is done
+                    handleNextQuestion();
+                }
             }, 5000); // Wait for 5 seconds before moving to the next question
         }
         return () => clearTimeout(timer);
-    }, [selectedAnswer]);
+    }, [selectedAnswer, isSpeaking]);
 
     const handleAnswerSelection = (answer) => {
         setSelectedAnswer(answer);
@@ -53,6 +56,7 @@ const Quiz = () => {
         setBackgroundColor(correct ? '#00FF00' : '#FF0000');
 
         // Read out if the answer is correct or incorrect
+        setIsSpeaking(true); // Set TTS status to speaking
         Tts.speak(correct ? 'Correct!' : 'Incorrect. Try again.');
     };
 
@@ -63,6 +67,7 @@ const Quiz = () => {
             Answer 3: ${currentQuestion.answers[2]}. 
             Answer 4: ${currentQuestion.answers[3]}.`;
 
+        setIsSpeaking(true);
         Tts.speak(textToRead);
     };
 
@@ -74,6 +79,7 @@ const Quiz = () => {
         if (currentQuestionIndex < questionsData.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
+            setIsSpeaking(true);
             Tts.speak('Quiz Completed');
             alert('Quiz Completed');
         }
@@ -81,7 +87,6 @@ const Quiz = () => {
 
     const handleTap = (event) => {
         if (event.nativeEvent.state === State.ACTIVE) {
-            // Clear the previous timeout if it exists, to avoid premature answer selection
             if (tapTimeout) {
                 clearTimeout(tapTimeout);
             }
