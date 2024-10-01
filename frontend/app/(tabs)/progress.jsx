@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router'; // Import useRouter
-
+import * as Haptics from 'expo-haptics'; // Import Haptics
 
 const handleButtonPress = (action) => {
     console.log(`${action} button pressed`);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Trigger haptic feedback
 
 };
 
@@ -16,7 +17,10 @@ const Progress = () => {
 
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => router.push('/screens/Progress/ViewProgress')}
+                onPress={() => {
+                    handleButtonPress('View Progress');
+                    router.push('/screens/Progress/ViewProgress');
+                }}
                 accessibilityLabel="View Progress"
                 accessibilityHint="Navigates to the page where you can view detailed student progress"
                 accessibilityRole="button"
@@ -26,7 +30,10 @@ const Progress = () => {
 
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => router.push('/screens/Progress/AddProgress')}
+                onPress={() => {
+                    handleButtonPress('Add Progress');
+                    router.push('/screens/Progress/AddProgress');
+                }}
                 accessibilityLabel="Add Student"
                 accessibilityHint="Navigates to the page where you can add new student information"
                 accessibilityRole="button"
@@ -36,7 +43,10 @@ const Progress = () => {
 
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => router.push('/screens/Progress/ProgressSummary')}
+                onPress={() => {
+                    handleButtonPress('Progress Summary');
+                    router.push('/screens/Progress/ProgressSummary');
+                }}
                 accessibilityLabel="Display Progress Summary"
                 accessibilityHint="Navigates to the page where you can view a summary of student progress"
                 accessibilityRole="button"
