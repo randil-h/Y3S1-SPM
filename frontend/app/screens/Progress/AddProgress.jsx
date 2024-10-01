@@ -4,7 +4,10 @@ import { useRouter } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
 import { collection, addDoc } from "firebase/firestore";
 import {db} from "../../../FirebaseConfig"; // Import from Firebase Firestore
+import * as Haptics from 'expo-haptics'; // Import Haptics
+import { Audio } from 'expo-av';
 
+const beepSound = require('../../../assets/sounds/beep.mp3');
 const AddProgress = () => {
     const [studentName, setStudentName] = useState('');
     const [studentID, setStudentID] = useState('');
@@ -17,6 +20,27 @@ const AddProgress = () => {
     const [science, setScience] = useState('');
 
     const router = useRouter();
+    const [sound, setSound] = useState();
+
+    // Load sound effect
+    const playSound = async () => {
+        try {
+            const { sound } = await Audio.Sound.createAsync(beepSound);
+            setSound(sound);
+            await sound.playAsync(); // Play the sound
+        } catch (error) {
+            console.error("Error loading or playing sound: ", error);
+        }
+    };
+
+    // Cleanup the sound effect
+    React.useEffect(() => {
+        return sound
+            ? () => {
+                sound.unloadAsync();
+            }
+            : undefined;
+    }, [sound]);
 
     const handleSubmit = async () => {
         console.log('Submitting data...');
@@ -42,7 +66,9 @@ const AddProgress = () => {
             });
             console.log('Document written with ID: ', docRef.id);
             Alert.alert('Success', `Student ${studentName}'s progress added successfully. Document ID: ${docRef.id}`);
-
+// Play sound and trigger haptic feedback on successful submission
+            await playSound();
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             // Navigate back to the previous screen
             console.log('Navigating back...');
             router.back();
@@ -50,6 +76,14 @@ const AddProgress = () => {
             console.error('Error adding document: ', error);
             Alert.alert('Error', 'Failed to add progress: ' + error.message);
         }
+    };
+    const handleClose = async () => {
+        // Play sound and trigger haptic feedback on close button press
+        await playSound();
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+        console.log('Navigating back...');
+        router.back();
     };
 
     return (
@@ -143,7 +177,7 @@ const AddProgress = () => {
                         <Text style={styles.buttonText}>Submit</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.roundButton2} onPress={() => router.back()}>
+                    <TouchableOpacity style={styles.roundButton2} onPress={handleClose}>
                         <Text style={styles.buttonText}>Close</Text>
                     </TouchableOpacity>
                 </View>
