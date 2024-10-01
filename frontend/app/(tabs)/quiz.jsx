@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView, State, TapGestureHandler } from 'react-native-gesture-handler';
-import Tts from 'react-native-tts';
+import * as Speech from 'expo-speech';
 import questionsData from '../../assets/quiz/questions.json';
 
 const Quiz = () => {
@@ -16,22 +16,11 @@ const Quiz = () => {
     const currentQuestion = questionsData[currentQuestionIndex];
 
     useEffect(() => {
-        // Set TTS defaults
-        Tts.setDefaultLanguage('en-UK');
-        Tts.setDefaultRate(0.5);
-
-        // Add a listener for TTS finish event
-        const finishListener = Tts.addEventListener('tts-finish', () => {
-            setIsSpeaking(false);
-        });
-
         // Clean up on component unmount
         return () => {
-            Tts.stop();
-            finishListener.remove(); // Remove the listener to prevent memory leaks
+            Speech.stop();
         };
     }, []);
-
 
     useEffect(() => {
         readQuestionAndAnswers();
@@ -41,13 +30,28 @@ const Quiz = () => {
         let timer;
         if (selectedAnswer !== null) {
             timer = setTimeout(() => {
-                if (!isSpeaking) { // Only navigate when TTS is done
+                if (!isSpeaking) { // Only navigate when speech is done
                     handleNextQuestion();
                 }
             }, 5000); // Wait for 5 seconds before moving to the next question
         }
         return () => clearTimeout(timer);
     }, [selectedAnswer, isSpeaking]);
+
+    const speakText = async (text) => {
+        setIsSpeaking(true);
+        try {
+            await Speech.speak(text, {
+                language: 'en-GB',
+                rate: 0.8,
+                onDone: () => setIsSpeaking(false),
+                onStopped: () => setIsSpeaking(false),
+            });
+        } catch (error) {
+            console.warn('Speech failed', error);
+            setIsSpeaking(false);
+        }
+    };
 
     const handleAnswerSelection = (answer) => {
         setSelectedAnswer(answer);
@@ -56,8 +60,7 @@ const Quiz = () => {
         setBackgroundColor(correct ? '#00FF00' : '#FF0000');
 
         // Read out if the answer is correct or incorrect
-        setIsSpeaking(true); // Set TTS status to speaking
-        Tts.speak(correct ? 'Correct!' : 'Incorrect. Try again.');
+        speakText(correct ? 'Correct!' : 'Incorrect. Try again.');
     };
 
     const readQuestionAndAnswers = () => {
@@ -67,8 +70,7 @@ const Quiz = () => {
             Answer 3: ${currentQuestion.answers[2]}. 
             Answer 4: ${currentQuestion.answers[3]}.`;
 
-        setIsSpeaking(true);
-        Tts.speak(textToRead);
+        speakText(textToRead);
     };
 
     const handleNextQuestion = () => {
@@ -79,8 +81,7 @@ const Quiz = () => {
         if (currentQuestionIndex < questionsData.length - 1) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
-            setIsSpeaking(true);
-            Tts.speak('Quiz Completed');
+            speakText('Quiz Completed');
             alert('Quiz Completed');
         }
     };
