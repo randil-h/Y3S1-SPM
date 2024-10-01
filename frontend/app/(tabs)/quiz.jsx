@@ -15,13 +15,22 @@ const Quiz = () => {
     const currentQuestion = questionsData[currentQuestionIndex];
 
     useEffect(() => {
-        Tts.setDefaultLanguage('en-US');
+        // Set TTS defaults
+        Tts.setDefaultLanguage('en-UK');
         Tts.setDefaultRate(0.5);
 
+        // Add a listener for TTS progress
+        const progressListener = Tts.addEventListener('tts-progress', (event) => {
+            console.log('TTS progress:', event);
+        });
+
+        // Clean up on component unmount
         return () => {
             Tts.stop();
+            progressListener.remove(); // Remove the listener to prevent memory leaks
         };
     }, []);
+
 
     useEffect(() => {
         readQuestionAndAnswers();
