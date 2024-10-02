@@ -4,11 +4,34 @@ import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from "../../../FirebaseConfig";
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics'; // Import Haptics
+import { Audio } from 'expo-av';
 
+const beepSound = require('../../../assets/sounds/beep.mp3'); // Path to the sound file
 const ViewProgress = () => {
     const [progressData, setProgressData] = useState([]);
     const router = useRouter();
+    const [sound, setSound] = useState();
 
+    // Load sound effect
+    const playSound = async () => {
+        try {
+            const { sound } = await Audio.Sound.createAsync(beepSound);
+            setSound(sound);
+            await sound.playAsync(); // Play the sound
+        } catch (error) {
+            console.error("Error loading or playing sound: ", error);
+        }
+    };
+
+    // Cleanup the sound effect
+    React.useEffect(() => {
+        return sound
+            ? () => {
+                sound.unloadAsync();
+            }
+            : undefined;
+    }, [sound]);
     const fetchData = async () => {
         try {
             const progressCollection = collection(db, 'progress');
@@ -32,14 +55,18 @@ const ViewProgress = () => {
             await deleteDoc(progressDocRef);
             Alert.alert('Success', 'Progress deleted successfully');
             setProgressData(progressData.filter(item => item.id !== id));
+            await playSound(); // Play sound on successful deletion
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         } catch (error) {
             Alert.alert('Error', 'Failed to delete progress');
             console.error('Error deleting document: ', error);
         }
     };
 
-    const handleUpdate = (item) => {
+    const handleUpdate = async (item) => {
         console.log('Navigating to update progress with ID:', item.id);
+        await playSound(); // Play sound on update button press
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Trigger haptic feedback on update
         router.push({
             pathname: '/screens/Progress/UpdateProgress',
             params: { id: item.id }
@@ -118,20 +145,20 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     roundButton: {
-        width: 100, // Width and height to make the button round
+        width: 100,
         height: 60,
-        borderRadius: 15, // Half of width/height to make it round
-        justifyContent: 'center', // Center text vertically
-        alignItems: 'center', // Center text horizontally
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     updateButton: {
-        backgroundColor: '#80AF81', // Green for Update
+        backgroundColor: '#80AF81',
     },
     closeButton: {
-        backgroundColor: '#F44336', // Red for Close
+        backgroundColor: '#F44336',
     },
     deleteButton: {
-        backgroundColor: '#FF5722', // Orange for Delete
+        backgroundColor: '#FF5722',
     },
     buttonText: {
         color: '#fff',
