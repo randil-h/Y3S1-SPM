@@ -3,12 +3,65 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router'; // Import useRouter
 import * as Haptics from 'expo-haptics'; // Import Haptics
 import { Audio } from 'expo-av';
+import {useFocusEffect} from "@react-navigation/native";
 
 const beepSound = require('../../assets/sounds/soft_beep.mp3'); // Path to the sound file
 
 const Progress = () => {
     const router = useRouter(); // Initialize router
     const [sound, setSound] = useState();
+    const [navigating, setNavigating] = useState(false);
+    let ws;
+
+    useFocusEffect(
+        React.useCallback(() => {
+            // WebSocket connection starts when the page is focused
+            ws = new WebSocket('ws://192.168.1.4:8765');  //ip address and port number of server
+
+            ws.onopen = () => {
+                console.log('WebSocket connection established');
+            };
+
+            ws.onmessage = (event) => {
+                const { gesture } = JSON.parse(event.data);
+                handleGesture(gesture);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket connection is closed');
+            };
+
+            // Cleanup function to close WebSocket when page is unfocused
+            return () => {
+                if (ws) {
+                    ws.close();
+                    console.log('WebSocket connection closed');
+                }
+            };
+        }, [])
+    );
+
+    const handleGesture = (gesture) => {
+        if (navigating) return;
+        console.log(`Gesture detected: ${gesture}`);
+
+        switch (gesture) {
+            case 'Selected answer: One':
+                setNavigating(true);
+                router.push('/screens/Progress/ViewProgress');
+                break;
+            case 'Selected answer: Two':
+                setNavigating(true);
+                router.push('/screens/Progress/AddProgress');
+                break;
+            case 'Selected answer: Three':
+                setNavigating(true);
+                router.push('/screens/Progress/ProgressSummary'); // Implement navigation to progress summary
+                break;
+            default:
+                break;
+        }
+    };
 
     // Load sound effect
     async function playSound() {

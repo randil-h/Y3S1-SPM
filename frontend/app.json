@@ -13,10 +13,14 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs access to the camera to scan gestures."
+      },
       "supportsTablet": true,
-      "bundleIdentifier": "com.bimidugunathilake.frontend"
+      "bundleIdentifier": "com.bimidugunathilake.frontend",
     },
     "android": {
+      "permissions": ["CAMERA"],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -27,7 +31,14 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": [
+    "plugins": [[
+      "expo-camera",
+      {
+        "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+        "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+        "recordAudioAndroid": true
+      }
+    ],
       "expo-router"
     ],
     "experiments": {
