@@ -23,6 +23,7 @@
     "@react-native-picker/picker": "^2.8.0",
     "@react-navigation/material-bottom-tabs": "^6.2.29",
     "@react-navigation/native": "^6.1.18",
+    "@tensorflow/tfjs-core": "^4.21.0",
     "expo": "~51.0.28",
     "expo-av": "~14.0.7",
     "expo-blur": "^13.0.2",

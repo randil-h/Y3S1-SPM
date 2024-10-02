@@ -4,6 +4,7 @@ import { GestureHandlerRootView, State, TapGestureHandler } from 'react-native-g
 import * as Speech from 'expo-speech';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import app from '../../FirebaseConfig';
+import {useFocusEffect} from "@react-navigation/native";
 
 const Quiz = ({ quiz, onComplete }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -11,9 +12,13 @@ const Quiz = ({ quiz, onComplete }) => {
     const [isCorrect, setIsCorrect] = useState(false);
     const [backgroundColor, setBackgroundColor] = useState('#F5FCFF');
     const [tapCount, setTapCount] = useState(0);
+    const [tapTimeout, setTapTimeout] = useState(null);
     const [attemptCount, setAttemptCount] = useState(0);
     const [marks, setMarks] = useState(0); // Holds total marks across all questions
     const [questionMarks, setQuestionMarks] = useState(0); // Holds the marks awarded for the current question
+    const [gesture, setGesture] = useState(null);
+    const [gestureTimeout, setGestureTimeout] = useState(false);
+    let ws;
 
     const firestore = getFirestore(app); // Firestore reference
 
@@ -30,6 +35,34 @@ const Quiz = ({ quiz, onComplete }) => {
         setAttemptCount(0); // Reset attempt count for new question
         setQuestionMarks(0); // Reset the question-specific marks for each question
     }, [currentQuestionIndex]);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            // WebSocket connection starts when the page is focused
+            ws = new WebSocket('ws://192.168.1.4:8765');
+
+            ws.onopen = () => {
+                console.log('WebSocket connection established');
+            };
+
+            ws.onmessage = (event) => {
+                const { gesture } = JSON.parse(event.data);
+                handleGestureSelection(gesture);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket connection is closed');
+            };
+
+            // Cleanup function to close WebSocket when page is unfocused
+            return () => {
+                if (ws) {
+                    ws.close();
+                    console.log('WebSocket connection closed');
+                }
+            };
+        }, [])
+    );
 
     const handleAnswerSelection = (answer) => {
         setSelectedAnswer(answer);
@@ -62,6 +95,30 @@ const Quiz = ({ quiz, onComplete }) => {
         if (correct || attemptCount >= 2) {
             setTimeout(handleNextQuestion, 3000);
         }
+    };
+
+    const handleGestureSelection = (gesture) => {
+        if(gestureTimeout) return;
+
+        setGestureTimeout(true);
+
+        if (gesture === 'Selected answer: One') {
+            handleAnswerSelection(currentQuestion.answers[0]);
+        } else if (gesture === 'Selected answer: Two') {
+            handleAnswerSelection(currentQuestion.answers[1]);
+        } else if (gesture === 'Selected answer: Three') {
+            handleAnswerSelection(currentQuestion.answers[2]);
+        } else if (gesture === 'Selected answer: Four') {
+            handleAnswerSelection(currentQuestion.answers[3]);
+        } else if (gesture === 'Submit') {
+            handleNextQuestion();
+        }else if (gesture === 'Previous Tab' || gesture === 'Next Tab') {
+
+        }
+
+        setTimeout(() => {
+            setGestureTimeout(false);
+        }, 3000);
     };
 
     const readQuestionAndAnswers = () => {
@@ -107,12 +164,27 @@ const Quiz = ({ quiz, onComplete }) => {
 
     const handleTap = (event) => {
         if (event.nativeEvent.state === State.ACTIVE) {
+            // Clear the previous timeout if it exists, to avoid premature answer selection
+            if (tapTimeout) {
+                clearTimeout(tapTimeout);
+            }
+
+            // Increment tap count
             const newTapCount = tapCount + 1;
             setTapCount(newTapCount);
 
-            if (newTapCount >= 1 && newTapCount <= 4) {
-                handleAnswerSelection(currentQuestion.answers[newTapCount - 1]);
-            }
+            // Set a timeout to finalize the selection after a short delay
+            const timeout = setTimeout(() => {
+                if (newTapCount >= 1 && newTapCount <= 4) {
+                    handleAnswerSelection(currentQuestion.answers[newTapCount - 1]);
+                }
+
+                // Reset tap count after the selection is made
+                setTapCount(0);
+            }, 500); // Short delay to wait for additional taps (adjusted to 500ms)
+
+            // Save the timeout ,so we can clear it on subsequent taps
+            setTapTimeout(timeout);
         }
     };
 
