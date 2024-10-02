@@ -104,7 +104,10 @@ const ProgressSummary = () => {
         // Students needing improvement (e.g., total score below a threshold, say 60% of max)
         const maxTotal = sortedByTotal[0].total;
         const threshold = maxTotal * 0.6; // 60% of the highest total
-        const needingImprovement = sortedByTotal.filter(student => student.total < threshold);
+        // Students needing improvement (sorted from lowest to highest score)
+        const needingImprovement = sortedByTotal
+            .filter(student => student.total < threshold)
+            .sort((a, b) => a.total - b.total);  // Sort ascending for improvement list
         setStudentsNeedingImprovement(needingImprovement);
 
         // Calculate average scores per subject

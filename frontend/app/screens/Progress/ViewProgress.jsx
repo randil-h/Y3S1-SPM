@@ -89,8 +89,10 @@ const ViewProgress = () => {
                         <Text>Geography Marks: {item.geography}</Text>
                         <Text>History Marks: {item.hist}</Text>
                         <Text>Science Marks: {item.science}</Text>
-                        <Text>Coursework Progress: {item.courseworkProgress}</Text>
 
+                        <Text>
+                            Coursework Progress: {item.courseworkProgress === 'need_improvement' ? 'Need improvement' : item.courseworkProgress}
+                        </Text>
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
                                 style={[styles.roundButton, styles.updateButton]}
