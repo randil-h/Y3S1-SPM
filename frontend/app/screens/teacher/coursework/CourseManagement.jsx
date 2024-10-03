@@ -1,112 +1,156 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, Alert, StyleSheet, Modal, TouchableWithoutFeedback } from 'react-native';
+import {
+    View,
+    Text,
+    TextInput,
+    FlatList,
+    TouchableOpacity,
+    Alert,
+    StyleSheet,
+    Modal,
+    TouchableWithoutFeedback,
+    ActivityIndicator
+} from 'react-native';
 import { addDoc, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import DocumentPicker from 'react-native-document-picker';
-import { db } from '../../../../FirebaseConfig'; // Adjust the import based on your structure
-import { useRouter, useGlobalSearchParams } from 'expo-router';
+import { db, storage } from '../../../../FirebaseConfig'; // Adjust the import based on your structure
+import { useGlobalSearchParams } from 'expo-router';
+import { Linking } from 'react-native';
+import Tts from 'react-native-tts'; // Import TTS library
 
 const CourseManagement = () => {
-    const { courseId, courseName } = useGlobalSearchParams(); // Accessing courseId and courseName
+    const { courseId, courseName } = useGlobalSearchParams();
     const [topics, setTopics] = useState([]);
+    const [documents, setDocuments] = useState({});
     const [topicName, setTopicName] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isDocModalVisible, setIsDocModalVisible] = useState(false);
     const [selectedTopic, setSelectedTopic] = useState(null);
-    const [fileName, setFileName] = useState('');
-    const [fileSize, setFileSize] = useState(0);
-    const [uploadedFiles, setUploadedFiles] = useState([]);
-
-    const storage = getStorage();
+    const [file, setFile] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     // Fetch topics from Firestore
     const fetchTopics = async () => {
+        setLoading(true);
         try {
             const querySnapshot = await getDocs(collection(db, `courses/${courseId}/topics`));
             const topicList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setTopics(topicList);
+
+            const documentsMap = {};
+            for (const topic of topicList) {
+                const docs = await getDocs(collection(db, `courses/${courseId}/topics/${topic.id}/documents`));
+                documentsMap[topic.id] = docs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            }
+            setDocuments(documentsMap);
+
+            if (topicList.length > 0) {
+                const firstTopicId = topicList[0].id;
+                setSelectedTopic(firstTopicId);
+            }
         } catch (error) {
             console.error("Error fetching topics:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    // Save topic to Firestore
+    // Function to handle saving a new topic
     const saveTopic = async () => {
-        if (topicName === '') {
-            Alert.alert('Error', 'Please enter a topic name.');
+        if (!topicName.trim()) {
+            Alert.alert("Error", "Please enter a topic name.");
             return;
         }
 
         try {
-            const newTopicRef = collection(db, `courses/${courseId}/topics`);
-            await addDoc(newTopicRef, {
-                topicName,
-                createdAt: new Date() // Add a timestamp
-            });
-            Alert.alert('Success', 'Topic added successfully!');
-            setTopicName(''); // Reset the input
-            setIsModalVisible(false); // Close the modal
-            fetchTopics(); // Refresh the topic list
+            await addDoc(collection(db, `courses/${courseId}/topics`), { topicName });
+            setTopicName('');
+            setIsModalVisible(false);
+            fetchTopics();
         } catch (error) {
             console.error("Error adding topic:", error);
-            Alert.alert('Error', 'Failed to add the topic.');
+            Alert.alert("Error", "Failed to add topic.");
         }
     };
 
-    // Save document to the selected topic
+    // Function to handle saving a document
     const saveDocument = async () => {
-        if (!fileName || fileSize === 0) {
-            Alert.alert('Error', 'Please select a file to upload.');
+        if (!file) {
+            Alert.alert("Error", "Please select a file.");
             return;
         }
 
         try {
-            // Create a reference to the file in Firebase Storage
-            const fileRef = ref(storage, `courses/${courseId}/topics/${selectedTopic}/documents/${fileName}`);
-            const file = await DocumentPicker.pick({
-                type: [DocumentPicker.types.allFiles],
+            const response = await fetch(file[0].uri);
+            const blob = await response.blob();
+            const storageRef = ref(storage, `courses/${courseId}/topics/${selectedTopic}/documents/${file[0].name}`);
+
+            await uploadBytes(storageRef, blob);
+            const downloadURL = await getDownloadURL(storageRef);
+
+            await addDoc(collection(db, `courses/${courseId}/topics/${selectedTopic}/documents`), {
+                fileName: file[0].name,
+                fileUrl: downloadURL,
             });
 
-            const response = await fetch(file.uri);
-            const blob = await response.blob();
+            setDocuments(prevDocuments => ({
+                ...prevDocuments,
+                [selectedTopic]: [
+                    ...(prevDocuments[selectedTopic] || []),
+                    { id: Date.now().toString(), fileName: file[0].name, fileUrl: downloadURL }
+                ],
+            }));
 
-            // Upload the file
-            await uploadBytes(fileRef, blob);
-            const fileUrl = await getDownloadURL(fileRef);
-
-            // Save file metadata in Firestore
-            const fileData = {
-                fileName,
-                fileSize,
-                fileUrl,
-                createdAt: new Date(), // Add a timestamp
-            };
-            const newDocRef = collection(db, `courses/${courseId}/topics/${selectedTopic}/documents`);
-            await addDoc(newDocRef, fileData);
-
-            Alert.alert('Success', 'Document added successfully!');
-            setFileName(''); // Reset the input
-            setFileSize(0);
-            setIsDocModalVisible(false); // Close the modal
-            fetchTopics(); // Refresh the topic list
+            setFile(null);
+            setIsDocModalVisible(false);
         } catch (error) {
-            console.error("Error adding document:", error);
-            Alert.alert('Error', 'Failed to add the document.');
+            console.error("Error uploading document:", error);
+            Alert.alert("Error", "Failed to upload document.");
         }
     };
 
-    // Delete a topic from Firestore
+    // Function to delete a document
+    const deleteDocument = async (topicId, documentId) => {
+        try {
+            await deleteDoc(doc(db, `courses/${courseId}/topics/${topicId}/documents`, documentId));
+            // Update the documents state
+            setDocuments(prevDocuments => {
+                const updatedDocs = { ...prevDocuments };
+                updatedDocs[topicId] = updatedDocs[topicId].filter(doc => doc.id !== documentId);
+                return updatedDocs;
+            });
+        } catch (error) {
+            console.error("Error deleting document:", error);
+            Alert.alert("Error", "Failed to delete document.");
+        }
+    };
+
+    // Function to handle opening a document
+    const handleDocumentAccess = (fileUrl) => {
+        Linking.openURL(fileUrl);
+    };
+
+    // Function to read PDF aloud
+    const readPDFAloud = async (fileUrl) => {
+        // Here you would implement logic to extract text from PDF
+        // This is a placeholder implementation:
+        const textToRead = "This is a placeholder text for the PDF content."; // Replace with extracted text
+        Tts.speak(textToRead);
+    };
+
+    // Function to delete a topic
     const deleteTopic = async (topicId) => {
         try {
             await deleteDoc(doc(db, `courses/${courseId}/topics`, topicId));
-            Alert.alert('Success', 'Topic deleted successfully!');
-            fetchTopics(); // Refresh the topic list
+            fetchTopics();
         } catch (error) {
             console.error("Error deleting topic:", error);
-            Alert.alert('Error', 'Failed to delete the topic.');
+            Alert.alert("Error", "Failed to delete topic.");
         }
     };
 
+    // Effect to fetch topics on component mount
     useEffect(() => {
         fetchTopics();
     }, []);
@@ -115,7 +159,8 @@ const CourseManagement = () => {
         <View style={styles.container}>
             <Text style={styles.title}>{courseName}</Text>
 
-            {/* Topic List */}
+            {loading && <ActivityIndicator size="large" color="#007BFF" />}
+
             <FlatList
                 data={topics}
                 keyExtractor={(item) => item.id}
@@ -133,15 +178,41 @@ const CourseManagement = () => {
                                 <Text style={styles.deleteButton}>Delete</Text>
                             </TouchableOpacity>
                         </View>
+                        {documents[item.id] && documents[item.id].length > 0 && (
+                            <FlatList
+                                data={documents[item.id]}
+                                keyExtractor={(doc) => doc.id}
+                                renderItem={({ item }) => (
+                                    <View style={styles.documentItem}>
+                                        {/* Vertical Line */}
+                                        <View style={styles.verticalLine} />
+                                        <View style={styles.documentContent}>
+                                            <Text style={styles.documentText}>{item.fileName}</Text>
+                                            <TouchableOpacity onPress={() => handleDocumentAccess(item.fileUrl)}>
+                                                <Text style={styles.accessButton}>Open</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={() => readPDFAloud(item.fileUrl)}>
+                                                <Text style={styles.accessButton}>Read Aloud</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={() => deleteDocument(item.id, item.id)}>
+                                                <Text style={styles.accessButton}>Delete</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                )}
+                                style={styles.documentList}
+                                contentContainerStyle={styles.documentListContainer}
+                            />
+                        )}
+
                     </View>
                 )}
                 contentContainerStyle={topics.length === 0 ? styles.emptyList : {}}
             />
 
-            {/* Floating '+' button */}
             <TouchableOpacity
                 style={styles.floatingButton}
-                onPress={() => setIsModalVisible(true)} // Show modal to add topic
+                onPress={() => setIsModalVisible(true)}
             >
                 <Text style={styles.floatingButtonText}>+</Text>
             </TouchableOpacity>
@@ -193,27 +264,18 @@ const CourseManagement = () => {
                     <View style={styles.modalContainer}>
                         <TouchableWithoutFeedback>
                             <View style={styles.modalContent}>
-                                <Text style={styles.modalTitle}>Add Document to Topic</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="Document Name"
-                                    value={fileName}
-                                    onChangeText={(text) => setFileName(text)}
-                                    placeholderTextColor="#999"
-                                />
-                                <Text style={styles.fileSizeText}>File Size: {fileSize} bytes</Text>
+                                <Text style={styles.modalTitle}>Add Document</Text>
                                 <TouchableOpacity onPress={async () => {
-                                    const file = await DocumentPicker.pick({
+                                    const result = await DocumentPicker.pick({
                                         type: [DocumentPicker.types.allFiles],
                                     });
-                                    setFileName(file.name);
-                                    setFileSize(file.size);
+                                    setFile(result);
                                 }}>
-                                    <Text style={styles.selectFileButton}>Select File</Text>
+                                    <Text style={styles.uploadButton}>{file ? file[0].name : "Upload Document"}</Text>
                                 </TouchableOpacity>
                                 <View style={styles.buttonContainer}>
                                     <TouchableOpacity style={styles.saveButton} onPress={saveDocument}>
-                                        <Text style={styles.buttonText}>Add Document</Text>
+                                        <Text style={styles.buttonText}>Upload Document</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={styles.cancelButton}
@@ -235,57 +297,61 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#F5FCFF',
     },
     title: {
-        fontSize: 28,
+        fontSize: 24,
+        fontWeight: 'bold',
         marginBottom: 20,
-        fontWeight: '500',
-        color: '#1e1e1e',
     },
     topicItem: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 15,
-        marginBottom: 10,
-        backgroundColor: '#ffffff',
-        borderRadius: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 2,
+        marginBottom: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+        paddingBottom: 10,
     },
     topicText: {
-        fontSize: 16,
-        color: '#333',
+        fontSize: 18,
     },
     topicActions: {
         flexDirection: 'row',
-        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginVertical: 10,
     },
     addDocButton: {
-        color: '#2a5a06',
+        color: '#007BFF',
         fontWeight: 'bold',
-        textDecorationLine: 'underline',
-        marginRight: 15,
     },
     deleteButton: {
-        color: '#e74c3c',
+        color: 'red',
         fontWeight: 'bold',
-        textDecorationLine: 'underline',
+    },
+    documentItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 5,
+        paddingLeft: 10, // Add padding to indent
+    },
+    documentText: {
+        flex: 1,
+        fontSize: 16,
+    },
+    accessButton: {
+        color: '#007BFF',
+        marginHorizontal: 5,
+    },
+    documentList: {
+        marginTop: 10,
+    },
+    documentListContainer: {
+        paddingVertical: 10,
     },
     floatingButton: {
         position: 'absolute',
-        bottom: 40,
-        right: 40,
-        width: 60,
-        height: 60,
+        right: 20,
+        bottom: 20,
+        backgroundColor: '#007BFF',
         borderRadius: 30,
-        backgroundColor: '#2a5a06',
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 5,
+        padding: 10,
     },
     floatingButtonText: {
         color: '#fff',
@@ -295,74 +361,71 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.7)', // Darker background for better contrast
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
-        width: '85%',
-        backgroundColor: '#ffffff',
-        padding: 25,
+        width: '80%',
+        backgroundColor: '#fff',
         borderRadius: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 10,
-        elevation: 5,
+        padding: 20,
+        alignItems: 'center',
     },
     modalTitle: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
-        color: '#2a5a06',
-        marginBottom: 15,
-        textAlign: 'center',
+        marginBottom: 20,
     },
     input: {
-        height: 45,
-        borderColor: '#ccc',
+        width: '100%',
         borderWidth: 1,
-        marginBottom: 15,
-        paddingHorizontal: 10,
+        borderColor: '#ccc',
         borderRadius: 5,
-        backgroundColor: '#f9f9f9', // Light background for the input
-    },
-    fileSizeText: {
-        fontSize: 14,
-        color: '#333',
-        marginBottom: 10,
-    },
-    selectFileButton: {
-        color: '#2a5a06',
-        fontWeight: 'bold',
-        textDecorationLine: 'underline',
-        marginBottom: 15,
+        padding: 10,
+        marginBottom: 20,
     },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        width: '100%',
     },
     saveButton: {
-        flex: 1,
-        backgroundColor: '#2a5a06',
-        paddingVertical: 10,
+        backgroundColor: '#007BFF',
         borderRadius: 5,
-        alignItems: 'center',
-        marginRight: 5, // Space between buttons
+        padding: 10,
+        flex: 1,
+        marginHorizontal: 5,
     },
     cancelButton: {
-        flex: 1,
-        backgroundColor: '#e74c3c',
-        paddingVertical: 10,
+        backgroundColor: '#ccc',
         borderRadius: 5,
-        alignItems: 'center',
-        marginLeft: 5, // Space between buttons
+        padding: 10,
+        flex: 1,
+        marginHorizontal: 5,
     },
     buttonText: {
         color: '#fff',
-        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    uploadButton: {
+        color: '#007BFF',
+        marginBottom: 20,
     },
     emptyList: {
-        justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
+        justifyContent: 'center',
+    },
+
+    verticalLine: {
+        width: 2, // Width of the vertical line
+        height: '100%', // Full height
+        backgroundColor: '#ccc', // Color of the line
+        marginRight: 10, // Space between line and document text
+    },
+    documentContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flex: 1, // Take the remaining space
     },
 });
 
