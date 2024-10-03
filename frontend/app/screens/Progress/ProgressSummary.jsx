@@ -180,12 +180,12 @@ const ProgressSummary = () => {
                         background-color: #f9f9f9;
                     }
                     h1 {
-                        font-size: 28px;
+                        font-size: 45px;
                         color: #333;
                         text-align: center;
                     }
                     h2 {
-                        font-size: 22px;
+                        font-size: 40px;
                         color: #555;
                         margin-top: 20px;
                     }
@@ -194,7 +194,7 @@ const ProgressSummary = () => {
                         padding: 0;
                     }
                     li {
-                        font-size: 18px;
+                        font-size: 35px;
                         color: #444;
                         margin-bottom: 10px;
                     }
