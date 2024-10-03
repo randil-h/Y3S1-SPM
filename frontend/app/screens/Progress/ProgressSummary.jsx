@@ -7,12 +7,13 @@ import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics'; // Import Haptics
 import { Audio } from 'expo-av';
+import * as Print from 'expo-print'; // Import Print for PDF generation
+import * as Sharing from 'expo-sharing'; // Import Sharing for sharing the PDF
 
 const beepSound = require('../../../assets/sounds/soft_beep.mp3'); // Path to the sound file
 
+
 // Load sound effect
-
-
 const ProgressSummary = () => {
     const [progressData, setProgressData] = useState([]);
     const [topPerformers, setTopPerformers] = useState([]);
@@ -125,12 +126,56 @@ const ProgressSummary = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         router.push('/screens/Progress/ViewProgress');
     };
+    // Function to generate and share PDF
+    const generatePdf = async () => {
+        const html = `
+            <html>
+                <body>
+                    <h1>Progress Summary</h1>
+                    <h2>Overall Average Scores</h2>
+                    <ul>
+                        ${Object.entries(averageScores).map(([subject, avg]) => (
+            `<li>${getSubjectDisplayName(subject)}: ${avg}</li>`
+        )).join('')}
+                    </ul>
+                    <h2>Top Performers</h2>
+                    <ul>
+                        ${topPerformers.map((student, index) => (
+            `<li>${index + 1}. ${student.studentName} (ID: ${student.studentID}) - Total: ${student.total}</li>`
+        )).join('')}
+                    </ul>
+                    <h2>Students Needing Improvement</h2>
+                    <ul>
+                        ${studentsNeedingImprovement.map((student, index) => (
+            `<li>${index + 1}. ${student.studentName} (ID: ${student.studentID}) - Total: ${student.total}</li>`
+        )).join('')}
+                    </ul>
+                </body>
+            </html>
+        `;
+
+        try {
+            const { uri } = await Print.printToFileAsync({ html });
+            await Sharing.shareAsync(uri);
+        } catch (error) {
+            console.error("Error generating or sharing PDF: ", error);
+        }
+    };
     return (
         <ScrollView style={styles.container} accessible={true}>
             <Text style={styles.title} accessible={true}>
                 Progress Summary
             </Text>
-
+            {/* Button for PDF generation */}
+            <TouchableOpacity
+                style={styles.pdfButton}
+                onPress={generatePdf}
+                accessibilityLabel="Generate PDF"
+                accessibilityHint="Generates a PDF version of the progress summary"
+                accessibilityRole="button"
+            >
+                <Text style={styles.buttonText}>Generate PDF</Text>
+            </TouchableOpacity>
             {/* Overall Statistics */}
             <View style={styles.section}>
                 <Text style={styles.sectionTitle} accessible={true}>
@@ -289,13 +334,24 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 3,
         marginBottom: 20,
-    },
+    },pdfButton: {
+        backgroundColor: '#80AF81',
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        borderRadius: 25,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        elevation: 3,
+        marginBottom: 20,
     buttonText: {
         fontSize: 18,
         color: '#fff',
         fontWeight: 'bold',
         textAlign: 'center',
     },
-});
+}});
 
 export default ProgressSummary;
