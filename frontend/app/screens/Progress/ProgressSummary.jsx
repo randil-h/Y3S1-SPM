@@ -126,41 +126,70 @@ const ProgressSummary = () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         router.push('/screens/Progress/ViewProgress');
     };
-    // Function to generate and share PDF
     const generatePdf = async () => {
         const html = `
-            <html>
-                <body>
-                    <h1>Progress Summary</h1>
-                    <h2>Overall Average Scores</h2>
-                    <ul>
-                        ${Object.entries(averageScores).map(([subject, avg]) => (
+        <html>
+            <head>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                        padding: 0;
+                        background-color: #f9f9f9;
+                    }
+                    h1 {
+                        font-size: 28px;
+                        color: #333;
+                        text-align: center;
+                    }
+                    h2 {
+                        font-size: 22px;
+                        color: #555;
+                        margin-top: 20px;
+                    }
+                    ul {
+                        list-style-type: none;
+                        padding: 0;
+                    }
+                    li {
+                        font-size: 18px;
+                        color: #444;
+                        margin-bottom: 10px;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>Progress Summary</h1>
+                <h2>Overall Average Scores</h2>
+                <ul>
+                    ${Object.entries(averageScores).map(([subject, avg]) => (
             `<li>${getSubjectDisplayName(subject)}: ${avg}</li>`
         )).join('')}
-                    </ul>
-                    <h2>Top Performers</h2>
-                    <ul>
-                        ${topPerformers.map((student, index) => (
+                </ul>
+                <h2>Top Performers</h2>
+                <ul>
+                    ${topPerformers.map((student, index) => (
             `<li>${index + 1}. ${student.studentName} (ID: ${student.studentID}) - Total: ${student.total}</li>`
         )).join('')}
-                    </ul>
-                    <h2>Students Needing Improvement</h2>
-                    <ul>
-                        ${studentsNeedingImprovement.map((student, index) => (
+                </ul>
+                <h2>Students Needing Improvement</h2>
+                <ul>
+                    ${studentsNeedingImprovement.map((student, index) => (
             `<li>${index + 1}. ${student.studentName} (ID: ${student.studentID}) - Total: ${student.total}</li>`
         )).join('')}
-                    </ul>
-                </body>
-            </html>
-        `;
+                </ul>
+            </body>
+        </html>
+    `;
 
         try {
-            const { uri } = await Print.printToFileAsync({ html });
+            const { uri } = await Print.printToFileAsync({ html, fileName: 'Progress Summary' }); // Set the file name
             await Sharing.shareAsync(uri);
         } catch (error) {
             console.error("Error generating or sharing PDF: ", error);
         }
     };
+
     return (
         <ScrollView style={styles.container} accessible={true}>
             <Text style={styles.title} accessible={true}>
