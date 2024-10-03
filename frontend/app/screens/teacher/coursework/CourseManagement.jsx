@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, Alert, StyleSheet, Modal, TouchableWithoutFeedback } from 'react-native';
 import { addDoc, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import DocumentPicker from 'react-native-document-picker';
 import { db } from '../../../../FirebaseConfig'; // Adjust the import based on your structure
 import { useRouter, useGlobalSearchParams } from 'expo-router';
 
@@ -9,6 +11,13 @@ const CourseManagement = () => {
     const [topics, setTopics] = useState([]);
     const [topicName, setTopicName] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isDocModalVisible, setIsDocModalVisible] = useState(false);
+    const [selectedTopic, setSelectedTopic] = useState(null);
+    const [fileName, setFileName] = useState('');
+    const [fileSize, setFileSize] = useState(0);
+    const [uploadedFiles, setUploadedFiles] = useState([]);
+
+    const storage = getStorage();
 
     // Fetch topics from Firestore
     const fetchTopics = async () => {
@@ -44,6 +53,48 @@ const CourseManagement = () => {
         }
     };
 
+    // Save document to the selected topic
+    const saveDocument = async () => {
+        if (!fileName || fileSize === 0) {
+            Alert.alert('Error', 'Please select a file to upload.');
+            return;
+        }
+
+        try {
+            // Create a reference to the file in Firebase Storage
+            const fileRef = ref(storage, `courses/${courseId}/topics/${selectedTopic}/documents/${fileName}`);
+            const file = await DocumentPicker.pick({
+                type: [DocumentPicker.types.allFiles],
+            });
+
+            const response = await fetch(file.uri);
+            const blob = await response.blob();
+
+            // Upload the file
+            await uploadBytes(fileRef, blob);
+            const fileUrl = await getDownloadURL(fileRef);
+
+            // Save file metadata in Firestore
+            const fileData = {
+                fileName,
+                fileSize,
+                fileUrl,
+                createdAt: new Date(), // Add a timestamp
+            };
+            const newDocRef = collection(db, `courses/${courseId}/topics/${selectedTopic}/documents`);
+            await addDoc(newDocRef, fileData);
+
+            Alert.alert('Success', 'Document added successfully!');
+            setFileName(''); // Reset the input
+            setFileSize(0);
+            setIsDocModalVisible(false); // Close the modal
+            fetchTopics(); // Refresh the topic list
+        } catch (error) {
+            console.error("Error adding document:", error);
+            Alert.alert('Error', 'Failed to add the document.');
+        }
+    };
+
     // Delete a topic from Firestore
     const deleteTopic = async (topicId) => {
         try {
@@ -62,7 +113,7 @@ const CourseManagement = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{courseName} - Manage Topics</Text>
+            <Text style={styles.title}>{courseName}</Text>
 
             {/* Topic List */}
             <FlatList
@@ -71,11 +122,20 @@ const CourseManagement = () => {
                 renderItem={({ item }) => (
                     <View style={styles.topicItem}>
                         <Text style={styles.topicText}>{item.topicName}</Text>
-                        <TouchableOpacity onPress={() => deleteTopic(item.id)}>
-                            <Text style={styles.deleteButton}>Delete</Text>
-                        </TouchableOpacity>
+                        <View style={styles.topicActions}>
+                            <TouchableOpacity onPress={() => {
+                                setSelectedTopic(item.id);
+                                setIsDocModalVisible(true);
+                            }}>
+                                <Text style={styles.addDocButton}>Add Document</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => deleteTopic(item.id)}>
+                                <Text style={styles.deleteButton}>Delete</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 )}
+                contentContainerStyle={topics.length === 0 ? styles.emptyList : {}}
             />
 
             {/* Floating '+' button */}
@@ -97,21 +157,71 @@ const CourseManagement = () => {
                     <View style={styles.modalContainer}>
                         <TouchableWithoutFeedback>
                             <View style={styles.modalContent}>
+                                <Text style={styles.modalTitle}>Add New Topic</Text>
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Topic Name"
                                     value={topicName}
                                     onChangeText={(text) => setTopicName(text)}
+                                    placeholderTextColor="#999"
                                 />
-                                <TouchableOpacity style={styles.saveButton} onPress={saveTopic}>
-                                    <Text style={styles.buttonText}>Add Topic</Text>
+                                <View style={styles.buttonContainer}>
+                                    <TouchableOpacity style={styles.saveButton} onPress={saveTopic}>
+                                        <Text style={styles.buttonText}>Add Topic</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.cancelButton}
+                                        onPress={() => setIsModalVisible(false)}
+                                    >
+                                        <Text style={styles.buttonText}>Cancel</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </View>
+                </TouchableWithoutFeedback>
+            </Modal>
+
+            {/* Modal for adding document */}
+            <Modal
+                visible={isDocModalVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setIsDocModalVisible(false)}
+            >
+                <TouchableWithoutFeedback onPress={() => setIsDocModalVisible(false)}>
+                    <View style={styles.modalContainer}>
+                        <TouchableWithoutFeedback>
+                            <View style={styles.modalContent}>
+                                <Text style={styles.modalTitle}>Add Document to Topic</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Document Name"
+                                    value={fileName}
+                                    onChangeText={(text) => setFileName(text)}
+                                    placeholderTextColor="#999"
+                                />
+                                <Text style={styles.fileSizeText}>File Size: {fileSize} bytes</Text>
+                                <TouchableOpacity onPress={async () => {
+                                    const file = await DocumentPicker.pick({
+                                        type: [DocumentPicker.types.allFiles],
+                                    });
+                                    setFileName(file.name);
+                                    setFileSize(file.size);
+                                }}>
+                                    <Text style={styles.selectFileButton}>Select File</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.cancelButton}
-                                    onPress={() => setIsModalVisible(false)}
-                                >
-                                    <Text style={styles.buttonText}>Cancel</Text>
-                                </TouchableOpacity>
+                                <View style={styles.buttonContainer}>
+                                    <TouchableOpacity style={styles.saveButton} onPress={saveDocument}>
+                                        <Text style={styles.buttonText}>Add Document</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.cancelButton}
+                                        onPress={() => setIsDocModalVisible(false)}
+                                    >
+                                        <Text style={styles.buttonText}>Cancel</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </TouchableWithoutFeedback>
                     </View>
@@ -128,27 +238,42 @@ const styles = StyleSheet.create({
         backgroundColor: '#F5FCFF',
     },
     title: {
-        fontSize: 24,
+        fontSize: 28,
         marginBottom: 20,
+        fontWeight: '500',
+        color: '#1e1e1e',
     },
     topicItem: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 15,
         marginBottom: 10,
-        backgroundColor: '#fff',
+        backgroundColor: '#ffffff',
         borderRadius: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 5,
+        elevation: 2,
     },
     topicText: {
         fontSize: 16,
+        color: '#333',
+    },
+    topicActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    addDocButton: {
+        color: '#2a5a06',
+        fontWeight: 'bold',
+        textDecorationLine: 'underline',
+        marginRight: 15,
     },
     deleteButton: {
-        color: 'red',
+        color: '#e74c3c',
         fontWeight: 'bold',
+        textDecorationLine: 'underline',
     },
     floatingButton: {
         position: 'absolute',
@@ -157,7 +282,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: '#529a25',
+        backgroundColor: '#2a5a06',
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 5,
@@ -170,38 +295,74 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)', // Darker background for better contrast
     },
     modalContent: {
-        width: '80%',
-        backgroundColor: '#fff',
-        padding: 20,
+        width: '85%',
+        backgroundColor: '#ffffff',
+        padding: 25,
         borderRadius: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 10,
+        elevation: 5,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#2a5a06',
+        marginBottom: 15,
+        textAlign: 'center',
     },
     input: {
-        height: 40,
+        height: 45,
         borderColor: '#ccc',
         borderWidth: 1,
         marginBottom: 15,
         paddingHorizontal: 10,
         borderRadius: 5,
+        backgroundColor: '#f9f9f9', // Light background for the input
+    },
+    fileSizeText: {
+        fontSize: 14,
+        color: '#333',
+        marginBottom: 10,
+    },
+    selectFileButton: {
+        color: '#2a5a06',
+        fontWeight: 'bold',
+        textDecorationLine: 'underline',
+        marginBottom: 15,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
     saveButton: {
-        backgroundColor: '#007BFF',
+        flex: 1,
+        backgroundColor: '#2a5a06',
         paddingVertical: 10,
         borderRadius: 5,
         alignItems: 'center',
+        marginRight: 5, // Space between buttons
     },
     cancelButton: {
+        flex: 1,
         backgroundColor: '#e74c3c',
         paddingVertical: 10,
         borderRadius: 5,
         alignItems: 'center',
-        marginTop: 10,
+        marginLeft: 5, // Space between buttons
     },
     buttonText: {
         color: '#fff',
         fontWeight: 'bold',
+    },
+    emptyList: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
     },
 });
 

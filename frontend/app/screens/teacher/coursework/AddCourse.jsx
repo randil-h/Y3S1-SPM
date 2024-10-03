@@ -191,7 +191,10 @@ const AddCourse = () => {
                                 keyExtractor={(item) => item.id}
                                 renderItem={({ item }) => (
                                     <View style={styles.courseItem}>
-                                        <TouchableOpacity onPress={() => handleCoursePress(item)} style={styles.courseDetails}>
+                                        <TouchableOpacity onPress={() => router.push({
+                                            pathname: 'screens/teacher/coursework/CourseManagement',
+                                            params: { courseId: item.id, courseName: item.courseName }
+                                        })} style={styles.courseDetails}>
                                             <Text style={styles.courseName}>{item.courseName}</Text>
                                             <Text style={styles.courseText}>Subject: <Text style={styles.courseValue}>{item.subject}</Text></Text>
                                             {/*<Text style={styles.courseLevel}>{item.level}</Text>*/}
@@ -199,10 +202,7 @@ const AddCourse = () => {
                                         <View style={styles.buttonContainer}>
                                             <TouchableOpacity
                                                 style={styles.topicButton}
-                                                onPress={() => router.push({
-                                                    pathname: 'screens/teacher/coursework/CourseManagement',
-                                                    params: { courseId: item.id, courseName: item.courseName }
-                                                })}
+                                                onPress={() => handleCoursePress(item)}
                                             >
                                                 <Icon name="cog" size={20} color="#fff" />
                                             </TouchableOpacity>
