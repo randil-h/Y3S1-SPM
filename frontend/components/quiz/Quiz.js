@@ -5,6 +5,8 @@ import * as Speech from 'expo-speech';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import app from '../../FirebaseConfig';
 import {useFocusEffect} from "@react-navigation/native";
+import * as Haptics from 'expo-haptics';
+
 
 const Quiz = ({ quiz, onComplete }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -85,6 +87,13 @@ const Quiz = ({ quiz, onComplete }) => {
 
         setBackgroundColor(correct ? '#00FF00' : '#FF0000');
         Speech.speak(correct ? `Correct! ${awardedMarks} marks.` : `Incorrect. You have ${2 - attemptCount} attempts left.`);
+
+        // Provide haptic feedback based on correctness
+        if (correct) {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        } else {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        }
 
         // Increment attempt count if incorrect
         if (!correct) {
