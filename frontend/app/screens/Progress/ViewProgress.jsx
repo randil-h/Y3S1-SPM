@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from "../../../FirebaseConfig";
@@ -12,6 +12,45 @@ const ViewProgress = () => {
     const [progressData, setProgressData] = useState([]);
     const router = useRouter();
     const [sound, setSound] = useState();
+    let ws;
+
+    useFocusEffect(
+        React.useCallback(() => {
+            // WebSocket connection starts when the page is focused
+            ws = new WebSocket('ws://192.168.1.4:8765');  //ip address and port number of server
+
+            ws.onopen = () => {
+                console.log('WebSocket connection established');
+            };
+
+            ws.onmessage = (event) => {
+                const { gesture } = JSON.parse(event.data);
+                handleReturnGesture(gesture);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket connection is closed');
+            };
+
+            // Cleanup function to close WebSocket when page is unfocused
+            return () => {
+                if (ws) {
+                    ws.close();
+                    console.log('WebSocket connection closed');
+                }
+            };
+        }, [])
+    );
+
+    const handleReturnGesture = (gesture) => {
+        console.log(`Gesture Detected : ${gesture}`);
+
+        if(gesture === 'Return') {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            playSound();
+            router.back();
+        }
+    };
 
     // Load sound effect
     const playSound = async () => {
@@ -89,8 +128,10 @@ const ViewProgress = () => {
                         <Text>Geography Marks: {item.geography}</Text>
                         <Text>History Marks: {item.hist}</Text>
                         <Text>Science Marks: {item.science}</Text>
-                        <Text>Coursework Progress: {item.courseworkProgress}</Text>
 
+                        <Text>
+                            Coursework Progress: {item.courseworkProgress === 'need_improvement' ? 'Need improvement' : item.courseworkProgress}
+                        </Text>
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
                                 style={[styles.roundButton, styles.updateButton]}

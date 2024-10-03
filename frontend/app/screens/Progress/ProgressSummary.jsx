@@ -21,9 +21,48 @@ const ProgressSummary = () => {
     const [averageScores, setAverageScores] = useState({});
     const router = useRouter();
     const [sound, setSound] = useState();
+    let ws;
 
     // Define the subjects array
     const subjects = ['maths', 'english', 'geography', 'hist', 'science'];
+
+    useFocusEffect(
+        React.useCallback(() => {
+            // WebSocket connection starts when the page is focused
+            ws = new WebSocket('ws://192.168.1.4:8765');  //ip address and port number of server
+
+            ws.onopen = () => {
+                console.log('WebSocket connection established');
+            };
+
+            ws.onmessage = (event) => {
+                const { gesture } = JSON.parse(event.data);
+                handleReturnGesture(gesture);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket connection is closed');
+            };
+
+            // Cleanup function to close WebSocket when page is unfocused
+            return () => {
+                if (ws) {
+                    ws.close();
+                    console.log('WebSocket connection closed');
+                }
+            };
+        }, [])
+    );
+
+    const handleReturnGesture = (gesture) => {
+        console.log(`Gesture Detected : ${gesture}`);
+
+        if(gesture === 'Return') {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            playSound();
+            router.back();
+        }
+    };
 
     // Helper function to get proper subject display names
     const getSubjectDisplayName = (key) => {
@@ -105,7 +144,10 @@ const ProgressSummary = () => {
         // Students needing improvement (e.g., total score below a threshold, say 60% of max)
         const maxTotal = sortedByTotal[0].total;
         const threshold = maxTotal * 0.6; // 60% of the highest total
-        const needingImprovement = sortedByTotal.filter(student => student.total < threshold);
+        // Students needing improvement (sorted from lowest to highest score)
+        const needingImprovement = sortedByTotal
+            .filter(student => student.total < threshold)
+            .sort((a, b) => a.total - b.total);  // Sort ascending for improvement list
         setStudentsNeedingImprovement(needingImprovement);
 
         // Calculate average scores per subject

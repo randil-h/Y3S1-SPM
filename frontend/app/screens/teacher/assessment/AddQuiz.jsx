@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Switch, Button, ScrollView, Alert, TouchableOpacity, SafeAreaView } from 'react-native';
 import { collection, addDoc } from "firebase/firestore";
 import {db} from "../../../../FirebaseConfig";
+import {useFocusEffect} from "@react-navigation/native";
+import * as Haptics from "expo-haptics";
+import {router} from "expo-router";
 
 const AddQuiz = () => {
     const [quizName, setQuizName] = useState('');
@@ -10,6 +13,44 @@ const AddQuiz = () => {
         { questionText: '', answers: ['', '', '', ''], correctAnswerIndex: null }
     ]);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    let ws;
+
+    useFocusEffect(
+        React.useCallback(() => {
+            // WebSocket connection starts when the page is focused
+            ws = new WebSocket('ws://192.168.1.4:8765');
+
+            ws.onopen = () => {
+                console.log('WebSocket connection established');
+            };
+
+            ws.onmessage = (event) => {
+                const { gesture } = JSON.parse(event.data);
+                handleSubmitGesture(gesture);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket connection is closed');
+            };
+
+            // Cleanup function to close WebSocket when page is unfocused
+            return () => {
+                if (ws) {
+                    ws.close();
+                    console.log('WebSocket connection closed');
+                }
+            };
+        }, [])
+    );
+
+    const handleSubmitGesture = (gesture) => {
+        if (gesture === 'Submit') {
+            handleSubmitQuiz();
+        } else if(gesture === 'Return') {
+            router.back();
+        }
+    };
+
 
     const handleQuestionChange = (text, index) => {
         const newQuestions = [...questions];

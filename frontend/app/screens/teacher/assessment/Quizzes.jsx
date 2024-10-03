@@ -1,8 +1,11 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, Modal, ScrollView, TextInput } from 'react-native';
 import { useNavigation, useRouter } from 'expo-router';
-import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, updateDoc, where } from 'firebase/firestore';
 import { db } from '../../../../FirebaseConfig';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+import {query} from "@react-native-firebase/firestore";
 
 const QuizPage = () => {
     const router = useRouter();
@@ -37,6 +40,124 @@ const QuizPage = () => {
         } catch (error) {
             console.error('Error fetching data: ', error);
         }
+    };
+
+    const fetchQuizAttempts = async (quizName) => {
+        try {
+            const attemptsQuery = query(collection(db, 'quiz_attempts'), where('quizName', '==', quizName));
+            const attemptsSnapshot = await getDocs(attemptsQuery);
+            const attemptsList = attemptsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            return attemptsList;
+        } catch (error) {
+            console.error("Error fetching quiz attempts:", error);
+            return [];
+        }
+    };
+
+    const handleLongPress = async (quiz) => {
+        const quizAttempts = await fetchQuizAttempts(quiz.quizName);
+
+        if (quizAttempts.length === 0) {
+            Alert.alert('No data', 'No quiz attempts found for this quiz.');
+            return;
+        }
+
+        const htmlContent = generateReportHTML(quiz, quizAttempts);
+
+        try {
+            const { uri } = await Print.printToFileAsync({ html: htmlContent });
+            await shareReport(uri);
+        } catch (error) {
+            console.error("Error generating or sharing PDF report:", error);
+            Alert.alert('Error', 'Failed to generate or share the PDF report.');
+        }
+    };
+
+    const generateReportHTML = (quiz, attempts) => {
+        let totalMarksSum = 0;
+        let totalQuestionsSum = 0;
+
+        const attemptsHTML = attempts.map((attempt, index) => {
+            totalMarksSum += attempt.totalMarks;
+            totalQuestionsSum += attempt.totalQuestions;
+
+            return `
+                <h3>Attempt ${index + 1}</h3>
+                <p>Timestamp: ${new Date(attempt.timestamp).toLocaleString()}</p>
+                <p>Total Marks: ${attempt.totalMarks}</p>
+                <p>Total Questions: ${attempt.totalQuestions}</p>
+            `;
+        }).join('');
+
+        const averageMarks = totalMarksSum / attempts.length;
+        const averageQuestions = totalQuestionsSum / attempts.length;
+
+        return `
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; }
+                    h1 { color: #4CAF50; }
+                    h2 { color: #2196F3; }
+                    .summary { background-color: #f2f2f2; padding: 10px; border-radius: 5px; }
+                </style>
+            </head>
+            <body>
+                <h1>Report for Quiz: ${quiz.quizName}</h1>
+                <p>Total Attempts: ${attempts.length}</p>
+                
+                <h2>Attempts Details</h2>
+                ${attemptsHTML}
+                
+                <h2>Summary</h2>
+                <div class="summary">
+                    <p>Average Marks: ${averageMarks.toFixed(2)}</p>
+                    <p>Average Questions: ${averageQuestions.toFixed(2)}</p>
+                </div>
+            </body>
+            </html>
+        `;
+    };
+
+    const shareReport = async (fileUri) => {
+        if (!(await Sharing.isAvailableAsync())) {
+            Alert.alert('Error', 'Sharing is not available on this device');
+            return;
+        }
+
+        try {
+            await Sharing.shareAsync(fileUri, { UTI: '.pdf', mimeType: 'application/pdf' });
+        } catch (error) {
+            console.error('Error sharing PDF report:', error);
+            Alert.alert('Error', 'Failed to share the PDF report.');
+        }
+    };
+
+    const generateReportContent = (quiz, attempts) => {
+        let report = `Report for Quiz: ${quiz.quizName}\n\n`;
+        report += `Total Attempts: ${attempts.length}\n\n`;
+
+        let totalMarksSum = 0;
+        let totalQuestionsSum = 0;
+
+        attempts.forEach((attempt, index) => {
+            report += `Attempt ${index + 1}:\n`;
+            report += `Timestamp: ${attempt.timestamp}\n`;
+            report += `Total Marks: ${attempt.totalMarks}\n`;
+            report += `Total Questions: ${attempt.totalQuestions}\n\n`;
+
+            totalMarksSum += attempt.totalMarks;
+            totalQuestionsSum += attempt.totalQuestions;
+        });
+
+        const averageMarks = totalMarksSum / attempts.length;
+        const averageQuestions = totalQuestionsSum / attempts.length;
+
+        report += `Summary:\n`;
+        report += `Average Marks: ${averageMarks.toFixed(2)}\n`;
+        report += `Average Questions: ${averageQuestions.toFixed(2)}\n`;
+
+        return report;
     };
 
     const handleDelete = async (id) => {
@@ -98,6 +219,7 @@ const QuizPage = () => {
                     setSelectedQuiz(item);
                     setIsModalVisible(true);
                 }}
+                onLongPress={() => handleLongPress(item)}
             >
                 <Text style={styles.quizText}>{item.quizName}</Text>
             </TouchableOpacity>
