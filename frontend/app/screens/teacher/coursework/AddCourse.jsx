@@ -4,6 +4,8 @@ import { addDoc, collection, getDocs, updateDoc, doc, deleteDoc, setDoc } from '
 import { db } from '../../../../FirebaseConfig';
 import { useRouter } from "expo-router";
 import Icon from 'react-native-vector-icons/Ionicons'; // Importing icons
+import RNHTMLtoPDF from 'react-native-html-to-pdf'; // PDF generation
+import * as Sharing from 'expo-sharing'; // To share the generated PDF
 
 const { width } = Dimensions.get('window');
 
@@ -107,6 +109,62 @@ const AddCourse = () => {
         </TouchableOpacity>
     );
 
+    const generatePDF = async () => {
+        let htmlContent = `
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid #dddddd; text-align: left; padding: 8px; }
+                th { background-color: #f2f2f2; }
+                h2 { text-align: center; }
+            </style>
+        </head>
+        <body>
+            <h2>Course List Report</h2>
+            <table>
+                <tr>
+                    <th>Course Name</th>
+                    <th>Subject</th>
+                    <th>Level</th>
+                </tr>
+    `;
+
+        courses.forEach(course => {
+            htmlContent += `
+            <tr>
+                <td>${course.courseName}</td>
+                <td>${course.subject}</td>
+                <td>${course.level}</td>
+            </tr>
+        `;
+        });
+
+        htmlContent += `
+            </table>
+        </body>
+        </html>
+    `;
+
+        try {
+            const file = await RNHTMLtoPDF.convert({
+                html: htmlContent,
+                fileName: 'course_report',
+                base64: false,
+            });
+
+            if (file && file.filePath) {
+                Alert.alert('Success', 'PDF Generated!');
+                await Sharing.shareAsync(file.filePath);
+            }
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            Alert.alert('Error', 'Failed to generate PDF.');
+        }
+    };
+
+
     useEffect(() => {
         fetchCourses();
     }, []);
@@ -114,6 +172,9 @@ const AddCourse = () => {
     return (
         <View style={styles.container}>
             <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
+            <TouchableOpacity style={styles.pdfButton} onPress={generatePDF}>
+                <Text style={styles.pdfButtonText}>Generate PDF</Text>
+            </TouchableOpacity>
 
             {/* Modal for adding/editing course */}
             <Modal

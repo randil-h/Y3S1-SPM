@@ -4321,6 +4321,11 @@ expo-router@~3.5.23:
     react-native-helmet-async "2.0.4"
     schema-utils "^4.0.1"
 
+expo-sharing@^12.0.1:
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/expo-sharing/-/expo-sharing-12.0.1.tgz#6c4d951beda47dac47112e679d60fc06c233b7aa"
+  integrity sha512-wBT+WeXwapj/9NWuLJO01vi9bdlchYu/Q/xD8slL/Ls4vVYku8CPqzkTtDFcjLrjtlJqyeHsdQXwKLvORmBIew==
+
 expo-speech@^12.0.2:
   version "12.0.2"
   resolved "https://registry.npmjs.org/expo-speech/-/expo-speech-12.0.2.tgz"
@@ -7331,6 +7336,11 @@ react-native-helmet-async@2.0.4:
     invariant "^2.2.4"
     react-fast-compare "^3.2.2"
     shallowequal "^1.1.0"
+
+react-native-html-to-pdf@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/react-native-html-to-pdf/-/react-native-html-to-pdf-0.12.0.tgz#2b467296f85c9c9783a7288b19722a7028dcbcb8"
+  integrity sha512-Yb5WO9SfF86s5Yv9PqXQ7fZDr9zZOJ+6jtweT9zFLraPNHWX7pSxe2dSkeg3cGiNrib65ZXGN6ksHymfYLFSSg==
 
 react-native-paper@^5.12.5:
   version "5.12.5"
