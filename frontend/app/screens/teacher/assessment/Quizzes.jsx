@@ -5,6 +5,7 @@ import { collection, getDocs, deleteDoc, doc, updateDoc, where } from 'firebase/
 import { db } from '../../../../FirebaseConfig';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
 import {query} from "@react-native-firebase/firestore";
 
 const QuizPage = () => {
@@ -56,6 +57,11 @@ const QuizPage = () => {
 
     const handleLongPress = async (quiz) => {
         const quizAttempts = await fetchQuizAttempts(quiz.quizName);
+        const currentDate = new Date();
+        let currentDateTime = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`
+            + `T${String(currentDate.getHours()).padStart(2, '0')}-${String(currentDate.getMinutes()).padStart(2, '0')}-${String(currentDate.getSeconds()).padStart(2, '0')}`;
+
+        currentDateTime = currentDateTime.slice(0, 10) + ' ' + currentDateTime.slice(11);
 
         if (quizAttempts.length === 0) {
             Alert.alert('No data', 'No quiz attempts found for this quiz.');
@@ -65,8 +71,12 @@ const QuizPage = () => {
         const htmlContent = generateReportHTML(quiz, quizAttempts);
 
         try {
-            const { uri } = await Print.printToFileAsync({ html: htmlContent });
-            await shareReport(uri);
+            const { uri } = await Print.printToFileAsync({
+                html: htmlContent,
+                base64: false
+            });
+            console.log("PDF generated at:", uri);
+            await shareReport(uri, `${quiz.quizName} report as at ${currentDateTime}.pdf`);
         } catch (error) {
             console.error("Error generating or sharing PDF report:", error);
             Alert.alert('Error', 'Failed to generate or share the PDF report.');
@@ -119,14 +129,22 @@ const QuizPage = () => {
         `;
     };
 
-    const shareReport = async (fileUri) => {
+    const shareReport = async (fileUri, filename) => {
         if (!(await Sharing.isAvailableAsync())) {
             Alert.alert('Error', 'Sharing is not available on this device');
             return;
         }
 
         try {
-            await Sharing.shareAsync(fileUri, { UTI: '.pdf', mimeType: 'application/pdf' });
+            const shareableUri = `${FileSystem.cacheDirectory}${filename}`;
+            await FileSystem.copyAsync({
+                from: fileUri,
+                to: shareableUri
+            });
+
+            await Sharing.shareAsync(shareableUri, { UTI: '.pdf', mimeType: 'application/pdf' });
+
+            await FileSystem.deleteAsync(shareableUri, { idempotent: true });
         } catch (error) {
             console.error('Error sharing PDF report:', error);
             Alert.alert('Error', 'Failed to share the PDF report.');
