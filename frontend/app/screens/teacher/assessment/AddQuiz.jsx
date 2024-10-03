@@ -3,6 +3,8 @@ import { View, Text, TextInput, StyleSheet, Switch, Button, ScrollView, Alert, T
 import { collection, addDoc } from "firebase/firestore";
 import {db} from "../../../../FirebaseConfig";
 import {useFocusEffect} from "@react-navigation/native";
+import * as Haptics from "expo-haptics";
+import {router} from "expo-router";
 
 const AddQuiz = () => {
     const [quizName, setQuizName] = useState('');
@@ -44,8 +46,8 @@ const AddQuiz = () => {
     const handleSubmitGesture = (gesture) => {
         if (gesture === 'Submit') {
             handleSubmitQuiz();
-        } else {
-
+        } else if(gesture === 'Return') {
+            router.back();
         }
     };
 
