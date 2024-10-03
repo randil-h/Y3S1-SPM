@@ -89,16 +89,20 @@ const CourseManagement = () => {
             await uploadBytes(storageRef, blob);
             const downloadURL = await getDownloadURL(storageRef);
 
+            // Get the size of the file
+            const fileSize = file[0].size; // assuming `file` object has size attribute
+
             await addDoc(collection(db, `courses/${courseId}/topics/${selectedTopic}/documents`), {
                 fileName: file[0].name,
                 fileUrl: downloadURL,
+                fileSize: fileSize, // Add file size here
             });
 
             setDocuments(prevDocuments => ({
                 ...prevDocuments,
                 [selectedTopic]: [
                     ...(prevDocuments[selectedTopic] || []),
-                    { id: Date.now().toString(), fileName: file[0].name, fileUrl: downloadURL }
+                    { id: Date.now().toString(), fileName: file[0].name, fileUrl: downloadURL, fileSize: fileSize } // Add file size here
                 ],
             }));
 
@@ -109,6 +113,8 @@ const CourseManagement = () => {
             Alert.alert("Error", "Failed to upload document.");
         }
     };
+
+
 
     // Function to delete a document
     const deleteDocument = async (topicId, documentId) => {

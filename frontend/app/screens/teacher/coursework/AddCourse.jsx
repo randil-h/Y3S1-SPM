@@ -21,19 +21,8 @@ const AddCourse = () => {
     const [loading, setLoading] = useState(false); // Loading state
     const router = useRouter();
 
-    const fetchCourses = async () => {
-        setLoading(true);
-        try {
-            const querySnapshot = await getDocs(collection(db, 'courses'));
-            const courseList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setCourses(courseList);
-        } catch (error) {
-            console.error("Error fetching courses:", error);
-            Alert.alert('Error', 'Failed to fetch courses.');
-        } finally {
-            setLoading(false);
-        }
-    };
+    const [topics, setTopics] = useState([]);
+    const [documents, setDocuments] = useState({});
 
     const saveCourse = async () => {
         if (!courseName || !subject || !level) {
@@ -109,34 +98,79 @@ const AddCourse = () => {
         </TouchableOpacity>
     );
 
+    const fetchCourses = async () => {
+        setLoading(true);
+        try {
+            const querySnapshot = await getDocs(collection(db, 'courses'));
+            const courseList = await Promise.all(querySnapshot.docs.map(async doc => {
+                const courseData = { id: doc.id, ...doc.data() };
+
+                // Fetch topics for each course
+                const topicsSnapshot = await getDocs(collection(db, 'courses', doc.id, 'topics'));
+                const topics = topicsSnapshot.docs.map(topicDoc => ({
+                    id: topicDoc.id,
+                    ...topicDoc.data()
+                }));
+
+                // Add topics to course data
+                return { ...courseData, topics };
+            }));
+            setCourses(courseList);
+        } catch (error) {
+            console.error("Error fetching courses:", error);
+            Alert.alert('Error', 'Failed to fetch courses.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const generatePDF = async () => {
         let htmlContent = `
         <html>
         <head>
             <style>
-                body { font-family: Arial, sans-serif; }
+                body { font-family: Arial, sans-serif; margin: 20px; }
                 table { width: 100%; border-collapse: collapse; }
                 th, td { border: 1px solid #dddddd; text-align: left; padding: 8px; }
                 th { background-color: #f2f2f2; }
-                h2 { text-align: center; }
+                h2 { text-align: center; margin-bottom: 20px; }
+                ul { padding-left: 20px; margin: 0; } /* Styling for document list */
+                li { list-style-type: disc; } /* Bullet points for documents */
+                .course-row { background-color: #e9f7ef; } /* Light green for course rows */
+                .topic-row { background-color: #f9f9f9; } /* Light grey for topic rows */
             </style>
         </head>
         <body>
             <h2>Course List Report</h2>
             <table>
                 <tr>
+                    <th>Level</th>
                     <th>Course Name</th>
                     <th>Subject</th>
-                    <th>Level</th>
+                    <th>Topics & Documents</th>
                 </tr>
     `;
 
         courses.forEach(course => {
+            const topicCount = course.topics ? course.topics.length : 0;
+
             htmlContent += `
-            <tr>
+            <tr class="course-row">
+                <td>${course.level}</td>
                 <td>${course.courseName}</td>
                 <td>${course.subject}</td>
-                <td>${course.level}</td>
+                <td>
+                    ${topicCount > 0
+                ? course.topics.map(topic => {
+                    const docs = documents[topic.id] || [];
+                    const docsList = docs.length > 0
+                        ? `<ul>${docs.map(doc => `<li>${doc.fileName} (${doc.fileSize} bytes)</li>`).join('')}</ul>`
+                        : 'No Documents';
+
+                    return `<strong>${topic.topicName}</strong>${docsList}`;
+                }).join('<br/>')
+                : 'No Topics Available'}
+                </td>
             </tr>
         `;
         });
@@ -163,6 +197,9 @@ const AddCourse = () => {
             Alert.alert('Error', 'Failed to generate PDF.');
         }
     };
+
+
+
 
 
     useEffect(() => {
