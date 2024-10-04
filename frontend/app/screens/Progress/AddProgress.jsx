@@ -284,8 +284,8 @@ const styles = StyleSheet.create({
         color: '#333333',
     },
     pickerContainer: {
-        marginBottom: 20,
-        borderWidth: 1, // Add border width
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
     },
     pickerLabel: {
         fontSize: 18,
