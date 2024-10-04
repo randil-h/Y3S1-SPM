@@ -244,12 +244,14 @@
     js-tokens "^4.0.0"
     picocolors "^1.0.0"
 
+
 "@babel/parser@^7.1.0", "@babel/parser@^7.13.16", "@babel/parser@^7.14.7", "@babel/parser@^7.20.0", "@babel/parser@^7.20.7", "@babel/parser@^7.23.9", "@babel/parser@^7.25.0", "@babel/parser@^7.25.6":
   version "7.25.6"
   resolved "https://registry.npmjs.org/@babel/parser/-/parser-7.25.6.tgz"
   integrity sha512-trGdfBdbD0l1ZPmcJ83eNxB9rbEax4ALFTF7fN386TMYbeCQbyme5cOEXQhbGXKebwGaB/J52w1mrklMcbgy6Q==
   dependencies:
     "@babel/types" "^7.25.6"
+
 
 "@babel/plugin-proposal-async-generator-functions@^7.0.0":
   version "7.20.7"
@@ -490,7 +492,11 @@
   resolved "https://registry.npmjs.org/@babel/plugin-syntax-typescript/-/plugin-syntax-typescript-7.25.4.tgz"
   integrity sha512-uMOCoHVU52BsSWxPOMVv5qKRdeSlPuImUCB2dlPuBSU+W2/ROE7/Zg8F2Kepbk+8yBa68LlRKxO+xgEVWorsDg==
   dependencies:
+<<<<<<< bimidu-09-05
+    "@babel/helper-plugin-utils" "^7.24.7"
+=======
     "@babel/helper-plugin-utils" "^7.24.8"
+>>>>>>> Final-viva
 
 "@babel/plugin-transform-arrow-functions@^7.0.0", "@babel/plugin-transform-arrow-functions@^7.0.0-0":
   version "7.24.7"
@@ -516,9 +522,15 @@
     "@babel/helper-plugin-utils" "^7.24.8"
 
 "@babel/plugin-transform-classes@^7.0.0":
+<<<<<<< bimidu-09-05
+  version "7.25.0"
+  resolved "https://registry.npmjs.org/@babel/plugin-transform-classes/-/plugin-transform-classes-7.25.0.tgz"
+  integrity sha512-xyi6qjr/fYU304fiRwFbekzkqVJZ6A7hOjWZd+89FVcBqPV3S9Wuozz82xdpLspckeaafntbzglaW4pqpzvtSw==
+=======
   version "7.25.4"
   resolved "https://registry.npmjs.org/@babel/plugin-transform-classes/-/plugin-transform-classes-7.25.4.tgz"
   integrity sha512-oexUfaQle2pF/b6E0dwsxQtAol9TLSO88kQvym6HHBWFliV2lGdrPieX+WgMRLSJDVzdYywk7jXbLPuO2KLTLg==
+>>>>>>> Final-viva
   dependencies:
     "@babel/helper-annotate-as-pure" "^7.24.7"
     "@babel/helper-compilation-targets" "^7.25.2"
@@ -626,9 +638,15 @@
     "@babel/helper-plugin-utils" "^7.24.7"
 
 "@babel/plugin-transform-private-methods@^7.22.5":
+<<<<<<< bimidu-09-05
+  version "7.24.7"
+  resolved "https://registry.npmjs.org/@babel/plugin-transform-private-methods/-/plugin-transform-private-methods-7.24.7.tgz"
+  integrity sha512-COTCOkG2hn4JKGEKBADkA8WNb35TGkkRbI5iT845dB+NyqgO8Hn+ajPbSnIQznneJTa3d30scb6iz/DhH8GsJQ==
+=======
   version "7.25.4"
   resolved "https://registry.npmjs.org/@babel/plugin-transform-private-methods/-/plugin-transform-private-methods-7.25.4.tgz"
   integrity sha512-ao8BG7E2b/URaUQGqN3Tlsg+M3KlHY6rJ1O1gXAEUnZoyNQnvKyH87Kfg+FoxSeyWUB8ISZZsC91C44ZuBFytw==
+>>>>>>> Final-viva
   dependencies:
     "@babel/helper-create-class-features-plugin" "^7.25.4"
     "@babel/helper-plugin-utils" "^7.24.8"
@@ -798,10 +816,17 @@
   resolved "https://registry.npmjs.org/@babel/regjsgen/-/regjsgen-0.8.0.tgz"
   integrity sha512-x/rqGMdzj+fWZvCOYForTghzbtqPDZ5gPwaoNGHdgDfF2QA/XZbCBp4Moo5scrkAMPhB7z26XM/AaHuIJdgauA==
 
+<<<<<<< bimidu-09-05
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.13.10", "@babel/runtime@^7.18.6", "@babel/runtime@^7.20.0":
+  version "7.25.0"
+  resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.25.0.tgz"
+  integrity sha512-7dRy4DwXwtzBrPbZflqxnvfxLF8kdZXPkhymtDeFoFqE6ldzjQFgYTtYIFARcLEYDrqfBfYcZt1WqFxRoyC9Rw==
+=======
 "@babel/runtime@^7.13.10", "@babel/runtime@^7.18.6", "@babel/runtime@^7.20.0", "@babel/runtime@^7.25.0":
   version "7.25.6"
   resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.25.6.tgz"
   integrity sha512-VBj9MYyDb9tuLq7yzqjgzt6Q+IBQLrGZfdjOekyEirZPHxXWoTSGUTMrpsfi58Up73d13NfYLv8HT9vmznjzhQ==
+>>>>>>> Final-viva
   dependencies:
     regenerator-runtime "^0.14.0"
 
@@ -814,10 +839,17 @@
     "@babel/parser" "^7.25.0"
     "@babel/types" "^7.25.0"
 
+<<<<<<< bimidu-09-05
+"@babel/traverse@^7.20.0", "@babel/traverse@^7.24.7", "@babel/traverse@^7.24.8", "@babel/traverse@^7.25.0", "@babel/traverse@^7.25.1", "@babel/traverse@^7.25.2":
+  version "7.25.3"
+  resolved "https://registry.npmjs.org/@babel/traverse/-/traverse-7.25.3.tgz"
+  integrity sha512-HefgyP1x754oGCsKmV5reSmtV7IXj/kpaE1XYY+D9G5PvKKoFfSbiS4M77MdjuwlZKDIKFCffq9rPU+H/s3ZdQ==
+=======
 "@babel/traverse@^7.20.0", "@babel/traverse@^7.24.7", "@babel/traverse@^7.24.8", "@babel/traverse@^7.25.0", "@babel/traverse@^7.25.1", "@babel/traverse@^7.25.2", "@babel/traverse@^7.25.4":
   version "7.25.6"
   resolved "https://registry.npmjs.org/@babel/traverse/-/traverse-7.25.6.tgz"
   integrity sha512-9Vrcx5ZW6UwK5tvqsj0nGpp/XzqthkT0dqIc9g1AdtygFToNtTF67XzYS//dm+SAK9cp3B9R4ZO/46p63SCjlQ==
+>>>>>>> Final-viva
   dependencies:
     "@babel/code-frame" "^7.24.7"
     "@babel/generator" "^7.25.6"
@@ -827,10 +859,17 @@
     debug "^4.3.1"
     globals "^11.1.0"
 
+<<<<<<< bimidu-09-05
+"@babel/types@^7.0.0", "@babel/types@^7.20.0", "@babel/types@^7.20.7", "@babel/types@^7.24.7", "@babel/types@^7.24.8", "@babel/types@^7.25.0", "@babel/types@^7.25.2", "@babel/types@^7.3.3":
+  version "7.25.2"
+  resolved "https://registry.npmjs.org/@babel/types/-/types-7.25.2.tgz"
+  integrity sha512-YTnYtra7W9e6/oAZEHj0bJehPRUlLH9/fbpT5LfB0NhQXyALCRkRs3zH9v07IYhkgpqX6Z78FnuccZr/l4Fs4Q==
+=======
 "@babel/types@^7.0.0", "@babel/types@^7.19.0", "@babel/types@^7.2.0", "@babel/types@^7.20.0", "@babel/types@^7.20.7", "@babel/types@^7.24.7", "@babel/types@^7.24.8", "@babel/types@^7.25.0", "@babel/types@^7.25.2", "@babel/types@^7.25.6", "@babel/types@^7.3.3":
   version "7.25.6"
   resolved "https://registry.npmjs.org/@babel/types/-/types-7.25.6.tgz"
   integrity sha512-/l42B1qxpG6RdfYf343Uw1vmDjeNhneUXtzhojE7pDgfpEypmRhI6j1kr17XCVv4Cgl9HdAiQY2x0GwKm7rWCw==
+>>>>>>> Final-viva
   dependencies:
     "@babel/helper-string-parser" "^7.24.8"
     "@babel/helper-validator-identifier" "^7.24.7"
@@ -1309,6 +1348,8 @@
     "@firebase/util" "1.9.7"
     tslib "^2.1.0"
 
+<<<<<<< bimidu-09-05
+=======
 "@firebase/app-compat@0.2.35":
   version "0.2.35"
   resolved "https://registry.npmjs.org/@firebase/app-compat/-/app-compat-0.2.35.tgz"
@@ -1320,6 +1361,7 @@
     "@firebase/util" "1.9.6"
     tslib "^2.1.0"
 
+>>>>>>> Final-viva
 "@firebase/app-compat@0.2.40":
   version "0.2.40"
   resolved "https://registry.npmjs.org/@firebase/app-compat/-/app-compat-0.2.40.tgz"
@@ -1856,6 +1898,8 @@
     tslib "^2.1.0"
     undici "6.19.7"
 
+<<<<<<< bimidu-09-05
+=======
 "@firebase/util@1.9.6":
   version "1.9.6"
   resolved "https://registry.npmjs.org/@firebase/util/-/util-1.9.6.tgz"
@@ -1863,6 +1907,7 @@
   dependencies:
     tslib "^2.1.0"
 
+>>>>>>> Final-viva
 "@firebase/util@1.9.7":
   version "1.9.7"
   resolved "https://registry.npmjs.org/@firebase/util/-/util-1.9.7.tgz"
@@ -2490,6 +2535,8 @@
     prompts "^2.4.2"
     semver "^7.5.2"
 
+<<<<<<< bimidu-09-05
+=======
 "@react-native-firebase/app@^20.4.0":
   version "20.4.0"
   resolved "https://registry.npmjs.org/@react-native-firebase/app/-/app-20.4.0.tgz"
@@ -2510,6 +2557,7 @@
   resolved "https://registry.npmjs.org/@react-native-firebase/firestore/-/firestore-20.4.0.tgz"
   integrity sha512-///YWJmZxCbDKM9QxaWnnEqvclIUbjsX+57hiwnzXzlNOd8dzOP1ub7EgBrzgZOT1VfybG9Fz16xTMjhxv21iQ==
 
+>>>>>>> Final-viva
 "@react-native-picker/picker@^2.8.0":
   version "2.8.0"
   resolved "https://registry.npmjs.org/@react-native-picker/picker/-/picker-2.8.0.tgz"
@@ -2675,6 +2723,14 @@
     hermes-parser "0.19.1"
     nullthrows "^1.1.1"
 
+<<<<<<< bimidu-09-05
+"@react-native/normalize-color@*":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@react-native/normalize-color/-/normalize-color-2.1.0.tgz#939b87a9849e81687d3640c5efa2a486ac266f91"
+  integrity sha512-Z1jQI2NpdFJCVgpY+8Dq/Bt3d+YUi1928Q+/CZm/oh66fzM0RUl54vvuXlPJKybH4pdCZey1eDTPaLHkMPNgWA==
+
+=======
+>>>>>>> Final-viva
 "@react-native/normalize-colors@0.74.84":
   version "0.74.84"
   resolved "https://registry.npmjs.org/@react-native/normalize-colors/-/normalize-colors-0.74.84.tgz"
@@ -2739,7 +2795,11 @@
     "@react-navigation/elements" "^1.3.30"
     warn-once "^0.1.0"
 
+<<<<<<< bimidu-09-05
+"@react-navigation/native@^6.0.2", "@react-navigation/native@~6.1.6":
+=======
 "@react-navigation/native@^6.1.18", "@react-navigation/native@~6.1.6":
+>>>>>>> Final-viva
   version "6.1.18"
   resolved "https://registry.npmjs.org/@react-navigation/native/-/native-6.1.18.tgz"
   integrity sha512-mIT9MiL/vMm4eirLcmw2h6h/Nm5FICtnYSdohq4vTLA2FF/6PNhByM7s8ffqoVfE5L0uAa6Xda1B7oddolUiGg==
@@ -3020,6 +3080,12 @@
   dependencies:
     "@types/node" "*"
 
+<<<<<<< bimidu-09-05
+"@types/node@*", "@types/node@>=12.12.47", "@types/node@>=13.7.0", "@types/node@^18.0.0":
+  version "18.19.44"
+  resolved "https://registry.npmjs.org/@types/node/-/node-18.19.44.tgz"
+  integrity sha512-ZsbGerYg72WMXUIE9fYxtvfzLEuq6q8mKERdWFnqTmOvudMxnz+CBNRoOwJ2kNpFOncrKjT1hZwxjlFgQ9qvQA==
+=======
 "@types/node@*", "@types/node@>=12.12.47", "@types/node@>=13.7.0":
   version "22.5.4"
   resolved "https://registry.npmjs.org/@types/node/-/node-22.5.4.tgz"
@@ -3031,6 +3097,7 @@
   version "18.19.50"
   resolved "https://registry.npmjs.org/@types/node/-/node-18.19.50.tgz"
   integrity sha512-xonK+NRrMBRtkL1hVCc3G+uXtjh1Al4opBLjqVmipe5ZAaBYWW6cNAiBVZ1BvmkBhep698rP3UM3aRAdSALuhg==
+>>>>>>> Final-viva
   dependencies:
     undici-types "~5.26.4"
 
@@ -3439,7 +3506,11 @@ babel-plugin-polyfill-corejs2@^0.4.10:
     "@babel/helper-define-polyfill-provider" "^0.6.2"
     semver "^6.3.1"
 
+<<<<<<< bimidu-09-05
+babel-plugin-polyfill-corejs3@^0.10.1:
+=======
 babel-plugin-polyfill-corejs3@^0.10.6:
+>>>>>>> Final-viva
   version "0.10.6"
   resolved "https://registry.npmjs.org/babel-plugin-polyfill-corejs3/-/babel-plugin-polyfill-corejs3-0.10.6.tgz"
   integrity sha512-b37+KR2i/khY5sKmWNVQAnitvquQbNdWy6lJdsr0kmquCKEEUgMKK4SboVM3HtfnZilfjr4MMQ7vY58FVWDtIA==
@@ -3756,6 +3827,17 @@ chalk@^3.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
+<<<<<<< bimidu-09-05
+chalk@^4.0.0, chalk@^4.1.0, chalk@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.npmjs.org/chalk/-/chalk-4.1.2.tgz"
+  integrity sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==
+  dependencies:
+    ansi-styles "^4.1.0"
+    supports-color "^7.1.0"
+
+=======
+>>>>>>> Final-viva
 char-regex@^1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/char-regex/-/char-regex-1.0.2.tgz"
@@ -4037,9 +4119,15 @@ cookie@^0.6.0:
   integrity sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==
 
 core-js-compat@^3.38.0:
+<<<<<<< bimidu-09-05
+  version "3.38.0"
+  resolved "https://registry.npmjs.org/core-js-compat/-/core-js-compat-3.38.0.tgz"
+  integrity sha512-75LAicdLa4OJVwFxFbQR3NdnZjNgX6ILpVcVzcC4T2smerB5lELMrJQQQoWV6TiuC/vlaFqgU2tKQx9w5s0e0A==
+=======
   version "3.38.1"
   resolved "https://registry.npmjs.org/core-js-compat/-/core-js-compat-3.38.1.tgz"
   integrity sha512-JRH6gfXxGmrzF3tZ57lFx97YARxCXPaMzPo6jELZhv88pBH5VXpQ+y0znKGlFnzuaihqhLbefxSJxWJMPtfDzw==
+>>>>>>> Final-viva
   dependencies:
     browserslist "^4.23.3"
 
@@ -4102,6 +4190,11 @@ crypt@0.0.2, crypt@~0.0.1:
   version "0.0.2"
   resolved "https://registry.npmjs.org/crypt/-/crypt-0.0.2.tgz"
   integrity sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==
+
+crypto-js@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.2.0.tgz#4d931639ecdfd12ff80e8186dba6af2c2e856631"
+  integrity sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==
 
 crypto-random-string@^1.0.0:
   version "1.0.0"
@@ -4200,12 +4293,21 @@ debug@2.6.9, debug@^2.2.0, debug@^2.6.9:
   dependencies:
     ms "2.0.0"
 
+<<<<<<< bimidu-09-05
+debug@4, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1, debug@^4.3.2, debug@^4.3.4:
+  version "4.3.6"
+  resolved "https://registry.npmjs.org/debug/-/debug-4.3.6.tgz"
+  integrity sha512-O/09Bd4Z1fBrU4VzkhFqVgpPzaGbw6Sm9FEkBT1A/YBXQFGuuSxa1dN2nxgxS34JmKXqYx8CZAwEVoJFImUXIg==
+  dependencies:
+    ms "2.1.2"
+=======
 debug@4, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1, debug@^4.3.2, debug@^4.3.4, debug@~4.3.1, debug@~4.3.2:
   version "4.3.7"
   resolved "https://registry.npmjs.org/debug/-/debug-4.3.7.tgz"
   integrity sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==
   dependencies:
     ms "^2.1.3"
+>>>>>>> Final-viva
 
 debug@^3.1.0:
   version "3.2.7"
@@ -4315,6 +4417,15 @@ depd@2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/depd/-/depd-2.0.0.tgz"
   integrity sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==
+
+deprecated-react-native-prop-types@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/deprecated-react-native-prop-types/-/deprecated-react-native-prop-types-2.3.0.tgz#c10c6ee75ff2b6de94bb127f142b814e6e08d9ab"
+  integrity sha512-pWD0voFtNYxrVqvBMYf5gq3NA2GCpfodS1yNynTPc93AYA/KEMGeWDqqeUB6R2Z9ZofVhks2aeJXiuQqKNpesA==
+  dependencies:
+    "@react-native/normalize-color" "*"
+    invariant "*"
+    prop-types "*"
 
 destroy@1.2.0:
   version "1.2.0"
@@ -4680,6 +4791,8 @@ expo-blur@^13.0.2:
   resolved "https://registry.npmjs.org/expo-blur/-/expo-blur-13.0.2.tgz"
   integrity sha512-t2p7BChO3Reykued++QJRMZ/og6J3aXtSQ+bU31YcBeXhZLkHwjWEhiPKPnJka7J2/yTs4+jOCNDY0kCZmcE3w==
 
+<<<<<<< bimidu-09-05
+=======
 expo-camera@^15.0.16:
   version "15.0.16"
   resolved "https://registry.npmjs.org/expo-camera/-/expo-camera-15.0.16.tgz"
@@ -4687,6 +4800,7 @@ expo-camera@^15.0.16:
   dependencies:
     invariant "^2.2.4"
 
+>>>>>>> Final-viva
 expo-constants@~16.0.0, expo-constants@~16.0.2:
   version "16.0.2"
   resolved "https://registry.npmjs.org/expo-constants/-/expo-constants-16.0.2.tgz"
@@ -4695,7 +4809,16 @@ expo-constants@~16.0.0, expo-constants@~16.0.2:
     "@expo/config" "~9.0.0"
     "@expo/env" "~0.3.0"
 
+<<<<<<< bimidu-09-05
+expo-document-picker@^12.0.2:
+  version "12.0.2"
+  resolved "https://registry.npmjs.org/expo-document-picker/-/expo-document-picker-12.0.2.tgz"
+  integrity sha512-tmwuRWoCPv6SmNDSMEWcttMBJ95k8/g5sMWnHdmvOx0UKp0pFXP8FI+55HKtQpo6k2+118MkdDDhQSwKqASVAw==
+
+expo-file-system@~17.0.1:
+=======
 expo-file-system@^17.0.1, expo-file-system@~17.0.1:
+>>>>>>> Final-viva
   version "17.0.1"
   resolved "https://registry.npmjs.org/expo-file-system/-/expo-file-system-17.0.1.tgz"
   integrity sha512-dYpnZJqTGj6HCYJyXAgpFkQWsiCH3HY1ek2cFZVHFoEc5tLz9gmdEgTF6nFHurvmvfmXqxi7a5CXyVm0aFYJBw==
@@ -4767,7 +4890,11 @@ expo-router@~3.5.23:
 
 expo-sharing@^12.0.1:
   version "12.0.1"
+<<<<<<< bimidu-09-05
+  resolved "https://registry.yarnpkg.com/expo-sharing/-/expo-sharing-12.0.1.tgz#6c4d951beda47dac47112e679d60fc06c233b7aa"
+=======
   resolved "https://registry.npmjs.org/expo-sharing/-/expo-sharing-12.0.1.tgz"
+>>>>>>> Final-viva
   integrity sha512-wBT+WeXwapj/9NWuLJO01vi9bdlchYu/Q/xD8slL/Ls4vVYku8CPqzkTtDFcjLrjtlJqyeHsdQXwKLvORmBIew==
 
 expo-speech@^12.0.2:
@@ -4801,9 +4928,15 @@ expo-web-browser@~13.0.3:
   integrity sha512-HXb7y82ApVJtqk8tManyudtTrCtx8xcUnVzmJECeHCB0SsWSQ+penVLZxJkcyATWoJOsFMnfVSVdrTcpKKGszQ==
 
 expo@~51.0.28:
+<<<<<<< bimidu-09-05
+  version "51.0.28"
+  resolved "https://registry.npmjs.org/expo/-/expo-51.0.28.tgz"
+  integrity sha512-R+0tSV0Zf5R+DxN4W3mLFlVvYVpiJ+dtYrMmBedIRw0A54we50QRM1jS0Gq2Bdzg2JtainSEApdQXUC6r9j/BA==
+=======
   version "51.0.32"
   resolved "https://registry.npmjs.org/expo/-/expo-51.0.32.tgz"
   integrity sha512-6GEhYvHRnyS/6BytQagGkClsaqbuwAtlN3A6oDfnNMRKLmz6NE/r+Rjg9zbQgUO6zigqb60Yj5lAX32DmixRDw==
+>>>>>>> Final-viva
   dependencies:
     "@babel/runtime" "^7.20.0"
     "@expo/cli" "0.18.29"
@@ -5586,7 +5719,7 @@ internal-slot@^1.0.7:
     hasown "^2.0.0"
     side-channel "^1.0.4"
 
-invariant@^2.2.4:
+invariant@*, invariant@^2.2.4:
   version "2.2.4"
   resolved "https://registry.npmjs.org/invariant/-/invariant-2.2.4.tgz"
   integrity sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==
@@ -6556,7 +6689,11 @@ lighthouse-logger@^1.0.0:
 
 lightningcss-darwin-arm64@1.19.0:
   version "1.19.0"
+<<<<<<< bimidu-09-05
+  resolved "https://registry.npmjs.org/lightningcss-darwin-arm64/-/lightningcss-darwin-arm64-1.19.0.tgz"
+=======
   resolved "https://registry.yarnpkg.com/lightningcss-darwin-arm64/-/lightningcss-darwin-arm64-1.19.0.tgz#56ab071e932f845dbb7667f44f5b78441175a343"
+>>>>>>> Final-viva
   integrity sha512-wIJmFtYX0rXHsXHSr4+sC5clwblEMji7HHQ4Ub1/CznVRxtCFha6JIt5JZaNf8vQrfdZnBxLLC6R8pC818jXqg==
 
 lightningcss-darwin-x64@1.19.0:
@@ -6591,7 +6728,11 @@ lightningcss-linux-x64-musl@1.19.0:
 
 lightningcss-win32-x64-msvc@1.19.0:
   version "1.19.0"
+<<<<<<< bimidu-09-05
+  resolved "https://registry.yarnpkg.com/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.19.0.tgz#0854dbd153035eca1396e2227c708ad43655a61c"
+=======
   resolved "https://registry.npmjs.org/lightningcss-win32-x64-msvc/-/lightningcss-win32-x64-msvc-1.19.0.tgz"
+>>>>>>> Final-viva
   integrity sha512-C+VuUTeSUOAaBZZOPT7Etn/agx/MatzJzGRkeV+zEABmPuntv1zihncsi+AyGmjkkzq3wVedEy7h0/4S84mUtg==
 
 lightningcss@~1.19.0:
@@ -6825,10 +6966,17 @@ metro-cache@0.80.11:
     flow-enums-runtime "^0.0.6"
     metro-core "0.80.11"
 
+<<<<<<< bimidu-09-05
+metro-config@0.80.10, metro-config@^0.80.3:
+  version "0.80.10"
+  resolved "https://registry.npmjs.org/metro-config/-/metro-config-0.80.10.tgz"
+  integrity sha512-0GYAw0LkmGbmA81FepKQepL1KU/85Cyv7sAiWm6QWeV6AcVCpsKg6jGLqGHJ0LLPL60rWzA4TV1DQAlzdJAEtA==
+=======
 metro-config@0.80.11, metro-config@^0.80.3:
   version "0.80.11"
   resolved "https://registry.npmjs.org/metro-config/-/metro-config-0.80.11.tgz"
   integrity sha512-NnWKDK3ZWyFnxCluTE3L+nbp30CQBjp6QEPmTCx1cFHPLoWqTX6BqHZ82e+xK95VuGjwKhWk4NihuV3WtcADtw==
+>>>>>>> Final-viva
   dependencies:
     connect "^3.6.5"
     cosmiconfig "^5.0.5"
@@ -6839,10 +6987,17 @@ metro-config@0.80.11, metro-config@^0.80.3:
     metro-core "0.80.11"
     metro-runtime "0.80.11"
 
+<<<<<<< bimidu-09-05
+metro-core@0.80.10, metro-core@^0.80.3:
+  version "0.80.10"
+  resolved "https://registry.npmjs.org/metro-core/-/metro-core-0.80.10.tgz"
+  integrity sha512-nwBB6HbpGlNsZMuzxVqxqGIOsn5F3JKpsp8PziS7Z4mV8a/jA1d44mVOgYmDa2q5WlH5iJfRIIhdz24XRNDlLA==
+=======
 metro-core@0.80.11, metro-core@^0.80.3:
   version "0.80.11"
   resolved "https://registry.npmjs.org/metro-core/-/metro-core-0.80.11.tgz"
   integrity sha512-N3I1jDAlACLzcwiZ7npPbV1ZSKdtcPDvivUaI10oCa13TJ2BeIXKlKetkB9qHjY7oyFquDRKt/P6wLlO6aliDw==
+>>>>>>> Final-viva
   dependencies:
     flow-enums-runtime "^0.0.6"
     lodash.throttle "^4.1.1"
@@ -6882,18 +7037,32 @@ metro-resolver@0.80.11:
   dependencies:
     flow-enums-runtime "^0.0.6"
 
+<<<<<<< bimidu-09-05
+metro-runtime@0.80.10, metro-runtime@^0.80.3:
+  version "0.80.10"
+  resolved "https://registry.npmjs.org/metro-runtime/-/metro-runtime-0.80.10.tgz"
+  integrity sha512-Xh0N589ZmSIgJYAM+oYwlzTXEHfASZac9TYPCNbvjNTn0EHKqpoJ/+Im5G3MZT4oZzYv4YnvzRtjqS5k0tK94A==
+=======
 metro-runtime@0.80.11, metro-runtime@^0.80.3:
   version "0.80.11"
   resolved "https://registry.npmjs.org/metro-runtime/-/metro-runtime-0.80.11.tgz"
   integrity sha512-EI7idlPKPZntUnht2ipFhIVR4+PyjRxCXi4xcDyJfrGhOJH/EfXjb5jp3sYN/np6m9HOtCniBOmL1twlDtmeaA==
+>>>>>>> Final-viva
   dependencies:
     "@babel/runtime" "^7.25.0"
     flow-enums-runtime "^0.0.6"
 
+<<<<<<< bimidu-09-05
+metro-source-map@0.80.10, metro-source-map@^0.80.3:
+  version "0.80.10"
+  resolved "https://registry.npmjs.org/metro-source-map/-/metro-source-map-0.80.10.tgz"
+  integrity sha512-EyZswqJW8Uukv/HcQr6K19vkMXW1nzHAZPWJSEyJFKIbgp708QfRZ6vnZGmrtFxeJEaFdNup4bGnu8/mIOYlyA==
+=======
 metro-source-map@0.80.11, metro-source-map@^0.80.3:
   version "0.80.11"
   resolved "https://registry.npmjs.org/metro-source-map/-/metro-source-map-0.80.11.tgz"
   integrity sha512-s/lxGxUBVYhufYmJBLpxk1m6m73KbcXBS30T1TGPKJWhrO/hu6T0i9fqS6r/z4LdhB/TGQkHoB1VWiQ/J445iQ==
+>>>>>>> Final-viva
   dependencies:
     "@babel/traverse" "^7.20.0"
     "@babel/types" "^7.20.0"
@@ -6949,10 +7118,17 @@ metro-transform-worker@0.80.11:
     metro-transform-plugins "0.80.11"
     nullthrows "^1.1.1"
 
+<<<<<<< bimidu-09-05
+metro@0.80.10, metro@^0.80.3:
+  version "0.80.10"
+  resolved "https://registry.npmjs.org/metro/-/metro-0.80.10.tgz"
+  integrity sha512-FDPi0X7wpafmDREXe1lgg3WzETxtXh6Kpq8+IwsG35R2tMyp2kFIqDdshdohuvDt1J/qDARcEPq7V/jElTb1kA==
+=======
 metro@0.80.11, metro@^0.80.3:
   version "0.80.11"
   resolved "https://registry.npmjs.org/metro/-/metro-0.80.11.tgz"
   integrity sha512-LQxygnIEB628EFcqCwQCkMAIQ5zf0aUnCuFzxwv9rNEwaQG6xdxoSHT8xpV625sWpOqNvrOiC0rYeQuo3aOUhQ==
+>>>>>>> Final-viva
   dependencies:
     "@babel/code-frame" "^7.0.0"
     "@babel/core" "^7.20.0"
@@ -7132,7 +7308,16 @@ ms@2.0.0:
   resolved "https://registry.npmjs.org/ms/-/ms-2.0.0.tgz"
   integrity sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==
 
+<<<<<<< bimidu-09-05
+ms@2.1.2, ms@^2.1.1:
+  version "2.1.2"
+  resolved "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
+  integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
+
+ms@2.1.3:
+=======
 ms@2.1.3, ms@^2.1.1, ms@^2.1.3:
+>>>>>>> Final-viva
   version "2.1.3"
   resolved "https://registry.npmjs.org/ms/-/ms-2.1.3.tgz"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
@@ -7546,9 +7731,15 @@ path-type@^4.0.0:
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
 
 picocolors@^1.0.0, picocolors@^1.0.1:
+<<<<<<< bimidu-09-05
+  version "1.0.1"
+  resolved "https://registry.npmjs.org/picocolors/-/picocolors-1.0.1.tgz"
+  integrity sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==
+=======
   version "1.1.0"
   resolved "https://registry.npmjs.org/picocolors/-/picocolors-1.1.0.tgz"
   integrity sha512-TQ92mBOW0l3LeMeyLV6mzy/kWr8lkd/hp3mTg7wYK7zJhuBStmGMBG0BdeDZS/dZx1IukaX6Bk11zcln25o1Aw==
+>>>>>>> Final-viva
 
 picomatch@^2.0.4, picomatch@^2.2.3, picomatch@^2.3.1:
   version "2.3.1"
@@ -7622,6 +7813,8 @@ pretty-bytes@5.6.0:
   resolved "https://registry.npmjs.org/pretty-bytes/-/pretty-bytes-5.6.0.tgz"
   integrity sha512-FFw039TmrBqFK8ma/7OL3sDz/VytdtJr044/QUJtH0wK9lb9jLq9tJyIxUwtQJHwar2BqtiA4iCWSwo9JLkzFg==
 
+<<<<<<< bimidu-09-05
+=======
 pretty-format@^24:
   version "24.9.0"
   resolved "https://registry.npmjs.org/pretty-format/-/pretty-format-24.9.0.tgz"
@@ -7632,6 +7825,7 @@ pretty-format@^24:
     ansi-styles "^3.2.0"
     react-is "^16.8.4"
 
+>>>>>>> Final-viva
 pretty-format@^26.5.2, pretty-format@^26.6.2:
   version "26.6.2"
   resolved "https://registry.npmjs.org/pretty-format/-/pretty-format-26.6.2.tgz"
@@ -7683,7 +7877,11 @@ prompts@^2.0.1, prompts@^2.2.1, prompts@^2.3.2, prompts@^2.4.2:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
+<<<<<<< bimidu-09-05
+prop-types@*, prop-types@^15.7.2, prop-types@^15.8.1:
+=======
 prop-types@^15.6.1, prop-types@^15.7.2, prop-types@^15.8.1:
+>>>>>>> Final-viva
   version "15.8.1"
   resolved "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -7825,6 +8023,16 @@ react-is@^18.0.0, react-is@^18.2.0:
   version "18.3.1"
   resolved "https://registry.npmjs.org/react-is/-/react-is-18.3.1.tgz"
   integrity sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==
+<<<<<<< bimidu-09-05
+
+react-native-document-picker@^9.3.1:
+  version "9.3.1"
+  resolved "https://registry.yarnpkg.com/react-native-document-picker/-/react-native-document-picker-9.3.1.tgz#f2c33237a906fd0893130e0605c8f18a3aef1605"
+  integrity sha512-Vcofv9wfB0j67zawFjfq9WQPMMzXxOZL9kBmvWDpjVuEcVK73ndRmlXHlkeFl5ZHVsv4Zb6oZYhqm9u5omJOPA==
+  dependencies:
+    invariant "^2.2.4"
+=======
+>>>>>>> Final-viva
 
 react-native-gesture-handler@~2.16.1:
   version "2.16.2"
@@ -7853,7 +8061,11 @@ react-native-helmet-async@2.0.4:
 
 react-native-html-to-pdf@^0.12.0:
   version "0.12.0"
+<<<<<<< bimidu-09-05
+  resolved "https://registry.yarnpkg.com/react-native-html-to-pdf/-/react-native-html-to-pdf-0.12.0.tgz#2b467296f85c9c9783a7288b19722a7028dcbcb8"
+=======
   resolved "https://registry.npmjs.org/react-native-html-to-pdf/-/react-native-html-to-pdf-0.12.0.tgz"
+>>>>>>> Final-viva
   integrity sha512-Yb5WO9SfF86s5Yv9PqXQ7fZDr9zZOJ+6jtweT9zFLraPNHWX7pSxe2dSkeg3cGiNrib65ZXGN6ksHymfYLFSSg==
 
 react-native-paper@^5.12.5:
@@ -7865,6 +8077,17 @@ react-native-paper@^5.12.5:
     color "^3.1.2"
     use-latest-callback "^0.1.5"
 
+<<<<<<< bimidu-09-05
+react-native-pdf@^6.7.5:
+  version "6.7.5"
+  resolved "https://registry.yarnpkg.com/react-native-pdf/-/react-native-pdf-6.7.5.tgz#1bc5479f2161189f938912b4080ea9eef8a9d84d"
+  integrity sha512-d1S76p2Vwax2iG+kTnjINiUMvpjtJJvtMiYwHRbgGczT8GJjtXH49YCWOd+HfnUAU29cB+knzsKGYoZBMQM8Ow==
+  dependencies:
+    crypto-js "4.2.0"
+    deprecated-react-native-prop-types "^2.3.0"
+
+=======
+>>>>>>> Final-viva
 react-native-reanimated@~3.10.1:
   version "3.10.1"
   resolved "https://registry.npmjs.org/react-native-reanimated/-/react-native-reanimated-3.10.1.tgz"
@@ -7924,6 +8147,8 @@ react-native-web@~0.19.10:
     postcss-value-parser "^4.2.0"
     styleq "^0.1.3"
 
+<<<<<<< bimidu-09-05
+=======
 react-native-websocket@^1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/react-native-websocket/-/react-native-websocket-1.0.2.tgz"
@@ -7931,6 +8156,7 @@ react-native-websocket@^1.0.2:
   dependencies:
     prop-types "^15.6.1"
 
+>>>>>>> Final-viva
 react-native@0.74.5:
   version "0.74.5"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.74.5.tgz"
@@ -8721,6 +8947,9 @@ string.prototype.trimstart@^1.0.8:
     define-properties "^1.2.1"
     es-object-atoms "^1.0.0"
 
+<<<<<<< bimidu-09-05
+string_decoder@^1.1.1, string_decoder@~1.1.1:
+=======
 string_decoder@^1.1.1:
   version "1.3.0"
   resolved "https://registry.npmjs.org/string_decoder/-/string_decoder-1.3.0.tgz"
@@ -8729,6 +8958,7 @@ string_decoder@^1.1.1:
     safe-buffer "~5.2.0"
 
 string_decoder@~1.1.1:
+>>>>>>> Final-viva
   version "1.1.1"
   resolved "https://registry.npmjs.org/string_decoder/-/string_decoder-1.1.1.tgz"
   integrity sha512-n/ShnvDi6FHbbVfviro+WojiFzv+s8MPMHBczVePfUpDJLwoLT0ht1l4YwBCbi8pJAveEEdnkHyPyTP/mzRfwg==
@@ -8831,6 +9061,8 @@ sudo-prompt@^9.0.0:
   resolved "https://registry.npmjs.org/sudo-prompt/-/sudo-prompt-9.2.1.tgz"
   integrity sha512-Mu7R0g4ig9TUuGSxJavny5Rv0egCEtpZRNMrZaYS1vxkiIxGiGUwoezU3LazIQ+KE04hTrTfNPgxU5gzi7F5Pw==
 
+<<<<<<< bimidu-09-05
+=======
 superstruct@^0.6.2:
   version "0.6.2"
   resolved "https://registry.npmjs.org/superstruct/-/superstruct-0.6.2.tgz"
@@ -8839,6 +9071,7 @@ superstruct@^0.6.2:
     clone-deep "^2.0.1"
     kind-of "^6.0.1"
 
+>>>>>>> Final-viva
 supports-color@^5.3.0:
   version "5.5.0"
   resolved "https://registry.npmjs.org/supports-color/-/supports-color-5.5.0.tgz"
@@ -9177,6 +9410,9 @@ undici-types@~5.26.4:
   resolved "https://registry.npmjs.org/undici-types/-/undici-types-5.26.5.tgz"
   integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
 
+<<<<<<< bimidu-09-05
+undici@6.19.7, undici@^6.11.1:
+=======
 undici-types@~6.19.2:
   version "6.19.8"
   resolved "https://registry.npmjs.org/undici-types/-/undici-types-6.19.8.tgz"
@@ -9190,6 +9426,7 @@ undici@5.28.4:
     "@fastify/busboy" "^2.0.0"
 
 undici@6.19.7:
+>>>>>>> Final-viva
   version "6.19.7"
   resolved "https://registry.npmjs.org/undici/-/undici-6.19.7.tgz"
   integrity sha512-HR3W/bMGPSr90i8AAp2C4DM3wChFdJPLrWYpIS++LxS8K+W535qftjt+4MyjNYHeWabMj1nvtmLIi7l++iq91A==

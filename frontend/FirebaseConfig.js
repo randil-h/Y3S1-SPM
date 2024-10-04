@@ -3,8 +3,10 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import {firebase} from "@react-native-firebase/firestore";
-// Your web app's Firebase configuration
+
+import { getStorage } from 'firebase/storage';
+
+
 const firebaseConfig = {
     apiKey: "AIzaSyAey9QSbnFR4PiCbjzulx_Cs1YUFPaxZSE",
     authDomain: "spm-app-da854.firebaseapp.com",
@@ -21,5 +23,8 @@ const analytics = getAnalytics(app);
 const auth = getAuth(app);  // Initialize Authentication
 const db = getFirestore(app);  // Initialize Firestore
 
+const storage = getStorage(app);
+
 // Export the initialized services
-export { app, auth, db, analytics };
+export { app, auth, db,storage, analytics };
+
