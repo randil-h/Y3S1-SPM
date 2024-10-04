@@ -12,7 +12,6 @@ import * as Print from 'expo-print'; // Import Print for PDF generation
 import * as Sharing from 'expo-sharing'; // Import Sharing for sharing the PDF
 import * as Speech from 'expo-speech';
 
-import * as Sharing from 'expo-sharing';
 import UseWebSocket from "../../../components/gesture/UseWebSocket"; // Import Sharing for sharing the PDF
 
 
