@@ -3,10 +3,28 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../FirebaseConfig';
 import * as Speech from 'expo-speech';
-import UseWebSocket from "../gesture/UseWebSocket"; // Import speech
+import UseWebSocket from "../gesture/UseWebSocket";
+import {
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+} from '@expo-google-fonts/inter';
+import { useFonts } from "expo-font";
 
 const QuizSelection = ({ onQuizSelect }) => {
     const [quizzes, setQuizzes] = useState([]);
+
+    let [fontsLoaded] = useFonts({
+        Inter_400Regular,
+        Inter_500Medium,
+        Inter_600SemiBold,
+        Inter_700Bold,
+    });
+
+    if (!fontsLoaded) {
+        return null;
+    }
 
     useEffect(() => {
         fetchQuizzes();
@@ -96,7 +114,7 @@ const styles = StyleSheet.create({
     title: {
         marginTop: 60,
         fontSize: 24,
-        fontWeight: 'bold',
+        fontFamily: 'Inter_700Bold',
         marginBottom: 20,
         textAlign: 'center',
     },
@@ -113,7 +131,7 @@ const styles = StyleSheet.create({
     },
     quizName: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: 'Inter_600SemiBold',
     },
 });
 
