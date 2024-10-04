@@ -7,6 +7,13 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
 import {query} from "@react-native-firebase/firestore";
+import {
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+} from '@expo-google-fonts/inter';
+import { useFonts } from "expo-font";
 
 const QuizPage = () => {
     const router = useRouter();
@@ -22,6 +29,17 @@ const QuizPage = () => {
             headerShown: false,
         });
     }, [navigation]);
+
+    let [fontsLoaded] = useFonts({
+        Inter_400Regular,
+        Inter_500Medium,
+        Inter_600SemiBold,
+        Inter_700Bold,
+    });
+
+    if (!fontsLoaded) {
+        return null;
+    }
 
     useEffect(() => {
         fetchData();
@@ -345,11 +363,11 @@ const QuizPage = () => {
                     <View style={styles.modalButtonContainer}>
                         {isEditing ? (
                             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                                <Text style={styles.buttonText}>Save</Text>
+                                <Text style={styles.saveButtonText}>Save</Text>
                             </TouchableOpacity>
                         ) : (
                             <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
-                                <Text style={styles.buttonText}>Edit</Text>
+                                <Text style={styles.editButtonText}>Edit</Text>
                             </TouchableOpacity>
                         )}
                         <TouchableOpacity
@@ -359,7 +377,7 @@ const QuizPage = () => {
                                 setIsEditing(false);
                             }}
                         >
-                            <Text style={styles.buttonText}>Close</Text>
+                            <Text style={styles.closeButtonText}>Close</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -369,6 +387,7 @@ const QuizPage = () => {
 
     return (
         <View style={styles.container}>
+            <Text style={styles.heading}>Quizzes</Text>
             <FlatList
                 data={quizzes}
                 renderItem={renderQuizItem}
@@ -379,7 +398,7 @@ const QuizPage = () => {
                 style={styles.addButton}
                 onPress={() => router.push('screens/teacher/assessment/AddQuiz')}
             >
-                <Text style={styles.buttonText}>Add Quiz</Text>
+                <Text style={styles.addButtonText}> + </Text>
             </TouchableOpacity>
             {renderQuizModal()}
         </View>
@@ -389,109 +408,79 @@ const QuizPage = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f8f8',
+        backgroundColor: '#FAFAFA', // Light grey background
+        paddingTop: 80,
+    },
+    heading: {
+        alignSelf: 'center',
+        fontFamily: "Inter_700Bold",
+        fontSize: 48,
+        color: '#323232',
+        marginBottom: 30,
     },
     addButton: {
         position: 'absolute',
-        top: 60,
-        right: 20,
-        backgroundColor: '#1e90ff',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-    },
-    buttonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    listContainer: {
-        marginTop: 100,
-        padding: 20,
-    },
-    quizItemContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    quizItem: {
-        flex: 1,
-        backgroundColor: '#9f9f9f',
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        marginRight: 10,
-    },
-    quizText: {
-        color: 'white',
-        fontSize: 16,
-    },
-    deleteButton: {
-        backgroundColor: 'red',
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-    },
-    deleteButtonText: {
-        color: 'white',
-        fontSize: 16,
-    },
-    modalContainer: {
-        flex: 1,
+        bottom: 16,
+        right: 16,
+        paddingBottom: 5,
+        backgroundColor: '#55b0f8',
+        width: 56,
+        height: 56,
+        borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        elevation: 6,
     },
-    modalContent: {
-        width: '90%',
-        maxHeight: '80%',
-        padding: 20,
+    addButtonText: {
+        color: 'white',
+        fontSize: 36,
+        fontFamily: "Inter_600SemiBold",
+    },
+    listContainer: {
+        padding: 16,
+    },
+    quizItemContainer: {
+        marginBottom: 16,
+    },
+    quizItem: {
         backgroundColor: 'white',
-        borderRadius: 10,
+        borderRadius: 4,
+        padding: 16,
+        elevation: 2,
     },
-    modalScrollContent: {
-        paddingBottom: 20,
-    },
-    modalTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 15,
-        textAlign: 'center',
-    },
-    quizInstructions: {
+    quizText: {
+        color: '#212121', // Almost black
         fontSize: 16,
-        marginBottom: 20,
-        fontStyle: 'italic',
-    },
-    questionContainer: {
-        marginBottom: 20,
-    },
-    questionText: {
-        fontSize: 18,
-        fontWeight: '600',
-        marginBottom: 10,
-    },
-    answerText: {
-        fontSize: 16,
-        marginLeft: 10,
-        marginBottom: 5,
-    },
-    correctAnswer: {
-        color: 'green',
-        fontWeight: 'bold',
-    },
-    modalButtonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 20,
+        fontFamily: "Inter_500Medium",
     },
     editButton: {
+        position: 'absolute',
+        bottom: 6,
+        left: 16,
         backgroundColor: '#4CAF50',
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 8,
     },
+    editButtonText: {
+        color: 'white',
+        fontFamily: "Inter_600SemiBold",
+        fontSize: 14,
+    },
+    saveButtonText: {
+        color: 'white',
+        fontFamily: "Inter_600SemiBold",
+        fontSize: 14,
+    },
+    closeButtonText: {
+        color: 'white',
+        fontFamily: "Inter_600SemiBold",
+        fontSize: 14,
+    },
     saveButton: {
+        position: 'absolute',
+        bottom: 6,
+        left: 16,
         backgroundColor: '#4CAF50',
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -503,34 +492,116 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 8,
     },
+    deleteButton: {
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        padding: 8,
+    },
+    deleteButtonText: {
+        color: '#B00020', // Error color
+        fontSize: 14,
+        fontFamily: "Inter_500Medium",
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    modalContent: {
+        width: '90%',
+        maxHeight: '80%',
+        backgroundColor: 'white',
+        borderRadius: 4,
+        elevation: 24,
+        overflow: 'hidden',
+    },
+    modalScrollContent: {
+        padding: 24,
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontFamily: "Inter_600SemiBold",
+        marginBottom: 16,
+        color: '#212121',
+    },
+    quizInstructions: {
+        fontSize: 16,
+        marginBottom: 24,
+        fontFamily: "Inter_400Regular",
+        color: '#757575',
+    },
+    questionContainer: {
+        marginBottom: 24,
+    },
+    questionText: {
+        fontSize: 18,
+        fontFamily: "Inter_500Medium",
+        marginBottom: 12,
+        color: '#212121',
+    },
+    answerText: {
+        fontSize: 16,
+        marginLeft: 16,
+        marginBottom: 8,
+        fontFamily: "Inter_400Regular",
+        color: '#424242',
+    },
+    correctAnswer: {
+        color: '#4CAF50',
+        fontFamily: "Inter_500Medium",
+    },
+    modalButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        padding: 8,
+        borderTopWidth: 1,
+        borderTopColor: '#E0E0E0',
+    },
+    actionButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        marginLeft: 8,
+    },
+    actionButtonText: {
+        color: '#6200EE',
+        fontFamily: "Inter_500Medium",
+        fontSize: 14,
+        textTransform: 'uppercase',
+    },
     input: {
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: '#E0E0E0',
         borderRadius: 4,
-        padding: 10,
-        marginBottom: 10,
+        padding: 12,
+        marginBottom: 16,
+        fontFamily: "Inter_400Regular",
+        fontSize: 16,
+        color: '#212121',
     },
     answerContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 5,
+        marginBottom: 8,
     },
     correctAnswerToggle: {
-        width: 30,
-        height: 30,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 15,
+        width: 24,
+        height: 24,
+        borderWidth: 2,
+        borderColor: '#478747',
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: 10,
+        marginLeft: 16,
     },
     correctAnswerToggleSelected: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#478747',
     },
     correctAnswerToggleText: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: "Inter_600SemiBold",
+        color: 'white',
     },
 });
 

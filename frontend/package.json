@@ -15,6 +15,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@expo-google-fonts/inter": "^0.2.3",
     "@expo/vector-icons": "^14.0.2",
     "@mediapipe/hands": "^0.4.1675469240",
     "@react-native-firebase/app": "^20.4.0",
