@@ -7,6 +7,13 @@ import app from '../../FirebaseConfig';
 import { useFocusEffect } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
 import {router} from "expo-router";
+import {
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+} from '@expo-google-fonts/inter';
+import { useFonts } from "expo-font";
 
 const Quiz = ({ quiz, onComplete }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -23,6 +30,17 @@ const Quiz = ({ quiz, onComplete }) => {
     const firestore = getFirestore(app); // Firestore reference
 
     const currentQuestion = quiz.questions[currentQuestionIndex];
+
+    let [fontsLoaded] = useFonts({
+        Inter_400Regular,
+        Inter_500Medium,
+        Inter_600SemiBold,
+        Inter_700Bold,
+    });
+
+    if (!fontsLoaded) {
+        return null;
+    }
 
     useEffect(() => {
         return () => {
@@ -308,7 +326,7 @@ const styles = StyleSheet.create({
     },
     questionText: {
         fontSize: 24,
-        fontWeight: 'bold',
+        fontFamily: 'Inter_500Medium',
         textAlign: 'center',
     },
     answersContainer: {
@@ -332,7 +350,7 @@ const styles = StyleSheet.create({
     },
     answerText: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: 'Inter_500Medium',
         textAlign: 'center',
         color: '#FFFFFF',
     },
@@ -375,7 +393,7 @@ const styles = StyleSheet.create({
     nextButtonText: {
         color: '#FFFFFF',
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: 'Inter_500Medium',
     },
 });
 
