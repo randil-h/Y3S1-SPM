@@ -16,7 +16,7 @@ const Progress = () => {
     useFocusEffect(
         React.useCallback(() => {
             // WebSocket connection starts when the page is focused
-            ws = new WebSocket('ws://192.168.1.4:8765');  //ip address and port number of server
+            ws = new WebSocket('ws://192.168.1.6:8765');  //ip address and port number of server
 
             ws.onopen = () => {
                 console.log('WebSocket connection established');

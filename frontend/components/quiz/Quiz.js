@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView, State, TapGestureHandler } from 'react-native-gesture-handler';
 import * as Speech from 'expo-speech';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import app from '../../FirebaseConfig';
-import {useFocusEffect} from "@react-navigation/native";
+import { useFocusEffect } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics';
-
+import {router} from "expo-router";
 
 const Quiz = ({ quiz, onComplete }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -18,8 +18,6 @@ const Quiz = ({ quiz, onComplete }) => {
     const [attemptCount, setAttemptCount] = useState(0);
     const [marks, setMarks] = useState(0); // Holds total marks across all questions
     const [questionMarks, setQuestionMarks] = useState(0); // Holds the marks awarded for the current question
-    const [gesture, setGesture] = useState(null);
-    const [gestureTimeout, setGestureTimeout] = useState(false);
     let ws;
 
     const firestore = getFirestore(app); // Firestore reference
@@ -41,7 +39,7 @@ const Quiz = ({ quiz, onComplete }) => {
     useFocusEffect(
         React.useCallback(() => {
             // WebSocket connection starts when the page is focused
-            ws = new WebSocket('ws://192.168.1.4:8765');
+            ws = new WebSocket('ws://192.168.1.6:8765');
 
             ws.onopen = () => {
                 console.log('WebSocket connection established');
@@ -63,10 +61,10 @@ const Quiz = ({ quiz, onComplete }) => {
                     console.log('WebSocket connection closed');
                 }
             };
-        }, [])
+        }, [currentQuestionIndex])
     );
 
-    const handleAnswerSelection = (answer) => {
+    /*const handleAnswerSelection = (answer) => {
         setSelectedAnswer(answer);
         const correct = answer === currentQuestion.answers[currentQuestion.correctAnswerIndex];
         setIsCorrect(correct);
@@ -104,31 +102,78 @@ const Quiz = ({ quiz, onComplete }) => {
         if (correct || attemptCount >= 2) {
             setTimeout(handleNextQuestion, 3000);
         }
+    };*/
+
+    const handleAnswerSelection = (answer) => {
+        const correct = answer === currentQuestion.answers[currentQuestion.correctAnswerIndex];
+        setSelectedAnswer(answer);
+        setIsCorrect(correct);
+
+        // Use functional updates to ensure we're using the latest state
+        setAttemptCount((prevAttemptCount) => {
+            const newAttemptCount = correct ? prevAttemptCount : prevAttemptCount + 1;
+
+            // Determine awarded marks
+            let awardedMarks;
+            if (prevAttemptCount === 0) {
+                awardedMarks = 10;
+            } else if (prevAttemptCount === 1) {
+                awardedMarks = 5;
+            } else {
+                awardedMarks = 3;
+            }
+
+            if (correct || newAttemptCount >= 2) {
+                setMarks((prevMarks) => prevMarks + awardedMarks);
+            }
+            setQuestionMarks(awardedMarks);
+
+            setBackgroundColor(correct ? '#00FF00' : '#FF0000');
+            Speech.speak(
+                correct
+                    ? `Correct! ${awardedMarks} marks.`
+                    : `Incorrect. You have ${2 - newAttemptCount} attempts left.`
+            );
+
+            // Provide haptic feedback based on correctness
+            if (correct) {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            } else {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            }
+
+            // If correct or out of attempts, move to next question
+            if (correct || newAttemptCount >= 2) {
+                setTimeout(handleNextQuestion, 3000);
+            }
+
+            return newAttemptCount;
+        });
     };
 
-    const handleGestureSelection = (gesture) => {
-        if(gestureTimeout) return;
+    const handleGestureSelection = useCallback((gesture) => {
+        console.log(`Gesture Detected : ${gesture}`);
 
-        setGestureTimeout(true);
+        let answerIndex = null;
 
         if (gesture === 'Selected answer: One') {
-            handleAnswerSelection(currentQuestion.answers[0]);
+            answerIndex = 0;
         } else if (gesture === 'Selected answer: Two') {
-            handleAnswerSelection(currentQuestion.answers[1]);
+            answerIndex = 1;
         } else if (gesture === 'Selected answer: Three') {
-            handleAnswerSelection(currentQuestion.answers[2]);
+            answerIndex = 2;
         } else if (gesture === 'Selected answer: Four') {
-            handleAnswerSelection(currentQuestion.answers[3]);
-        } else if (gesture === 'Submit') {
-            handleNextQuestion();
-        }else if (gesture === 'Previous Tab' || gesture === 'Next Tab') {
-
+            answerIndex = 3;
+        } else if (gesture === 'Return') {
+            router.back();
+            return;
         }
 
-        setTimeout(() => {
-            setGestureTimeout(false);
-        }, 3000);
-    };
+        if (answerIndex !== null) {
+            // Dynamically handle answer selection based on the current question
+            handleAnswerSelection(currentQuestion.answers[answerIndex]);
+        }
+    }, [currentQuestion]);
 
     const readQuestionAndAnswers = () => {
         const textToRead = `${currentQuestion.questionText}. 
@@ -146,15 +191,21 @@ const Quiz = ({ quiz, onComplete }) => {
         setTapCount(0);
         setBackgroundColor('#F5FCFF');
 
-        // If the quiz is not over, move to the next question
-        if (currentQuestionIndex < quiz.questions.length - 1) {
-            setCurrentQuestionIndex(currentQuestionIndex + 1);
-        } else {
-            Speech.speak('Quiz Completed');
-            // Send total marks and attempts data to Firestore
-            saveQuizResultsToFirestore();
-            onComplete();
-        }
+        console.log('Moving onto the next question');
+
+        setCurrentQuestionIndex((prevQuestionIndex) => {
+            const newQuestionIndex = prevQuestionIndex + 1;
+            console.log('CurrentQuestionIndex updated to:', newQuestionIndex);
+            if (newQuestionIndex < quiz.questions.length) {
+                return newQuestionIndex;
+            } else {
+                Speech.speak('Quiz Completed');
+                // Send total marks and attempts data to Firestore
+                saveQuizResultsToFirestore();
+                onComplete();
+                return prevQuestionIndex; // Keep the index same as quiz is over
+            }
+        });
     };
 
     const saveQuizResultsToFirestore = async () => {
@@ -170,6 +221,17 @@ const Quiz = ({ quiz, onComplete }) => {
             console.error('Error adding document: ', e);
         }
     };
+
+    useFocusEffect(
+        useCallback(() => {
+            // Do nothing on focus
+
+            return () => {
+                // Stop any ongoing speech when the user leaves the screen
+                Speech.stop();
+            };
+        }, [])
+    );
 
     const handleTap = (event) => {
         if (event.nativeEvent.state === State.ACTIVE) {
@@ -190,9 +252,9 @@ const Quiz = ({ quiz, onComplete }) => {
 
                 // Reset tap count after the selection is made
                 setTapCount(0);
-            }, 500); // Short delay to wait for additional taps (adjusted to 500ms)
+            }, 1000); // Short delay to wait for additional taps
 
-            // Save the timeout ,so we can clear it on subsequent taps
+            // Save the timeout so we can clear it on subsequent taps
             setTapTimeout(timeout);
         }
     };
