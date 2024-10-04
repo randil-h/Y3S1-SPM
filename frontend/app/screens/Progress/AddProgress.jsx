@@ -7,7 +7,11 @@ import {db} from "../../../FirebaseConfig"; // Import from Firebase Firestore
 import * as Haptics from 'expo-haptics'; // Import Haptics
 import { Audio } from 'expo-av';
 import {useFocusEffect} from "@react-navigation/native";
+
+import * as Speech from "expo-speech";
+
 import UseWebSocket from "../../../components/gesture/UseWebSocket";
+
 
 const beepSound = require('../../../assets/sounds/beep.mp3');
 const AddProgress = () => {
@@ -58,6 +62,18 @@ const AddProgress = () => {
             : undefined;
     }, [sound]);
 
+// Function to handle speech
+    const speak = (message) => {
+        Speech.speak(message, {
+            language: 'en',
+            pitch: 1,
+            rate: 1,
+        });
+    };
+    const handleInputChange = (setter) => (text) => {
+        setter(text);
+        speak(text); // Speak the current input value
+    };
     const handleSubmit = async () => {
         console.log('Submitting data...');
         if (!studentName || !studentID || !studentClass || !courseworkProgress || !maths || !english || !geography || !hist || !science) {
@@ -85,6 +101,7 @@ const AddProgress = () => {
 // Play sound and trigger haptic feedback on successful submission
             await playSound();
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            speak(`Student ${studentName}'s progress has been added successfully.`);
             // Navigate back to the previous screen
             console.log('Navigating back...');
             router.back();
@@ -97,7 +114,7 @@ const AddProgress = () => {
         // Play sound and trigger haptic feedback on close button press
         await playSound();
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
+        speak('Closing the form.');
         console.log('Navigating back...');
         router.back();
     };
@@ -107,29 +124,30 @@ const AddProgress = () => {
             <View style={styles.formContainer}>
                 <Text style={styles.formTitle}>Add Student Progress</Text>
                 <Text style={styles.pickerLabel}>Student Details</Text>
-
+                <View style={styles.detailsContainer}>
                 {/* Input fields */}
                 <TextInput
                     style={styles.input}
                     placeholder="Student Name"
                     value={studentName}
-                    onChangeText={setStudentName}
+                    onChangeText={handleInputChange(setStudentName)}
                 />
                 <TextInput
                     style={styles.input}
                     placeholder="Student ID"
                     value={studentID}
-                    onChangeText={setStudentID}
+                    onChangeText={handleInputChange(setStudentID)}
                 />
                 <TextInput
                     style={styles.input}
                     placeholder="Student Class"
                     value={studentClass}
-                    onChangeText={setStudentClass}
+                    onChangeText={handleInputChange(setStudentClass)}
                 />
-
+                </View>
                 {/* Grades */}
                 <Text style={styles.pickerLabel}>Grades</Text>
+                <View style={styles.detailsContainer}>
                 <View style={styles.inputContainer}>
                     <View style={styles.inputGroupLeft}>
                         <TextInput
@@ -137,21 +155,21 @@ const AddProgress = () => {
                             placeholder="Maths"
                             keyboardType="numeric"
                             value={maths}
-                            onChangeText={setMaths}
+                            onChangeText={handleInputChange(setMaths)}
                         />
                         <TextInput
                             style={styles.inputLarge}
                             placeholder="English"
                             keyboardType="numeric"
                             value={english}
-                            onChangeText={setEnglish}
+                            onChangeText={handleInputChange(setEnglish)}
                         />
                         <TextInput
                             style={styles.inputLarge}
                             placeholder="Geography"
                             keyboardType="numeric"
                             value={geography}
-                            onChangeText={setGeography}
+                            onChangeText={handleInputChange(setGeography)}
                         />
                     </View>
                     <View style={styles.inputGroupRight}>
@@ -160,40 +178,44 @@ const AddProgress = () => {
                             placeholder="History"
                             keyboardType="numeric"
                             value={hist}
-                            onChangeText={setHistory}
+                            onChangeText={handleInputChange(setHistory)}
                         />
                         <TextInput
                             style={styles.inputSmall}
                             placeholder="Science"
                             keyboardType="numeric"
                             value={science}
-                            onChangeText={setScience}
+                            onChangeText={handleInputChange(setScience)}
                         />
                     </View>
                 </View>
-
+                </View>
                 {/* Coursework Progress */}
                 <View style={styles.pickerContainer}>
                     <Text style={styles.pickerLabel}>Coursework Progress</Text>
+                    <View style={styles.detailsContainer}>
                     <Picker
                         selectedValue={courseworkProgress}
                         style={styles.picker}
-                        onValueChange={(itemValue) => setCourseworkProgress(itemValue)}
-                    >
+                        onValueChange={(itemValue) => {
+                            setCourseworkProgress(itemValue);
+                            speak(itemValue); // Speak the selected value
+                        }}
+                        >
                         <Picker.Item label="Excellent" value="excellent" />
                         <Picker.Item label="Good" value="good" />
                         <Picker.Item label="Average" value="average" />
                         <Picker.Item label="Need Improvement" value="need_improvement" />
                     </Picker>
                 </View>
-
+                </View>
                 {/* Buttons */}
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.roundButton} onPress={handleSubmit}>
+                    <TouchableOpacity style={[styles.button, styles.submitButton]} onPress={handleSubmit}>
                         <Text style={styles.buttonText}>Submit</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.roundButton2} onPress={handleClose}>
+                    <TouchableOpacity style={[styles.button, styles.closeButton]} onPress={handleClose}>
                         <Text style={styles.buttonText}>Close</Text>
                     </TouchableOpacity>
                 </View>
@@ -202,103 +224,110 @@ const AddProgress = () => {
     );
 };
 
+
+
 const styles = StyleSheet.create({
     scrollContainer: {
         flexGrow: 1,
-        padding: 20,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#ffffff',
     },
     formContainer: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#ffffff',
     },
     formTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
+        fontSize: 28,
+        fontWeight: '700',
+        color: '#333333',
+        marginBottom: 30,
+        marginTop: 40,
+        textAlign: 'center',
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#1a8e5f',
+        marginBottom: 15,
+    },
+    input: {
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+        paddingVertical: 10,
         marginBottom: 20,
-        marginTop:20,
-    },
-    pickerContainer: {
-        width: '100%',
-        marginVertical: 10,
-    },
-    pickerLabel: {
         fontSize: 16,
-        marginBottom: 5,
+        color: '#333333',
     },
     inputContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginVertical: 10,
+        marginBottom: 20,
     },
     inputGroupLeft: {
-        width: '48%',
+        marginBottom: 10,
     },
     inputGroupRight: {
-        width: '48%',
+        marginBottom: 10,
     },
     inputLarge: {
-        width: '100%',
-        padding: 15,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 5,
-        backgroundColor: '#fff',
-        height: 135 / 3, // Height for Maths, English, Geography
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+        paddingVertical: 10,
+        marginBottom: 15,
+        fontSize: 16,
+        color: '#333333',
     },
     inputSmall: {
-        width: '100%',
-        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+        paddingVertical: 10,
+        marginBottom: 15,
+        fontSize: 16,
+        color: '#333333',
+    },
+    pickerContainer: {
+        marginBottom: 20,
+        borderWidth: 1, // Add border width
+    },
+    pickerLabel: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#1a8e5f',
         marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 5,
-        backgroundColor: '#fff',
-        height: 90 / 2, // One-third of the height of inputLarge
     },
     picker: {
         height: 50,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 5,
-        backgroundColor: '#fff',
-    },
-    input: {
         width: '100%',
-        padding: 15,
-        marginVertical: 10,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 5,
-        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
     },
     buttonContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-around', // Space between the buttons
-        marginTop: 20,
+        justifyContent: 'space-between',
+        marginTop: 30,
+        marginBottom: 40,
     },
-    roundButton: {
-        backgroundColor: '#80AF81',
-        width: 120,
-        height: 60,
-        borderRadius: 10,
+    button: {
+        flex: 1,
+        height: 50,
         justifyContent: 'center',
         alignItems: 'center',
+        borderRadius: 8,
+        marginHorizontal: 5,
     },
-    roundButton2: {
-        backgroundColor: '#F44336',
-        width: 120,
-        height: 60,
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
+    submitButton: {
+        backgroundColor: '#1a8e5f',
+    },
+    closeButton: {
+        backgroundColor: '#333333',
     },
     buttonText: {
-        color: '#fff',
+        color: '#ffffff',
+        fontWeight: '600',
         fontSize: 16,
-        textAlign: 'center',
+        lineHeight: 22,
+        textAlignVertical: 'center',
+    },
+    detailsContainer: {
+        marginBottom: 20,
     },
 });
 
