@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 5, // Adds space between buttons
     },
     updateButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#1a8e5f',
     },
     deleteButton: {
         backgroundColor: '#000',

@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     },
     pickerContainer: {
         marginBottom: 20,
-        borderColor:'#000000',
+        borderWidth: 1, // Add border width
     },
     pickerLabel: {
         fontSize: 18,

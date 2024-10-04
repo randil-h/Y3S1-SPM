@@ -116,8 +116,8 @@ const Progress = () => {
                 accessibilityHint="Navigates to the page where you can view detailed student progress"
                 accessibilityRole="button"
             >
-                {/* Wrap button text in <Text> */}
                 <Text style={styles.buttonText}>View Progress</Text>
+                <Text style={styles.buttonSubText}>Check the progress of students over time</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -132,6 +132,7 @@ const Progress = () => {
                 accessibilityRole="button"
             >
                 <Text style={styles.buttonText}>Add Student Progress</Text>
+                <Text style={styles.buttonSubText}>Enter new progress details for students</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -146,6 +147,7 @@ const Progress = () => {
                 accessibilityRole="button"
             >
                 <Text style={styles.buttonText}>Progress Summary</Text>
+                <Text style={styles.buttonSubText}>View a summary of all students' progress</Text>
             </TouchableOpacity>
         </View>
     );
@@ -183,12 +185,18 @@ const styles = StyleSheet.create({
         color: '#333', // Darker text for better contrast
         textAlign: 'center', // Centered text
     },
+    buttonSubText: {
+        fontSize: 14, // Smaller than the main button text
+        color: 'grey', // Grey color for additional text
+        marginTop: 8, // Some space between main text and subtext
+        textAlign: 'center', // Center the subtext
+    },
     topic: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#000', // Blue color for the title
         marginBottom: 20,
-        marginTop:20,// Spacing below the topic text
+        marginTop: 20, // Spacing below the topic text
     },
 });
 
