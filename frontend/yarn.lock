@@ -2732,11 +2732,6 @@
   dependencies:
     merge-options "^3.0.4"
 
-"@react-native-community/checkbox@^0.5.17":
-  version "0.5.17"
-  resolved "https://registry.npmjs.org/@react-native-community/checkbox/-/checkbox-0.5.17.tgz"
-  integrity sha512-ZZx/eOH3SIxBg+hvA2zRd7lX5zPQEWcZU8C8Dn7WLdpJkiTkPmIUDFHWrmzxCnwZcyoD+BIt6gUZPKGGb9WmeQ==
-
 "@react-native-community/cli-clean@13.6.9":
   version "13.6.9"
   resolved "https://registry.npmjs.org/@react-native-community/cli-clean/-/cli-clean-13.6.9.tgz"
@@ -8445,7 +8440,7 @@ react-native-websocket@^1.0.2:
   dependencies:
     prop-types "^15.6.1"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", "react-native@>= 0.62", react-native@>=0.60.0, react-native@0.74.5:
+react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", react-native@>=0.60.0, react-native@0.74.5:
   version "0.74.5"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.74.5.tgz"
   integrity sha512-Bgg2WvxaGODukJMTZFTZBNMKVaROHLwSb8VAGEdrlvKwfb1hHg/3aXTUICYk7dwgAnb+INbGMwnF8yeAgIUmqw==
