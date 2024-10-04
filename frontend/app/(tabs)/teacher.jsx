@@ -124,9 +124,9 @@ const Teacher = () => {
                         <TouchableOpacity
                             style={styles.circleButton}
                             onLayout={handleButtonLayout('addQuiz')}
-                            onPress={() => router.push('screens/teacher/assessment/Quizzes')}
+                            onPress={() => router.push('screens/teacher/assessment/AddQuiz')}
                         >
-                            <Text style={styles.buttonText}>Quizzes</Text>
+                            <Text style={styles.buttonText}>Add Quiz</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.circleButton}

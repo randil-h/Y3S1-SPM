@@ -1,63 +1,12 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import {Tabs, useRouter} from 'expo-router';
+import { Tabs } from 'expo-router';
 import {FontAwesome5, FontAwesome6, Ionicons, MaterialCommunityIcons, MaterialIcons} from "@expo/vector-icons";
-import React, {useEffect, useState} from "react";
+import React from "react";
 
 export default function TabLayout() {
-    const[currentTab, setCurrentTab] = useState(0);
-    const router = useRouter();
-
-    const tabRoutes = ['index', 'teacher', 'quiz', 'gesture', 'progress'];
-
-    /*useEffect(() => {
-        const ws = new WebSocket('ws://192.168.1.4:8765'); // Replace with your WebSocket address
-
-        ws.onopen = () => {
-            console.log('WebSocket connection established');
-        };
-
-        ws.onmessage = (event) => {
-            const { gesture } = JSON.parse(event.data);
-            handleGesture(gesture);
-        };
-
-        ws.onclose = () => {
-            console.log('WebSocket connection closed');
-        };
-
-        return () => {
-            ws.close();
-        };
-    }, [currentTab]);
-
-    const handleGesture = (gesture) => {
-        if (gesture === 'Next Tab') {
-            navigateToNextTab();
-        } else if (gesture === 'Previous Tab') {
-            navigateToPreviousTab();
-        }
-    };
-
-    const navigateToNextTab = () => {
-        if (currentTab < tabRoutes.length - 1) {
-            const nextTab = currentTab + 1;
-            setCurrentTab(nextTab);
-            router.push(`/${tabRoutes[nextTab]}`); // Navigate to the next tab
-        }
-    };
-
-    const navigateToPreviousTab = () => {
-        if (currentTab > 0) {
-            const previousTab = currentTab - 1;
-            setCurrentTab(previousTab);
-            router.push(`/${tabRoutes[previousTab]}`); // Navigate to the previous tab
-        }
-    };*/
 
     return (
-        <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}
-              /*initialRouteName={tabRoutes[currentTab]}*/
-        >
+        <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
             <Tabs.Screen
                 name="index"
                 options={{
