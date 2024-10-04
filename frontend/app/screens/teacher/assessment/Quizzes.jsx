@@ -191,7 +191,7 @@ const QuizPage = () => {
 
         report += `Summary:\n`;
         report += `Average Marks: ${averageMarks.toFixed(2)}\n`;
-        report += `Average Questions: ${averageQuestions.toFixed(2)}\n`;
+        report += `Average Questions Attempted: ${averageQuestions.toFixed(2)}\n`;
 
         return report;
     };
