@@ -5,7 +5,8 @@ import { db } from '../../../../FirebaseConfig';
 import { useRouter } from "expo-router";
 import Icon from 'react-native-vector-icons/Ionicons'; // Importing icons
 import RNHTMLtoPDF from 'react-native-html-to-pdf'; // PDF generation
-import * as Sharing from 'expo-sharing'; // To share the generated PDF
+import * as Sharing from 'expo-sharing';
+import {FontAwesome} from "@expo/vector-icons"; // To share the generated PDF
 
 const { width } = Dimensions.get('window');
 
@@ -209,9 +210,7 @@ const AddCourse = () => {
     return (
         <View style={styles.container}>
             <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
-            <TouchableOpacity style={styles.pdfButton} onPress={generatePDF}>
-                <Text style={styles.pdfButtonText}>Generate PDF</Text>
-            </TouchableOpacity>
+
 
             {/* Modal for adding/editing course */}
             <Modal
@@ -316,6 +315,11 @@ const AddCourse = () => {
                 )}
             </View>
 
+            <TouchableOpacity style={styles.pdfButton} onPress={generatePDF}>
+                <FontAwesome name="file-pdf-o" size={24} color="black" style={styles.icon} />
+
+            </TouchableOpacity>
+
             <TouchableOpacity
                 style={styles.floatingButton}
                 onPress={() => {
@@ -348,6 +352,21 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 20,
         width: '90%',
+        elevation: 5,
+    },
+    pdfButton: {
+        position: 'absolute',
+        bottom: 30,
+        right: 100,
+        width: 60,
+        height: 60,
+        alignSelf: 'flex-end',
+        alignContent: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#acacac',
+        padding: 10,
+        borderRadius: 35,
         elevation: 5,
     },
     input: {

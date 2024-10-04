@@ -17,7 +17,8 @@ import DocumentPicker from 'react-native-document-picker';
 import { db, storage } from '../../../../FirebaseConfig'; // Adjust the import based on your structure
 import { useGlobalSearchParams } from 'expo-router';
 import { Linking } from 'react-native';
-import Tts from 'react-native-tts'; // Import TTS library
+import Tts from 'react-native-tts';
+import {FontAwesome, MaterialIcons} from "@expo/vector-icons"; // Import TTS library
 
 const CourseManagement = () => {
     const { courseId, courseName } = useGlobalSearchParams();
@@ -118,18 +119,35 @@ const CourseManagement = () => {
 
     // Function to delete a document
     const deleteDocument = async (topicId, documentId) => {
-        try {
-            await deleteDoc(doc(db, `courses/${courseId}/topics/${topicId}/documents`, documentId));
-            // Update the documents state
-            setDocuments(prevDocuments => {
-                const updatedDocs = { ...prevDocuments };
-                updatedDocs[topicId] = updatedDocs[topicId].filter(doc => doc.id !== documentId);
-                return updatedDocs;
-            });
-        } catch (error) {
-            console.error("Error deleting document:", error);
-            Alert.alert("Error", "Failed to delete document.");
-        }
+        Alert.alert(
+            "Confirm Delete",
+            "Are you sure you want to delete this document?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Delete canceled"),
+                    style: "cancel"
+                },
+                {
+                    text: "Delete",
+                    onPress: async () => {
+                        try {
+                            await deleteDoc(doc(db, `courses/${courseId}/topics/${topicId}/documents`, documentId));
+                            // Update the documents state
+                            setDocuments(prevDocuments => {
+                                const updatedDocs = { ...prevDocuments };
+                                updatedDocs[topicId] = updatedDocs[topicId].filter(doc => doc.id !== documentId);
+                                return updatedDocs;
+                            });
+                        } catch (error) {
+                            console.error("Error deleting document:", error);
+                            Alert.alert("Error", "Failed to delete document.");
+                        }
+                    },
+                    style: "destructive"
+                }
+            ]
+        );
     };
 
     // Function to handle opening a document
@@ -147,13 +165,30 @@ const CourseManagement = () => {
 
     // Function to delete a topic
     const deleteTopic = async (topicId) => {
-        try {
-            await deleteDoc(doc(db, `courses/${courseId}/topics`, topicId));
-            fetchTopics();
-        } catch (error) {
-            console.error("Error deleting topic:", error);
-            Alert.alert("Error", "Failed to delete topic.");
-        }
+        Alert.alert(
+            "Confirm Delete",
+            "Are you sure you want to delete this topic?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Delete canceled"),
+                    style: "cancel"
+                },
+                {
+                    text: "Delete",
+                    onPress: async () => {
+                        try {
+                            await deleteDoc(doc(db, `courses/${courseId}/topics`, topicId));
+                            fetchTopics(); // Re-fetch topics after deletion
+                        } catch (error) {
+                            console.error("Error deleting topic:", error);
+                            Alert.alert("Error", "Failed to delete topic.");
+                        }
+                    },
+                    style: "destructive"
+                }
+            ]
+        );
     };
 
     // Effect to fetch topics on component mount
@@ -194,14 +229,19 @@ const CourseManagement = () => {
                                         <View style={styles.verticalLine} />
                                         <View style={styles.documentContent}>
                                             <Text style={styles.documentText}>{item.fileName}</Text>
-                                            <TouchableOpacity onPress={() => handleDocumentAccess(item.fileUrl)}>
-                                                <Text style={styles.accessButton}>Open</Text>
+                                            {/* Open Button with Preview Icon */}
+                                            <TouchableOpacity onPress={() => handleDocumentAccess(item.fileUrl)} style={styles.iconButton}>
+                                                <FontAwesome name="eye" size={16} color="white" />
                                             </TouchableOpacity>
-                                            <TouchableOpacity onPress={() => readPDFAloud(item.fileUrl)}>
-                                                <Text style={styles.accessButton}>Read Aloud</Text>
+
+                                            {/* Read Aloud Button with Sound Icon */}
+                                            <TouchableOpacity onPress={() => readPDFAloud(item.fileUrl)} style={styles.iconButton}>
+                                                <MaterialIcons name="volume-up" size={16} color="white" />
                                             </TouchableOpacity>
-                                            <TouchableOpacity onPress={() => deleteDocument(item.id, item.id)}>
-                                                <Text style={styles.accessButton}>Delete</Text>
+
+                                            {/* Delete Button with Delete Icon */}
+                                            <TouchableOpacity onPress={() => deleteDocument(item.id)} style={styles.iconButton}>
+                                                <FontAwesome name="trash" size={16} color="white" />
                                             </TouchableOpacity>
                                         </View>
                                     </View>
@@ -316,7 +356,15 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
     },
     topicText: {
-        fontSize: 18,
+        fontSize: 22,
+    },
+    iconButton: {
+        backgroundColor: '#959595', // Change this color as per your theme
+        padding: 5,
+        borderRadius: 50, // Makes the button circular
+        margin: 6, // Spacing between buttons
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     topicActions: {
         flexDirection: 'row',
@@ -324,7 +372,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     addDocButton: {
-        color: '#007BFF',
+        color: '#2a5a06',
         fontWeight: 'bold',
     },
     deleteButton: {
@@ -339,10 +387,11 @@ const styles = StyleSheet.create({
     },
     documentText: {
         flex: 1,
-        fontSize: 16,
+        fontSize: 14,
+        color: '#515151',
     },
     accessButton: {
-        color: '#007BFF',
+        color: '#2a5a06',
         marginHorizontal: 5,
     },
     documentList: {
@@ -355,13 +404,18 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 20,
         bottom: 20,
-        backgroundColor: '#007BFF',
+        height: 60,
+        width: 60,
+        backgroundColor: '#2a5a06',
         borderRadius: 30,
         padding: 10,
     },
     floatingButtonText: {
         color: '#fff',
         fontSize: 24,
+        textAlign: 'center',
+        justifyContent: 'center',
+        textAlignVertical: 'center',
     },
     modalContainer: {
         flex: 1,
@@ -372,7 +426,7 @@ const styles = StyleSheet.create({
     modalContent: {
         width: '80%',
         backgroundColor: '#fff',
-        borderRadius: 10,
+        borderRadius: 0,
         padding: 20,
         alignItems: 'center',
     },
@@ -385,7 +439,7 @@ const styles = StyleSheet.create({
         width: '100%',
         borderWidth: 1,
         borderColor: '#ccc',
-        borderRadius: 5,
+        borderRadius: 0,
         padding: 10,
         marginBottom: 20,
     },
@@ -395,15 +449,15 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     saveButton: {
-        backgroundColor: '#007BFF',
-        borderRadius: 5,
+        backgroundColor: '#2a5a06',
+        borderRadius: 0,
         padding: 10,
         flex: 1,
         marginHorizontal: 5,
     },
     cancelButton: {
         backgroundColor: '#ccc',
-        borderRadius: 5,
+        borderRadius: 0,
         padding: 10,
         flex: 1,
         marginHorizontal: 5,
@@ -413,7 +467,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     uploadButton: {
-        color: '#007BFF',
+        color: '#2a5a06',
         marginBottom: 20,
     },
     emptyList: {
@@ -425,7 +479,7 @@ const styles = StyleSheet.create({
         width: 2, // Width of the vertical line
         height: '100%', // Full height
         backgroundColor: '#ccc', // Color of the line
-        marginRight: 10, // Space between line and document text
+        marginRight: 20, // Space between line and document text
     },
     documentContent: {
         flexDirection: 'row',
