@@ -66,7 +66,7 @@ const Gesture = () => {
                     </View>
                 </View>
                 <View style={styles.card}>
-                    <Text style={{fontWeight: 'bold', fontSize: 18, marginHorizontal: 10}}>Button Selection</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: 18, marginHorizontal: 10}}>Confirmation Selection</Text>
                     <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly',paddingVertical: 10}}>
                         <View style={styles.imageContainer}>
                             <Image source={submit} style={styles.image}></Image>

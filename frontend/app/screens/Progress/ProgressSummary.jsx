@@ -8,7 +8,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics'; // Import Haptics
 import { Audio } from 'expo-av';
 import * as Print from 'expo-print'; // Import Print for PDF generation
-import * as Sharing from 'expo-sharing'; // Import Sharing for sharing the PDF
+import * as Sharing from 'expo-sharing';
+import UseWebSocket from "../../../components/gesture/UseWebSocket"; // Import Sharing for sharing the PDF
 
 const beepSound = require('../../../assets/sounds/soft_beep.mp3'); // Path to the sound file
 
@@ -21,38 +22,9 @@ const ProgressSummary = () => {
     const [averageScores, setAverageScores] = useState({});
     const router = useRouter();
     const [sound, setSound] = useState();
-    let ws;
 
     // Define the subjects array
     const subjects = ['maths', 'english', 'geography', 'hist', 'science'];
-
-    useFocusEffect(
-        React.useCallback(() => {
-            // WebSocket connection starts when the page is focused
-            ws = new WebSocket('ws://192.168.1.4:8765');  //ip address and port number of server
-
-            ws.onopen = () => {
-                console.log('WebSocket connection established');
-            };
-
-            ws.onmessage = (event) => {
-                const { gesture } = JSON.parse(event.data);
-                handleReturnGesture(gesture);
-            };
-
-            ws.onclose = () => {
-                console.log('WebSocket connection is closed');
-            };
-
-            // Cleanup function to close WebSocket when page is unfocused
-            return () => {
-                if (ws) {
-                    ws.close();
-                    console.log('WebSocket connection closed');
-                }
-            };
-        }, [])
-    );
 
     const handleReturnGesture = (gesture) => {
         console.log(`Gesture Detected : ${gesture}`);
@@ -61,8 +33,12 @@ const ProgressSummary = () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             playSound();
             router.back();
+        } else if(gesture === 'Submit') {
+            generatePdf();
         }
     };
+
+    UseWebSocket(handleReturnGesture);
 
     // Helper function to get proper subject display names
     const getSubjectDisplayName = (key) => {
