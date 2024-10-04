@@ -5,6 +5,7 @@ import { collection, getDocs, deleteDoc, doc, updateDoc, where } from 'firebase/
 import { db } from '../../../../FirebaseConfig';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import { MaterialIcons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
 import {query} from "@react-native-firebase/firestore";
 import {
@@ -278,9 +279,22 @@ const QuizPage = () => {
                 setIsEditing(false);
             }}
         >
-            <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
-                    <ScrollView contentContainerStyle={styles.modalScrollContent}>
+            <View style={styles.modalOverlay}>
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalHeader}>
+                        <Text style={styles.modalHeaderText}>
+                            {isEditing ? 'Edit Quiz' : 'Quiz Details'}
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setIsModalVisible(false);
+                                setIsEditing(false);
+                            }}
+                        >
+                            <MaterialIcons name="close" size={24} color="#757575" />
+                        </TouchableOpacity>
+                    </View>
+                    <ScrollView style={styles.modalContent}>
                         {isEditing ? (
                             <View>
                                 <TextInput
@@ -290,7 +304,7 @@ const QuizPage = () => {
                                     placeholder="Quiz Name"
                                 />
                                 <TextInput
-                                    style={styles.input}
+                                    style={[styles.input, styles.multilineInput]}
                                     value={editedQuiz.quizInstructions}
                                     onChangeText={(text) => setEditedQuiz({ ...editedQuiz, quizInstructions: text })}
                                     placeholder="Quiz Instructions"
@@ -311,7 +325,7 @@ const QuizPage = () => {
                                         {question.answers.map((answer, answerIndex) => (
                                             <View key={answerIndex} style={styles.answerContainer}>
                                                 <TextInput
-                                                    style={styles.input}
+                                                    style={[styles.input, styles.answerInput]}
                                                     value={answer}
                                                     onChangeText={(text) => {
                                                         const updatedQuestions = [...editedQuiz.questions];
@@ -331,9 +345,11 @@ const QuizPage = () => {
                                                         setEditedQuiz({ ...editedQuiz, questions: updatedQuestions });
                                                     }}
                                                 >
-                                                    <Text style={styles.correctAnswerToggleText}>
-                                                        {answerIndex === question.correctAnswerIndex ? '✓' : ' '}
-                                                    </Text>
+                                                    <MaterialIcons
+                                                        name={answerIndex === question.correctAnswerIndex ? "check-circle" : "radio-button-unchecked"}
+                                                        size={24}
+                                                        color={answerIndex === question.correctAnswerIndex ? "#4CAF50" : "#757575"}
+                                                    />
                                                 </TouchableOpacity>
                                             </View>
                                         ))}
@@ -360,25 +376,16 @@ const QuizPage = () => {
                             </View>
                         )}
                     </ScrollView>
-                    <View style={styles.modalButtonContainer}>
+                    <View style={styles.modalFooter}>
                         {isEditing ? (
                             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                                <Text style={styles.saveButtonText}>Save</Text>
+                                <Text style={styles.buttonText}>Save</Text>
                             </TouchableOpacity>
                         ) : (
                             <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
-                                <Text style={styles.editButtonText}>Edit</Text>
+                                <Text style={styles.buttonText}>Edit</Text>
                             </TouchableOpacity>
                         )}
-                        <TouchableOpacity
-                            style={styles.closeButton}
-                            onPress={() => {
-                                setIsModalVisible(false);
-                                setIsEditing(false);
-                            }}
-                        >
-                            <Text style={styles.closeButtonText}>Close</Text>
-                        </TouchableOpacity>
                     </View>
                 </View>
             </View>
@@ -410,6 +417,121 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FAFAFA', // Light grey background
         paddingTop: 80,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        width: '90%',
+        maxHeight: '80%',
+        backgroundColor: 'white',
+        borderRadius: 8,
+        elevation: 5,
+        overflow: 'hidden',
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',
+    },
+    modalHeaderText: {
+        fontSize: 20,
+        fontFamily: "Inter_600SemiBold",
+        color: '#212121',
+    },
+    modalContent: {
+        padding: 16,
+    },
+    modalFooter: {
+        padding: 16,
+        borderTopWidth: 1,
+        borderTopColor: '#E0E0E0',
+        alignItems: 'flex-end',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        borderRadius: 4,
+        padding: 12,
+        marginBottom: 16,
+        fontFamily: "Inter_400Regular",
+        fontSize: 16,
+        color: '#212121',
+    },
+    multilineInput: {
+        minHeight: 80,
+        textAlignVertical: 'top',
+    },
+    questionContainer: {
+        marginBottom: 24,
+        backgroundColor: '#F5F5F5',
+        padding: 16,
+        borderRadius: 8,
+    },
+    answerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    answerInput: {
+        flex: 1,
+        marginRight: 8,
+    },
+    correctAnswerToggle: {
+        padding: 4,
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontFamily: "Inter_600SemiBold",
+        marginBottom: 16,
+        color: '#212121',
+    },
+    quizInstructions: {
+        fontSize: 16,
+        marginBottom: 24,
+        fontFamily: "Inter_400Regular",
+        color: '#757575',
+    },
+    questionText: {
+        fontSize: 18,
+        fontFamily: "Inter_500Medium",
+        marginBottom: 12,
+        color: '#212121',
+    },
+    answerText: {
+        fontSize: 16,
+        marginLeft: 16,
+        marginBottom: 8,
+        fontFamily: "Inter_400Regular",
+        color: '#424242',
+    },
+    correctAnswer: {
+        color: '#4CAF50',
+        fontFamily: "Inter_500Medium",
+    },
+    saveButton: {
+        backgroundColor: '#4CAF50',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 4,
+    },
+    editButton: {
+        backgroundColor: '#2196F3',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 4,
+    },
+    buttonText: {
+        color: 'white',
+        fontFamily: "Inter_600SemiBold",
+        fontSize: 14,
+        textTransform: 'uppercase',
     },
     heading: {
         alignSelf: 'center',
@@ -453,15 +575,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: "Inter_500Medium",
     },
-    editButton: {
-        position: 'absolute',
-        bottom: 6,
-        left: 16,
-        backgroundColor: '#4CAF50',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-    },
     editButtonText: {
         color: 'white',
         fontFamily: "Inter_600SemiBold",
@@ -476,15 +589,6 @@ const styles = StyleSheet.create({
         color: 'white',
         fontFamily: "Inter_600SemiBold",
         fontSize: 14,
-    },
-    saveButton: {
-        position: 'absolute',
-        bottom: 6,
-        left: 16,
-        backgroundColor: '#4CAF50',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 8,
     },
     closeButton: {
         backgroundColor: '#1e90ff',
@@ -503,54 +607,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: "Inter_500Medium",
     },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)',
-    },
-    modalContent: {
-        width: '90%',
-        maxHeight: '80%',
-        backgroundColor: 'white',
-        borderRadius: 4,
-        elevation: 24,
-        overflow: 'hidden',
-    },
     modalScrollContent: {
         padding: 24,
-    },
-    modalTitle: {
-        fontSize: 24,
-        fontFamily: "Inter_600SemiBold",
-        marginBottom: 16,
-        color: '#212121',
-    },
-    quizInstructions: {
-        fontSize: 16,
-        marginBottom: 24,
-        fontFamily: "Inter_400Regular",
-        color: '#757575',
-    },
-    questionContainer: {
-        marginBottom: 24,
-    },
-    questionText: {
-        fontSize: 18,
-        fontFamily: "Inter_500Medium",
-        marginBottom: 12,
-        color: '#212121',
-    },
-    answerText: {
-        fontSize: 16,
-        marginLeft: 16,
-        marginBottom: 8,
-        fontFamily: "Inter_400Regular",
-        color: '#424242',
-    },
-    correctAnswer: {
-        color: '#4CAF50',
-        fontFamily: "Inter_500Medium",
     },
     modalButtonContainer: {
         flexDirection: 'row',
@@ -570,34 +628,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         textTransform: 'uppercase',
     },
-    input: {
-        borderWidth: 1,
-        borderColor: '#E0E0E0',
-        borderRadius: 4,
-        padding: 12,
-        marginBottom: 16,
-        fontFamily: "Inter_400Regular",
-        fontSize: 16,
-        color: '#212121',
-    },
-    answerContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    correctAnswerToggle: {
-        width: 24,
-        height: 24,
-        borderWidth: 2,
-        borderColor: '#478747',
-        borderRadius: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginLeft: 16,
-        marginBottom: 15,
-    },
     correctAnswerToggleSelected: {
-        backgroundColor: '#478747',
+        backgroundColor: 'rgba(0,216,15,0)',
     },
     correctAnswerToggleText: {
         fontSize: 16,
