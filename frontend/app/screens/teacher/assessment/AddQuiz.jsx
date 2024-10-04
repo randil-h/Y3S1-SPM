@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Switch, Button, ScrollView, Alert, TouchableOpacity, SafeAreaView } from 'react-native';
+import { collection, addDoc } from "firebase/firestore";
+import {db} from "../../../../FirebaseConfig";
+import {useFocusEffect} from "@react-navigation/native";
+import * as Haptics from "expo-haptics";
+import {router} from "expo-router";
 
 const AddQuiz = () => {
     const [quizName, setQuizName] = useState('');
@@ -8,6 +13,44 @@ const AddQuiz = () => {
         { questionText: '', answers: ['', '', '', ''], correctAnswerIndex: null }
     ]);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    let ws;
+
+    useFocusEffect(
+        React.useCallback(() => {
+            // WebSocket connection starts when the page is focused
+            ws = new WebSocket('ws://192.168.1.4:8765');
+
+            ws.onopen = () => {
+                console.log('WebSocket connection established');
+            };
+
+            ws.onmessage = (event) => {
+                const { gesture } = JSON.parse(event.data);
+                handleSubmitGesture(gesture);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket connection is closed');
+            };
+
+            // Cleanup function to close WebSocket when page is unfocused
+            return () => {
+                if (ws) {
+                    ws.close();
+                    console.log('WebSocket connection closed');
+                }
+            };
+        }, [])
+    );
+
+    const handleSubmitGesture = (gesture) => {
+        if (gesture === 'Submit') {
+            handleSubmitQuiz();
+        } else if(gesture === 'Return') {
+            router.back();
+        }
+    };
+
 
     const handleQuestionChange = (text, index) => {
         const newQuestions = [...questions];
@@ -36,7 +79,7 @@ const AddQuiz = () => {
         setQuestions(newQuestions);
     };
 
-    const handleSubmitQuiz = () => {
+    const handleSubmitQuiz = async () => {
         const incompleteQuestions = questions.some(
             (q) => q.questionText === '' || q.answers.includes('') || q.correctAnswerIndex === null
         );
@@ -46,10 +89,24 @@ const AddQuiz = () => {
             return;
         }
 
-        console.log('Quiz submitted:', { quizName, quizInstructions, questions });
-        setIsSubmitted(true);
-        Alert.alert('Quiz Submitted', 'Your quiz has been submitted successfully.');
+        const quizData = {
+            quizName,
+            quizInstructions,
+            questions,
+            createdAt: new Date(),
+        };
+
+        try {
+            const docRef = await addDoc(collection(db, 'quizzes'), quizData);
+            console.log('Quiz submitted with ID: ', docRef.id);
+            setIsSubmitted(true);
+            Alert.alert('Quiz Submitted', 'Your quiz has been submitted successfully.');
+        } catch (e) {
+            console.error('Error adding document: ', e);
+            Alert.alert('Submission Failed', 'There was an issue submitting your quiz. Please try again.');
+        }
     };
+
 
     return (
         <SafeAreaView style={styles.container}>
