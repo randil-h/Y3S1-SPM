@@ -594,6 +594,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 16,
+        marginBottom: 15,
     },
     correctAnswerToggleSelected: {
         backgroundColor: '#478747',
