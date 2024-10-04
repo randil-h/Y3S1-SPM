@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router'; // Import useRouter
 import * as Haptics from 'expo-haptics'; // Import Haptics
 import { Audio } from 'expo-av';
 import {useFocusEffect} from "@react-navigation/native";
+import * as Speech from 'expo-speech'; // Import expo-speech
 
 const beepSound = require('../../assets/sounds/soft_beep.mp3'); // Path to the sound file
 
@@ -40,7 +41,14 @@ const Progress = () => {
             };
         }, [])
     );
-
+// Function to handle speech
+    const speakProgress = (text) => {
+        Speech.speak(text, {
+            language: 'en',
+            pitch: 1,
+            rate: 1,
+        });
+    };
     const handleGesture = (gesture) => {
         if (navigating) return;
         console.log(`Gesture detected: ${gesture}`);
@@ -48,17 +56,21 @@ const Progress = () => {
         switch (gesture) {
             case 'Selected answer: One':
                 setNavigating(true);
+
                 router.push('/screens/Progress/ViewProgress');
                 break;
             case 'Selected answer: Two':
                 setNavigating(true);
+
                 router.push('/screens/Progress/AddProgress');
                 break;
             case 'Selected answer: Three':
                 setNavigating(true);
-                router.push('/screens/Progress/ProgressSummary'); // Implement navigation to progress summary
+
+                router.push('/screens/Progress/ProgressSummary');
                 break;
             default:
+                speak("Unknown action");
                 break;
         }
     };
@@ -91,16 +103,20 @@ const Progress = () => {
 
     return (
         <View style={styles.container}>
+            <Text style={styles.topic}>Student Progress</Text>
+
             <TouchableOpacity
                 style={styles.button}
                 onPress={() => {
                     handleButtonPress('View Progress');
                     router.push('/screens/Progress/ViewProgress');
+                    speakProgress("Navigating to view student progress");
                 }}
                 accessibilityLabel="View Progress"
                 accessibilityHint="Navigates to the page where you can view detailed student progress"
                 accessibilityRole="button"
             >
+                {/* Wrap button text in <Text> */}
                 <Text style={styles.buttonText}>View Progress</Text>
             </TouchableOpacity>
 
@@ -109,6 +125,7 @@ const Progress = () => {
                 onPress={() => {
                     handleButtonPress('Add Progress');
                     router.push('/screens/Progress/AddProgress');
+                    speakProgress("Navigating to add student progress");
                 }}
                 accessibilityLabel="Add Student"
                 accessibilityHint="Navigates to the page where you can add new student information"
@@ -122,6 +139,7 @@ const Progress = () => {
                 onPress={() => {
                     handleButtonPress('Progress Summary');
                     router.push('/screens/Progress/ProgressSummary');
+                    speakProgress("Navigating to student progress summary");
                 }}
                 accessibilityLabel="Display Progress Summary"
                 accessibilityHint="Navigates to the page where you can view a summary of student progress"
@@ -141,28 +159,38 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 20,
         padding: 20,
+        backgroundColor: '#f2f5f8', // Light background color
     },
     button: {
         backgroundColor: '#fff', // Card-like white background
-        width: 280,
+        width: 300,
         height: 180,
         borderRadius: 25, // Card-like rounded corners
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000', // Shadow for depth
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 3, // Android shadow
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 10,
+        elevation: 6, // Android shadow
         paddingHorizontal: 20, // Padding similar to card style
         paddingVertical: 20,
+        marginVertical: 10, // Adds spacing between buttons
     },
     buttonText: {
-        fontSize: 18,
+        fontSize: 20, // Consistent font size
         fontWeight: 'bold', // Similar to card title
-        color: '#666', // Gray text like card
+        color: '#333', // Darker text for better contrast
         textAlign: 'center', // Centered text
     },
+    topic: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#000', // Blue color for the title
+        marginBottom: 20,
+        marginTop:20,// Spacing below the topic text
+    },
 });
+
 
 export default Progress;

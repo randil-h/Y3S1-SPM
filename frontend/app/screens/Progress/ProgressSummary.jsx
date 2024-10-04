@@ -247,6 +247,16 @@ const ProgressSummary = () => {
             >
                 <Text style={styles.buttonText}>Generate PDF</Text>
             </TouchableOpacity>
+            {/* Navigation Button */}
+            <TouchableOpacity
+                style={styles.button1}
+                onPress={handleViewProgress}
+                accessibilityLabel="View Detailed Progress"
+                accessibilityHint="Navigates to the page where you can view detailed student progress"
+                accessibilityRole="button"
+            >
+                <Text style={styles.buttonText}>View Detailed Progress</Text>
+            </TouchableOpacity>
             {/* Overall Statistics */}
             <View style={styles.section}>
                 <Text style={styles.sectionTitle} accessible={true}>
@@ -323,16 +333,7 @@ const ProgressSummary = () => {
                 )}
             </View>
 
-            {/* Navigation Button */}
-            <TouchableOpacity
-                style={styles.button}
-                onPress={handleViewProgress}
-                accessibilityLabel="View Detailed Progress"
-                accessibilityHint="Navigates to the page where you can view detailed student progress"
-                accessibilityRole="button"
-            >
-                <Text style={styles.buttonText}>View Detailed Progress</Text>
-            </TouchableOpacity>
+
         </ScrollView>
     );
 };
@@ -346,83 +347,100 @@ const capitalize = (s) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#ffffff',
         padding: 20,
-        backgroundColor: '#f2f2f2',
     },
     title: {
         fontSize: 28,
-        fontWeight: 'bold',
-        color: '#000',
-        marginBottom: 20,
+        fontWeight: '700',
+        color: '#333333',
+        marginBottom: 30,
+        marginTop: 40,
         textAlign: 'center',
-        paddingTop: 30,
     },
     section: {
         marginBottom: 30,
-        padding: 15,
-        backgroundColor: '#fff',
-        borderRadius: 15,
-        shadowColor: '#000',
+        padding: 20,
+        backgroundColor: '#ffffff',
+        borderRadius: 12,
+        shadowColor: '#000000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 5,
+        shadowRadius: 4,
         elevation: 3,
     },
     sectionTitle: {
         fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#333',
+        fontWeight: '600',
+        color: '#1a8e5f',
+        marginBottom: 15,
     },
     statText: {
         fontSize: 16,
-        color: '#555',
-        marginBottom: 5,
+        color: '#333333',
+        marginBottom: 8,
     },
     listItem: {
-        paddingVertical: 10,
+        paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
+        borderBottomColor: '#e0e0e0',
     },
     listText: {
         fontSize: 16,
-        color: '#555',
+        color: '#333333',
+        marginBottom: 4,
     },
     noDataText: {
         fontSize: 16,
-        color: '#999',
+        color: '#999999',
         fontStyle: 'italic',
     },
     button: {
-        backgroundColor: '#80AF81',
+        backgroundColor: '#1a8e5f',
         paddingVertical: 15,
         paddingHorizontal: 20,
-        borderRadius: 25,
+        borderRadius: 8,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: '#000000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
         elevation: 3,
         marginBottom: 20,
-    },pdfButton: {
-        backgroundColor: '#80AF81',
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        borderRadius: 25,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        elevation: 3,
-        marginBottom: 20,
-    buttonText: {
-        fontSize: 18,
-        color: '#fff',
-        fontWeight: 'bold',
-        textAlign: 'center',
     },
-}});
+    button1: {
+        backgroundColor: '#000000',
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        alignItems: 'center',
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+        marginBottom: 20,
+    },
+    pdfButton: {
+        backgroundColor: '#1a8e5f',
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#1a8e5f',
+        marginBottom: 20,
+    },
+    buttonText: {
+        fontSize: 16,
+        color: '#ffffff',
+        fontWeight: '600',
+    },
+    pdfButtonText: {
+        fontSize: 16,
+        color: '#1a8e5f',
+        fontWeight: '600',
+    },
+});
 
 export default ProgressSummary;

@@ -4,6 +4,7 @@ import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../../FirebaseConfig'; // Ensure the path to your Firebase config is correct
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
+import { Picker } from '@react-native-picker/picker';
 
 const UpdateProgress = () => {
     const router = useRouter();
@@ -22,6 +23,7 @@ const UpdateProgress = () => {
         science: '',
         courseworkProgress: '',
     });
+    const [progressStatus, setProgressStatus] = useState(progressData.courseworkProgress || '');
 
     useEffect(() => {
         console.log('Params in useEffect:', params);
@@ -175,22 +177,27 @@ const UpdateProgress = () => {
             <Text style={styles.sectionTitle}>Coursework Progress</Text>
             <View style={styles.form}>
                 <Text style={styles.label}>Progress Status:</Text>
-                <TextInput
-                    style={styles.input}
-                    value={progressData.courseworkProgress}
-                    onChangeText={(text) => handleInputChange('courseworkProgress', text)}
-                />
+                <Picker
+                    selectedValue={progressStatus}
+                    style={styles.picker}
+                    onValueChange={(itemValue) => setProgressStatus(itemValue)} // Update picker state
+                >
+                    <Picker.Item label="Excellent" value="excellent" />
+                    <Picker.Item label="Good" value="good" />
+                    <Picker.Item label="Average" value="average" />
+                    <Picker.Item label="Needs Improvement" value="needs_improvement" />
+                </Picker>
             </View>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                    style={[styles.roundButton, styles.updateButton]}
+                    style={[styles.button, styles.updateButton]} // Add styles.button here
                     onPress={handleUpdate}
                 >
                     <Text style={styles.buttonText}>Update</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    style={[styles.roundButton, styles.closeButton]}
+                    style={[styles.button, styles.closeButton]} // Add styles.button here
                     onPress={() => router.back()}
                 >
                     <Text style={styles.buttonText}>Close</Text>
@@ -203,88 +210,63 @@ const UpdateProgress = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#ffffff',
         padding: 20,
-        backgroundColor: '#F0F4F8', // Light blue-gray background
     },
     title: {
         fontSize: 28,
-        fontWeight: '800',
-        color: '#2C3E50',
-        marginBottom: 24,
+        fontWeight: '700',
+        color: '#333333',
+        marginBottom: 30,
         marginTop: 40,
         textAlign: 'center',
-        letterSpacing: 1,
     },
-    form: {
-        backgroundColor: '#FFFFFF',
-        padding: 24,
-        borderRadius: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 5,
-    },
-    label: {
-        fontSize: 16,
-        marginBottom: 8,
+    sectionTitle: {
+        fontSize: 18,
         fontWeight: '600',
-        color: '#34495E',
+        color: '#1a8e5f',
+        marginBottom: 15,
     },
     input: {
-        borderWidth: 1,
-        borderColor: '#BDC3C7',
-        padding: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+        paddingVertical: 10,
         marginBottom: 20,
-        borderRadius: 8,
         fontSize: 16,
-        backgroundColor: '#ECF0F1',
-        color: '#2C3E50',
+        color: '#333333',
+    },
+    picker: {
+        height: 50,
+        width: '100%',
     },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 32,
-        paddingBottom: 30,
+        marginTop: 30,
+        marginBottom: 40,
     },
-    roundButton: {
-        width: 140,
-        height: 50,
-        borderRadius: 25,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 3,
+    button: {
+        flex: 1,
+        height: 50, // Ensure a fixed height
+        justifyContent: 'center', // Center the content vertically
+        alignItems: 'center', // Center the content horizontally
+        borderRadius: 8,
+        marginHorizontal: 5,
     },
     updateButton: {
-        backgroundColor: '#3498DB',
+        backgroundColor: '#1a8e5f',
     },
     closeButton: {
-        backgroundColor: '#E74C3C',
+        backgroundColor: '#333333',
     },
     buttonText: {
-        color: '#FFFFFF',
-        fontWeight: '700',
+        color: '#ffffff',
+        fontWeight: '600',
         fontSize: 16,
-        letterSpacing: 1,
-    },
-    sectionTitle: {
-        fontSize: 20,
-        fontWeight: '700',
-        color: '#2C3E50',
-        marginTop: 24,
-        marginBottom: 16,
-    },
-    marksContainer: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 12,
-        padding: 24,
-        marginBottom: 24,
+        lineHeight: 22, // Ensure lineHeight is consistent with font size
+        textAlignVertical: 'center', // Center text vertically (for Android)
     },
 });
+
 
 export default UpdateProgress;

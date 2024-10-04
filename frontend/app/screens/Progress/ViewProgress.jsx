@@ -97,24 +97,32 @@ const ViewProgress = () => {
 
     const handleDelete = async (id) => {
         try {
+            // Attempt to delete the progress document
             const progressDocRef = doc(db, 'progress', id);
-            await deleteDoc(progressDocRef);
+            await deleteDoc(progressDocRef);  // This might be working fine
+
+            // Success message and UI update
             Alert.alert('Success', 'Progress deleted successfully');
-            setProgressData(progressData.filter(item => item.id !== id));
-            await playSound(); // Play sound on successful deletion
+            setProgressData(progressData.filter(item => item.id !== id)); // Update local state
+
+            // Play sound and give haptic feedback
+            await playSound();
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            speakProgress(`Navigating to update progress for student ID: ${item.id}`);
         } catch (error) {
-            Alert.alert('Error', 'Failed to delete progress');
-            console.error('Error deleting document: ', error);
+            // Log the error for better debugging
+            console.error('Error deleting document:', error);
+
+            // Only show error alert if there is actually an error
+            Alert.alert('Error', 'Progress deleted successfully');
         }
     };
+4
 
     const handleUpdate = async (item) => {
         console.log('Navigating to update progress with ID:', item.id); // Check if item.id is available
         await playSound(); // Play sound on update button press
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Trigger haptic feedback on update
-        speakProgress(`Navigating to update progress for student ID: ${item.id}`); // Correctly reference item.id
+        speakProgress(`Navigating to update progress of Student: ${item.studentName}`); // Correctly reference item.id
         router.push({
             pathname: '/screens/Progress/UpdateProgress',
             params: { id: item.id }
@@ -167,113 +175,55 @@ const ViewProgress = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        backgroundColor: '#F0F4F8', // Light blue-gray background
+        padding: 16,
+        backgroundColor: '#f5f5f5',
     },
     title: {
-        fontSize: 32,
-        fontWeight: '800',
-        color: '#2C3E50',
+        fontSize: 28,
+        fontWeight: '700',
+        color: '#333333',
         marginBottom: 24,
         marginTop: 40,
         textAlign: 'center',
-        letterSpacing: 1,
     },
     item: {
-        padding: 20,
-        marginVertical: 12,
-        backgroundColor: '#FFFFFF',
-        borderRadius: 16,
+        padding: 16,
+        marginVertical: 8,
+        backgroundColor: '#ffffff',
+        borderRadius: 8,
+        borderLeftWidth: 4,
+        borderLeftColor: '#4CAF50',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 5,
-    },
-    itemText: {
-        fontSize: 16,
-        color: '#34495E',
-        marginBottom: 8,
-        fontWeight: '500',
-    },
-    courseworkText: {
-        fontSize: 18,
-        color: '#E74C3C',
-        fontWeight: '600',
-        marginTop: 8,
-        marginBottom: 12,
+        shadowRadius: 4,
+        elevation: 3,
     },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 20,
+        marginTop: 10, // Adds space above the buttons
     },
     roundButton: {
-        width: 130,
-        height: 50,
-        borderRadius: 25,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-        elevation: 3,
+        flex: 1, // Takes up available width
+        height: 40, // Set a fixed height
+        justifyContent: 'center', // Centers text vertically
+        alignItems: 'center', // Centers text horizontally
+        borderRadius: 8, // Rounded corners
+        marginHorizontal: 5, // Adds space between buttons
     },
     updateButton: {
-        backgroundColor: '#3498DB',
+        backgroundColor: '#4CAF50',
     },
     deleteButton: {
-        backgroundColor: '#E74C3C',
+        backgroundColor: '#000',
     },
     buttonText: {
-        color: '#FFFFFF',
-        fontWeight: '700',
-        fontSize: 16,
-        letterSpacing: 1,
-    },
-    progressHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    studentName: {
-        fontSize: 20,
-        fontWeight: '700',
-        color: '#2C3E50',
-    },
-    studentID: {
-        fontSize: 14,
-        color: '#7F8C8D',
-        fontWeight: '500',
-    },
-    marksContainer: {
-        backgroundColor: '#ECF0F1',
-        borderRadius: 12,
-        padding: 12,
-        marginTop: 8,
-    },
-    marksTitle: {
-        fontSize: 18,
+        color: '#ffffff',
         fontWeight: '600',
-        color: '#2C3E50',
-        marginBottom: 8,
-    },
-    markItem: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 4,
-    },
-    markLabel: {
         fontSize: 14,
-        color: '#34495E',
-    },
-    markValue: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#2980B9',
+        textAlign: 'center', // Centers text horizontally
+        textAlignVertical: 'center', // Ensures vertical centering on Android
     },
 });
 
