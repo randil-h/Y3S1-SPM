@@ -7,7 +7,11 @@ import {db} from "../../../FirebaseConfig"; // Import from Firebase Firestore
 import * as Haptics from 'expo-haptics'; // Import Haptics
 import { Audio } from 'expo-av';
 import {useFocusEffect} from "@react-navigation/native";
+
 import * as Speech from "expo-speech";
+
+import UseWebSocket from "../../../components/gesture/UseWebSocket";
+
 
 const beepSound = require('../../../assets/sounds/beep.mp3');
 const AddProgress = () => {
@@ -20,38 +24,9 @@ const AddProgress = () => {
     const [geography, setGeography] = useState('');
     const [hist, setHistory] = useState('');
     const [science, setScience] = useState('');
-    let ws;
 
     const router = useRouter();
     const [sound, setSound] = useState();
-
-    useFocusEffect(
-        React.useCallback(() => {
-            // WebSocket connection starts when the page is focused
-            ws = new WebSocket('ws://192.168.1.4:8765');  //ip address and port number of server
-
-            ws.onopen = () => {
-                console.log('WebSocket connection established');
-            };
-
-            ws.onmessage = (event) => {
-                const { gesture } = JSON.parse(event.data);
-                handleGesture(gesture);
-            };
-
-            ws.onclose = () => {
-                console.log('WebSocket connection is closed');
-            };
-
-            // Cleanup function to close WebSocket when page is unfocused
-            return () => {
-                if (ws) {
-                    ws.close();
-                    console.log('WebSocket connection closed');
-                }
-            };
-        }, [])
-    );
 
     const handleGesture = (gesture) => {
         console.log(`Gesture Detected : ${gesture}`);
@@ -64,6 +39,8 @@ const AddProgress = () => {
             handleSubmit();
         }
     };
+
+    UseWebSocket(handleGesture);
 
     // Load sound effect
     const playSound = async () => {

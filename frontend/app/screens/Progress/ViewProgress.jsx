@@ -6,44 +6,19 @@ import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics'; // Import Haptics
 import { Audio } from 'expo-av';
+
 import * as Speech from 'expo-speech';
+
+import UseWebSocket from "../../../components/gesture/UseWebSocket";
+
 
 const beepSound = require('../../../assets/sounds/beep.mp3'); // Path to the sound file
 const ViewProgress = () => {
     const [progressData, setProgressData] = useState([]);
     const router = useRouter();
     const [sound, setSound] = useState();
-    let ws;
 
-    useFocusEffect(
-        React.useCallback(() => {
-            // WebSocket connection starts when the page is focused
-            ws = new WebSocket('ws://192.168.1.4:8765');  //ip address and port number of server
-
-            ws.onopen = () => {
-                console.log('WebSocket connection established');
-            };
-
-            ws.onmessage = (event) => {
-                const { gesture } = JSON.parse(event.data);
-                handleReturnGesture(gesture);
-            };
-
-            ws.onclose = () => {
-                console.log('WebSocket connection is closed');
-            };
-
-            // Cleanup function to close WebSocket when page is unfocused
-            return () => {
-                if (ws) {
-                    ws.close();
-                    console.log('WebSocket connection closed');
-                }
-            };
-        }, [])
-    );
-
-    const handleReturnGesture = (gesture) => {
+    const handleReturnGesture = async (gesture) => {
         console.log(`Gesture Detected : ${gesture}`);
 
         if(gesture === 'Return') {
@@ -52,6 +27,7 @@ const ViewProgress = () => {
             router.back();
         }
     };
+
     const speakProgress = (text) => {
         Speech.speak(text, {
             language: 'en',
@@ -59,6 +35,11 @@ const ViewProgress = () => {
             rate: 1,
         });
     };
+
+
+    UseWebSocket(handleReturnGesture);
+
+
     // Load sound effect
     const playSound = async () => {
         try {

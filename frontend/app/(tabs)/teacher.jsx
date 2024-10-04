@@ -5,6 +5,13 @@ import { BlurView } from "expo-blur";
 import * as Haptics from 'expo-haptics';
 import { Audio } from 'expo-av';
 import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
+import {
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+} from '@expo-google-fonts/inter';
+import { useFonts } from "expo-font";
 
 const beepSound = require('../../assets/sounds/beep.mp3'); // Ensure this path is correct
 
@@ -15,6 +22,17 @@ const Teacher = () => {
     const [buttonLayouts, setButtonLayouts] = useState({});
     const [fingerPosition, setFingerPosition] = useState({ x: 0, y: 0 });
     const [isFeedbackActive, setIsFeedbackActive] = useState(false);
+
+    let [fontsLoaded] = useFonts({
+        Inter_400Regular,
+        Inter_500Medium,
+        Inter_600SemiBold,
+        Inter_700Bold,
+    });
+
+    if (!fontsLoaded) {
+        return null;
+    }
 
     const loadSound = async () => {
         try {
@@ -185,7 +203,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     buttonText: {
-        fontWeight: 'bold',
+        fontFamily: "Inter_600SemiBold",
         color: '#FFFFFF',
         fontSize: 26,
         textAlign: 'center',

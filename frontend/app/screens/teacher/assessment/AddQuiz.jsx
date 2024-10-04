@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Switch, Button, ScrollView, Alert, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, SafeAreaView } from 'react-native';
+import { TextInput, Switch, Button, Text, useTheme, Provider as PaperProvider } from 'react-native-paper';
 import { collection, addDoc } from "firebase/firestore";
-import {db} from "../../../../FirebaseConfig";
-import {useFocusEffect} from "@react-navigation/native";
+import { db } from "../../../../FirebaseConfig";
+import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
-import {router} from "expo-router";
+import { router } from "expo-router";
+import { useFonts, Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
 
 const AddQuiz = () => {
+    const [fontsLoaded] = useFonts({
+        Inter_400Regular,
+        Inter_700Bold,
+    });
+
+    const theme = useTheme();
+
     const [quizName, setQuizName] = useState('');
     const [quizInstructions, setQuizInstructions] = useState('');
     const [questions, setQuestions] = useState([
@@ -17,7 +26,6 @@ const AddQuiz = () => {
 
     useFocusEffect(
         React.useCallback(() => {
-            // WebSocket connection starts when the page is focused
             ws = new WebSocket('ws://192.168.1.4:8765');
 
             ws.onopen = () => {
@@ -33,7 +41,6 @@ const AddQuiz = () => {
                 console.log('WebSocket connection is closed');
             };
 
-            // Cleanup function to close WebSocket when page is unfocused
             return () => {
                 if (ws) {
                     ws.close();
@@ -50,7 +57,6 @@ const AddQuiz = () => {
             router.back();
         }
     };
-
 
     const handleQuestionChange = (text, index) => {
         const newQuestions = [...questions];
@@ -107,169 +113,148 @@ const AddQuiz = () => {
         }
     };
 
+    if (!fontsLoaded) {
+        return null;
+    }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.topBar}>
-            </View>
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <TextInput
-                    style={styles.openTextField}
-                    placeholder="Enter Quiz Name"
-                    value={quizName}
-                    onChangeText={setQuizName}
-                    editable={!isSubmitted}
-                />
-                <TextInput
-                    style={styles.instructionsInput}
-                    placeholder="Enter Quiz Instructions (Optional)"
-                    value={quizInstructions}
-                    onChangeText={setQuizInstructions}
-                    editable={!isSubmitted}
-                    multiline
-                />
-                <Text style={styles.toggleLabel}>Toggle on the correct answer</Text>
+        <PaperProvider theme={{
+            ...theme,
+            fonts: {
+                ...theme.fonts,
+                regular: { fontFamily: 'Inter_400Regular' },
+                medium: { fontFamily: 'Inter_400Regular' },
+                light: { fontFamily: 'Inter_400Regular' },
+                thin: { fontFamily: 'Inter_400Regular' },
+            },
+        }}>
+            <SafeAreaView style={styles.container}>
+                <ScrollView contentContainerStyle={styles.scrollContainer}>
+                    <Text style={styles.heading}>Add Quiz</Text>
+                    <TextInput
+                        label="Quiz Name"
+                        value={quizName}
+                        onChangeText={setQuizName}
+                        mode="outlined"
+                        style={styles.quizNameInput}
+                        disabled={isSubmitted}
+                    />
+                    <TextInput
+                        label="Quiz Instructions (Optional)"
+                        value={quizInstructions}
+                        onChangeText={setQuizInstructions}
+                        mode="outlined"
+                        multiline
+                        numberOfLines={4}
+                        style={styles.instructionsInput}
+                        disabled={isSubmitted}
+                    />
+                    <Text style={styles.toggleLabel}>Toggle on the correct answer</Text>
 
-                {questions.map((question, questionIndex) => (
-                    <View key={questionIndex} style={styles.questionContainer}>
-                        <TouchableOpacity
-                            style={styles.removeButton}
-                            onPress={() => removeQuestion(questionIndex)}
-                        >
-                            <Text style={styles.removeButtonText}>X</Text>
-                        </TouchableOpacity>
-                        <Text style={styles.label}>Question {questionIndex + 1}:</Text>
-                        <TextInput
-                            style={styles.questionInput}
-                            placeholder="Enter the question"
-                            value={question.questionText}
-                            onChangeText={(text) => handleQuestionChange(text, questionIndex)}
-                            editable={!isSubmitted}
-                        />
-                        {question.answers.map((answer, answerIndex) => (
-                            <View key={answerIndex} style={styles.answerContainer}>
-                                <TextInput
-                                    style={styles.answerInput}
-                                    placeholder={`Answer ${answerIndex + 1}`}
-                                    value={answer}
-                                    onChangeText={(text) => handleAnswerChange(text, questionIndex, answerIndex)}
-                                    editable={!isSubmitted}
-                                />
-                                <Switch
-                                    value={question.correctAnswerIndex === answerIndex}
-                                    onValueChange={() => handleToggleChange(questionIndex, answerIndex)}
-                                    style={styles.switch}
-                                    disabled={isSubmitted}
-                                />
-                            </View>
-                        ))}
+                    {questions.map((question, questionIndex) => (
+                        <View key={questionIndex} style={styles.questionContainer}>
+                            <Button
+                                icon="close"
+                                mode="contained"
+                                onPress={() => removeQuestion(questionIndex)}
+                                style={styles.removeButton}>
+                            </Button>
+                            <Text style={styles.questionLabel}>Question {questionIndex + 1}:</Text>
+                            <TextInput
+                                label="Enter the question"
+                                value={question.questionText}
+                                onChangeText={(text) => handleQuestionChange(text, questionIndex)}
+                                mode="outlined"
+                                style={styles.questionInput}
+                                disabled={isSubmitted}
+                            />
+                            {question.answers.map((answer, answerIndex) => (
+                                <View key={answerIndex} style={styles.answerContainer}>
+                                    <TextInput
+                                        label={`Answer ${answerIndex + 1}`}
+                                        value={answer}
+                                        onChangeText={(text) => handleAnswerChange(text, questionIndex, answerIndex)}
+                                        mode="outlined"
+                                        style={styles.answerInput}
+                                        disabled={isSubmitted}
+                                    />
+                                    <Switch
+                                        value={question.correctAnswerIndex === answerIndex}
+                                        onValueChange={() => handleToggleChange(questionIndex, answerIndex)}
+                                        disabled={isSubmitted}
+                                        trackColor={{false: '#767577', true: '#a0f1a7'}}
+                                        thumbColor={{false: '#000000', true: '#f4f3f4'}}
+                                    />
+                                </View>
+                            ))}
+                        </View>
+                    ))}
+                </ScrollView>
+                {!isSubmitted && (
+                    <View style={styles.bottomBar}>
+                        <Button mode="outlined" onPress={handleSubmitQuiz} style={styles.submitButton}>
+                            <Text style={styles.submitButtonText}> Submit </Text>
+                        </Button>
+                        <Button mode="outlined" onPress={addNewQuestion} style={styles.addQuestionButton}>
+                            <Text style = {styles.addQuestionButtonText}> Add Question </Text>
+                        </Button>
                     </View>
-                ))}
-            </ScrollView>
-            {!isSubmitted && (
-                <View style={styles.bottomBar}>
-                    <TouchableOpacity
-                        style={styles.submitButton}
-                        onPress={handleSubmitQuiz}
-                    >
-                        <Text style={styles.submitButtonText}>Submit Quiz</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.addQuestionButton}
-                        onPress={addNewQuestion}
-                    >
-                        <Text style={styles.addQuestionButtonText}>Add Question</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-        </SafeAreaView>
+                )}
+            </SafeAreaView>
+        </PaperProvider>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5FCFF',
-    },
-    topBar: {
-        height: 10,
-        backgroundColor: '#007BFF00',
-        justifyContent: 'center',
-        paddingHorizontal: 15,
+        backgroundColor: '#ededed',
     },
     scrollContainer: {
-        flexGrow: 1,
         padding: 20,
         paddingBottom: 80,
     },
-    openTextField: {
-        marginTop: 20,
-        height: 50,
-        fontSize: 22,
-        fontWeight: 'bold',
-        paddingHorizontal: 5,
+    heading: {
+        alignSelf: 'center',
+        fontFamily: "Inter_700Bold",
+        fontSize: 48,
+        color: '#323232',
+        marginTop: 15,
+        marginBottom: 30,
+    },
+    quizNameInput: {
         marginBottom: 15,
-        borderBottomWidth: 1,
-        borderColor: '#333',
+        fontFamily: 'Inter_700Bold',
     },
     instructionsInput: {
-        height: 100,
-        borderColor: '#333',
-        borderWidth: 2,
-        borderRadius: 8,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
         marginBottom: 20,
-        backgroundColor: '#FFF',
-        fontSize: 16,
     },
     toggleLabel: {
-        fontSize: 16,
-        fontWeight: 'bold',
         marginBottom: 20,
-        color: '#333',
+        fontFamily: 'Inter_700Bold',
+        fontSize: 16,
     },
     questionContainer: {
         marginBottom: 30,
-        position: 'relative',
         padding: 10,
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 8,
-        backgroundColor: '#FFF',
     },
     removeButton: {
-        position: 'absolute',
-        top: 10,
-        right: 10,
-        backgroundColor: '#FFFFFF',
+        paddingLeft: 15,
+        width: 10,
         borderRadius: 15,
-        width: 30,
-        height: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 100,
+        backgroundColor: 'red',
+        alignSelf: 'flex-end',
     },
-    removeButtonText: {
-        color: '#D7D7D7',
+    questionLabel: {
         fontSize: 18,
-        fontWeight: 'bold',
-    },
-    label: {
-        fontSize: 20,
-        fontWeight: 'bold',
+        fontFamily: 'Inter_700Bold',
         marginBottom: 10,
-        color: '#333',
     },
     questionInput: {
-        height: 50,
-        borderColor: '#333',
-        borderWidth: 2,
-        borderRadius: 8,
-        paddingHorizontal: 15,
         marginBottom: 15,
-        backgroundColor: '#FFF',
-        fontSize: 18,
     },
     answerContainer: {
         flexDirection: 'row',
@@ -277,55 +262,51 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     answerInput: {
-        height: 50,
         flex: 1,
-        borderColor: '#333',
-        borderWidth: 2,
-        borderRadius: 8,
-        paddingHorizontal: 15,
-        backgroundColor: '#FFF',
-        fontSize: 18,
         marginRight: 10,
-    },
-    switch: {
-        transform: [{ scaleX: 1.2 }, { scaleY: 1.2 }],
     },
     bottomBar: {
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
-        height: 80,
-        backgroundColor: '#F5FCFF',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderTopWidth: 1,
-        borderTopColor: '#ccc',
-        alignItems: 'center',
+        padding: 20,
+        backgroundColor: '#d6d6d6',
     },
     submitButton: {
-        marginBottom: 10,
-        backgroundColor: '#007BFF',
-        padding: 10,
-        borderRadius: 8,
+        flex: 1,
+        marginRight: 10,
+        backgroundColor: '#f8f8f8',
+        width: 56,
+        height: 56,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 6,
+        borderColor: '#323232'
     },
     submitButtonText: {
-        color: '#FFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    addQuestionButton: {
-        marginBottom: 10,
-        backgroundColor: '#28A745',
-        padding: 10,
-        borderRadius: 8,
+        fontSize: 18,
+        fontFamily: 'Inter_700Bold',
+        color: '#323232',
     },
     addQuestionButtonText: {
-        color: '#FFF',
-        fontSize: 16,
-        fontWeight: 'bold',
+        fontSize: 18,
+        fontFamily: 'Inter_700Bold',
+        color: '#323232',
+    },
+    addQuestionButton: {
+        flex: 1,
+        backgroundColor: '#f8f8f8',
+        width: 56,
+        height: 56,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 6,
+        borderColor: '#323232'
     },
 });
 

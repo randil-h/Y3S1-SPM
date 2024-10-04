@@ -2,10 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../FirebaseConfig';
-import * as Speech from 'expo-speech'; // Import speech
+import * as Speech from 'expo-speech';
+import UseWebSocket from "../gesture/UseWebSocket";
+import {
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+} from '@expo-google-fonts/inter';
+import { useFonts } from "expo-font";
 
 const QuizSelection = ({ onQuizSelect }) => {
     const [quizzes, setQuizzes] = useState([]);
+
+    let [fontsLoaded] = useFonts({
+        Inter_400Regular,
+        Inter_500Medium,
+        Inter_600SemiBold,
+        Inter_700Bold,
+    });
+
+    if (!fontsLoaded) {
+        return null;
+    }
 
     useEffect(() => {
         fetchQuizzes();
@@ -32,6 +51,24 @@ const QuizSelection = ({ onQuizSelect }) => {
             console.error('Error fetching quizzes:', error);
         }
     };
+
+    const handleGestureSelection = (gesture) => {
+        console.log(`Gesture detected: ${gesture}`);
+
+        if (gesture === 'Selected answer: One' && quizzes[0]) {
+            handleQuizSelect(quizzes[0]);
+        } else if (gesture === 'Selected answer: Two' && quizzes[1]) {
+            handleQuizSelect(quizzes[1]);
+        } else if (gesture === 'Selected answer: Three' && quizzes[2]) {
+            handleQuizSelect(quizzes[2]);
+        } else if (gesture === 'Selected answer: Four' && quizzes[3]) {
+            handleQuizSelect(quizzes[3]);
+        } else {
+            Speech.speak('No corresponding quiz for this gesture.');
+        }
+    };
+
+    UseWebSocket(handleGestureSelection);
 
     const handleQuizSelect = (item) => {
         // Read aloud the selected quiz name
@@ -77,7 +114,7 @@ const styles = StyleSheet.create({
     title: {
         marginTop: 60,
         fontSize: 24,
-        fontWeight: 'bold',
+        fontFamily: 'Inter_700Bold',
         marginBottom: 20,
         textAlign: 'center',
     },
@@ -94,7 +131,7 @@ const styles = StyleSheet.create({
     },
     quizName: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: 'Inter_600SemiBold',
     },
 });
 
