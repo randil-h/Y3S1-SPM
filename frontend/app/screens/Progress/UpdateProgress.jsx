@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView 
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../../FirebaseConfig'; // Ensure the path to your Firebase config is correct
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import * as Speech from 'expo-speech';
+import { Picker } from '@react-native-picker/picker';
 
 const UpdateProgress = () => {
     const router = useRouter();
@@ -21,6 +23,7 @@ const UpdateProgress = () => {
         science: '',
         courseworkProgress: '',
     });
+    const [progressStatus, setProgressStatus] = useState(progressData.courseworkProgress || '');
 
     useEffect(() => {
         console.log('Params in useEffect:', params);
@@ -76,6 +79,20 @@ const UpdateProgress = () => {
             });
             console.log('Document successfully updated');
             Alert.alert('Success', 'Progress updated successfully');
+            // Create a summary of updated information for speech
+            const updatedInfo = `
+            Student Name: ${progressData.studentName}, 
+            Student ID: ${progressData.studentID}, 
+            Class: ${progressData.studentClass}, 
+            Maths: ${progressData.maths}, 
+            English: ${progressData.english}, 
+            Geography: ${progressData.geography}, 
+            History: ${progressData.hist}, 
+            Science: ${progressData.science}, 
+            Coursework Progress: ${progressData.courseworkProgress}
+        `;
+
+            Speech.speak(`Progress updated successfully. Updated information: ${updatedInfo}`); // Include the updated info
             router.back();
         } catch (error) {
             console.error('Error updating document: ', error);
@@ -88,19 +105,19 @@ const UpdateProgress = () => {
             ...prevData,
             [field]: value
         }));
+        Speech.speak(`Changed ${field} to ${value}`); // Provide auditory feedback on field change
     };
-
     return (
         <ScrollView style={styles.container}>
             <Text style={styles.title}>Update Student Progress</Text>
+            <Text style={styles.sectionTitle}>Student Information</Text>
             <View style={styles.form}>
                 <Text style={styles.label}>Student Name:</Text>
                 <TextInput
                     style={styles.input}
                     value={progressData.studentName}
                     onChangeText={(text) => handleInputChange('studentName', text)}
-                />
-
+></TextInput>
                 <Text style={styles.label}>Student ID:</Text>
                 <TextInput
                     style={styles.input}
@@ -114,7 +131,9 @@ const UpdateProgress = () => {
                     value={progressData.studentClass}
                     onChangeText={(text) => handleInputChange('studentClass', text)}
                 />
-
+            </View>
+            <Text style={styles.sectionTitle}>Academic Progress</Text>
+            <View style={styles.marksContainer}>
                 <Text style={styles.label}>Maths Marks:</Text>
                 <TextInput
                     style={styles.input}
@@ -154,29 +173,35 @@ const UpdateProgress = () => {
                     onChangeText={(text) => handleInputChange('science', text)}
                     keyboardType="numeric"
                 />
+            </View>
+            <Text style={styles.sectionTitle}>Coursework Progress</Text>
+            <View style={styles.form}>
+                <Text style={styles.label}>Progress Status:</Text>
+                <Picker
+                    selectedValue={progressStatus}
+                    style={styles.picker}
+                    onValueChange={(itemValue) => setProgressStatus(itemValue)} // Update picker state
+                >
+                    <Picker.Item label="Excellent" value="excellent" />
+                    <Picker.Item label="Good" value="good" />
+                    <Picker.Item label="Average" value="average" />
+                    <Picker.Item label="Needs Improvement" value="needs_improvement" />
+                </Picker>
+            </View>
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    style={[styles.button, styles.updateButton]} // Add styles.button here
+                    onPress={handleUpdate}
+                >
+                    <Text style={styles.buttonText}>Update</Text>
+                </TouchableOpacity>
 
-                <Text style={styles.label}>Coursework Progress:</Text>
-                <TextInput
-                    style={styles.input}
-                    value={progressData.courseworkProgress}
-                    onChangeText={(text) => handleInputChange('courseworkProgress', text)}
-                />
-
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        style={[styles.roundButton, styles.updateButton]}
-                        onPress={handleUpdate}
-                    >
-                        <Text style={styles.buttonText}>Update</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={[styles.roundButton, styles.closeButton]}
-                        onPress={() => router.back()}
-                    >
-                        <Text style={styles.buttonText}>Close</Text>
-                    </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                    style={[styles.button, styles.closeButton]} // Add styles.button here
+                    onPress={() => router.back()}
+                >
+                    <Text style={styles.buttonText}>Close</Text>
+                </TouchableOpacity>
             </View>
         </ScrollView>
     );
@@ -185,61 +210,63 @@ const UpdateProgress = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#ffffff',
         padding: 20,
-        backgroundColor: '#F5F5F5',
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
+        fontSize: 28,
+        fontWeight: '700',
+        color: '#333333',
+        marginBottom: 30,
+        marginTop: 40,
+        textAlign: 'center',
     },
-    form: {
-        backgroundColor: '#fff',
-        padding: 20,
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 1.41,
-        elevation: 2,
-    },
-    label: {
-        fontSize: 16,
-        marginBottom: 5,
-        fontWeight: 'bold',
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#1a8e5f',
+        marginBottom: 15,
     },
     input: {
-        borderWidth: 1,
-        borderColor: '#ddd',
-        padding: 10,
-        marginBottom: 15,
-        borderRadius: 4,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+        paddingVertical: 10,
+        marginBottom: 20,
+        fontSize: 16,
+        color: '#333333',
+    },
+    picker: {
+        height: 50,
+        width: '100%',
     },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 20,
-        paddingHorizontal: 20,
+        marginTop: 30,
+        marginBottom: 40,
     },
-    roundButton: {
-        width: 100,
-        height: 60,
-        borderRadius:15,
-        justifyContent: 'center',
-        alignItems: 'center',
+    button: {
+        flex: 1,
+        height: 50, // Ensure a fixed height
+        justifyContent: 'center', // Center the content vertically
+        alignItems: 'center', // Center the content horizontally
+        borderRadius: 8,
+        marginHorizontal: 5,
     },
     updateButton: {
-        backgroundColor: '#80AF81',
+        backgroundColor: '#1a8e5f',
     },
     closeButton: {
-        backgroundColor: '#F44336',
+        backgroundColor: '#333333',
     },
     buttonText: {
-        color: '#fff',
-        fontWeight: 'bold',
+        color: '#ffffff',
+        fontWeight: '600',
         fontSize: 16,
+        lineHeight: 22, // Ensure lineHeight is consistent with font size
+        textAlignVertical: 'center', // Center text vertically (for Android)
     },
 });
+
 
 export default UpdateProgress;

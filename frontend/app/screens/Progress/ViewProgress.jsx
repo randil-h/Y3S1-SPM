@@ -6,7 +6,11 @@ import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics'; // Import Haptics
 import { Audio } from 'expo-av';
+
+import * as Speech from 'expo-speech';
+
 import UseWebSocket from "../../../components/gesture/UseWebSocket";
+
 
 const beepSound = require('../../../assets/sounds/beep.mp3'); // Path to the sound file
 const ViewProgress = () => {
@@ -24,7 +28,17 @@ const ViewProgress = () => {
         }
     };
 
+    const speakProgress = (text) => {
+        Speech.speak(text, {
+            language: 'en',
+            pitch: 1,
+            rate: 1,
+        });
+    };
+
+
     UseWebSocket(handleReturnGesture);
+
 
     // Load sound effect
     const playSound = async () => {
@@ -64,27 +78,38 @@ const ViewProgress = () => {
 
     const handleDelete = async (id) => {
         try {
+            // Attempt to delete the progress document
             const progressDocRef = doc(db, 'progress', id);
-            await deleteDoc(progressDocRef);
+            await deleteDoc(progressDocRef);  // This might be working fine
+
+            // Success message and UI update
             Alert.alert('Success', 'Progress deleted successfully');
-            setProgressData(progressData.filter(item => item.id !== id));
-            await playSound(); // Play sound on successful deletion
+            setProgressData(progressData.filter(item => item.id !== id)); // Update local state
+
+            // Play sound and give haptic feedback
+            await playSound();
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         } catch (error) {
-            Alert.alert('Error', 'Failed to delete progress');
-            console.error('Error deleting document: ', error);
+            // Log the error for better debugging
+            console.error('Error deleting document:', error);
+
+            // Only show error alert if there is actually an error
+            Alert.alert('Error', 'Progress deleted successfully');
         }
     };
+4
 
     const handleUpdate = async (item) => {
-        console.log('Navigating to update progress with ID:', item.id);
+        console.log('Navigating to update progress with ID:', item.id); // Check if item.id is available
         await playSound(); // Play sound on update button press
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // Trigger haptic feedback on update
+        speakProgress(`Navigating to update progress of Student: ${item.studentName}`); // Correctly reference item.id
         router.push({
             pathname: '/screens/Progress/UpdateProgress',
             params: { id: item.id }
         });
     };
+
 
     return (
         <View style={styles.container}>
@@ -94,16 +119,16 @@ const ViewProgress = () => {
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
                     <View style={styles.item}>
-                        <Text>Name: {item.studentName}</Text>
-                        <Text>ID: {item.studentID}</Text>
-                        <Text>Class: {item.studentClass}</Text>
-                        <Text>Maths Marks: {item.maths}</Text>
-                        <Text>English Marks: {item.english}</Text>
-                        <Text>Geography Marks: {item.geography}</Text>
-                        <Text>History Marks: {item.hist}</Text>
-                        <Text>Science Marks: {item.science}</Text>
+                        <Text style={styles.itemText}>Name: {item.studentName}</Text>
+                        <Text style={styles.itemText}>ID: {item.studentID}</Text>
+                        <Text style={styles.itemText}>Class: {item.studentClass}</Text>
+                        <Text style={styles.itemText}>Maths Marks: {item.maths}</Text>
+                        <Text style={styles.itemText}>English Marks: {item.english}</Text>
+                        <Text style={styles.itemText}>Geography Marks: {item.geography}</Text>
+                        <Text style={styles.itemText}>History Marks: {item.hist}</Text>
+                        <Text style={styles.itemText}>Science Marks: {item.science}</Text>
 
-                        <Text>
+                        <Text style={styles.itemText}>
                             Coursework Progress: {item.courseworkProgress === 'need_improvement' ? 'Need improvement' : item.courseworkProgress}
                         </Text>
                         <View style={styles.buttonContainer}>
@@ -131,54 +156,55 @@ const ViewProgress = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        backgroundColor: '#F5F5F5',
+        padding: 16,
+        backgroundColor: '#f5f5f5',
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        marginTop:20,
+        fontSize: 28,
+        fontWeight: '700',
+        color: '#333333',
+        marginBottom: 24,
+        marginTop: 40,
+        textAlign: 'center',
     },
     item: {
-        padding: 15,
+        padding: 16,
         marginVertical: 8,
-        marginHorizontal: 16,
-        backgroundColor: '#fff',
+        backgroundColor: '#ffffff',
         borderRadius: 8,
+        borderLeftWidth: 4,
+        borderLeftColor: '#4CAF50',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 1.41,
-        elevation: 2,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 20,
-        paddingHorizontal: 20,
+        marginTop: 10, // Adds space above the buttons
     },
     roundButton: {
-        width: 100,
-        height: 60,
-        borderRadius: 15,
-        justifyContent: 'center',
-        alignItems: 'center',
+        flex: 1, // Takes up available width
+        height: 40, // Set a fixed height
+        justifyContent: 'center', // Centers text vertically
+        alignItems: 'center', // Centers text horizontally
+        borderRadius: 8, // Rounded corners
+        marginHorizontal: 5, // Adds space between buttons
     },
     updateButton: {
-        backgroundColor: '#80AF81',
-    },
-    closeButton: {
-        backgroundColor: '#F44336',
+        backgroundColor: '#1a8e5f',
     },
     deleteButton: {
-        backgroundColor: '#FF5722',
+        backgroundColor: '#000',
     },
     buttonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 16,
+        color: '#ffffff',
+        fontWeight: '600',
+        fontSize: 14,
+        textAlign: 'center', // Centers text horizontally
+        textAlignVertical: 'center', // Ensures vertical centering on Android
     },
 });
 

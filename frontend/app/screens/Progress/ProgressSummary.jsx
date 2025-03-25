@@ -8,8 +8,12 @@ import { useFocusEffect } from '@react-navigation/native';
 import * as Haptics from 'expo-haptics'; // Import Haptics
 import { Audio } from 'expo-av';
 import * as Print from 'expo-print'; // Import Print for PDF generation
-import * as Sharing from 'expo-sharing';
+
+import * as Sharing from 'expo-sharing'; // Import Sharing for sharing the PDF
+import * as Speech from 'expo-speech';
+
 import UseWebSocket from "../../../components/gesture/UseWebSocket"; // Import Sharing for sharing the PDF
+
 
 const beepSound = require('../../../assets/sounds/soft_beep.mp3'); // Path to the sound file
 
@@ -38,7 +42,17 @@ const ProgressSummary = () => {
         }
     };
 
+    const speakProgress = (text) => {
+        Speech.speak(text, {
+            language: 'en',
+            pitch: 1,
+            rate: 1,
+        });
+    };
+
+
     UseWebSocket(handleReturnGesture);
+
 
     // Helper function to get proper subject display names
     const getSubjectDisplayName = (key) => {
@@ -142,71 +156,101 @@ const ProgressSummary = () => {
     const handleViewProgress = async () => {
         await playSound();
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        speakProgress('Viewing detailed progress');
         router.push('/screens/Progress/ViewProgress');
     };
     const generatePdf = async () => {
+        speakProgress('Generating PDF');
         const html = `
-        <html>
-            <head>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 20px;
-                        padding: 0;
-                        background-color: #f9f9f9;
-                    }
-                    h1 {
-                        font-size: 45px;
-                        color: #333;
-                        text-align: center;
-                    }
-                    h2 {
-                        font-size: 40px;
-                        color: #555;
-                        margin-top: 20px;
-                    }
-                    ul {
-                        list-style-type: none;
-                        padding: 0;
-                    }
-                    li {
-                        font-size: 35px;
-                        color: #444;
-                        margin-bottom: 10px;
-                    }
-                </style>
-            </head>
-            <body>
+    <html>
+        <head>
+            <style>
+                body {
+                    font-family: 'Arial', sans-serif;
+                    margin: 0;
+                    padding: 20px;
+                    background-color: #f4f4f4; /* Light background for contrast */
+                    color: #333;
+                }
+                h1 {
+                    font-size: 36px;
+                    color: #1a8e5f; /* Primary color for headings */
+                    text-align: center;
+                    margin-bottom: 20px;
+                    border-bottom: 2px solid #1a8e5f; /* Underline for header */
+                    padding-bottom: 10px;
+                }
+                h2 {
+                    font-size: 28px;
+                    color: #1a8e5f; /* Primary color for subheadings */
+                    margin: 20px 0 10px; /* Space above and below */
+                }
+                ul {
+                    list-style-type: none; /* Remove bullet points */
+                    padding: 0;
+                    margin: 0; /* Reset margins */
+                }
+                li {
+                    font-size: 18px; /* Slightly smaller text for list items */
+                    color: #444; /* Darker shade for better readability */
+                    margin-bottom: 10px; /* Space between list items */
+                    padding: 10px; /* Padding for list items */
+                    background-color: #ffffff; /* White background for list items */
+                    border-radius: 8px; /* Rounded corners */
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+                }
+                .container {
+                    background-color: #ffffff; /* White background for main content */
+                    border-radius: 12px; /* Rounded corners for main container */
+                    padding: 20px; /* Inner padding */
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+                }
+                .section {
+                    margin-bottom: 20px; /* Space between sections */
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
                 <h1>Progress Summary</h1>
-                <h2>Overall Average Scores</h2>
-                <ul>
-                    ${Object.entries(averageScores).map(([subject, avg]) => (
+                <div class="section">
+                    <h2>Overall Average Scores</h2>
+                    <ul>
+                        ${Object.entries(averageScores).map(([subject, avg]) => (
             `<li>${getSubjectDisplayName(subject)}: ${avg}</li>`
         )).join('')}
-                </ul>
-                <h2>Top Performers</h2>
-                <ul>
-                    ${topPerformers.map((student, index) => (
+                    </ul>
+                </div>
+                <div class="section">
+                    <h2>Top Performers</h2>
+                    <ul>
+                        ${topPerformers.map((student, index) => (
             `<li>${index + 1}. ${student.studentName} (ID: ${student.studentID}) - Total: ${student.total}</li>`
         )).join('')}
-                </ul>
-                <h2>Students Needing Improvement</h2>
-                <ul>
-                    ${studentsNeedingImprovement.map((student, index) => (
+                    </ul>
+                </div>
+                <div class="section">
+                    <h2>Students Needing Improvement</h2>
+                    <ul>
+                        ${studentsNeedingImprovement.map((student, index) => (
             `<li>${index + 1}. ${student.studentName} (ID: ${student.studentID}) - Total: ${student.total}</li>`
         )).join('')}
-                </ul>
-            </body>
-        </html>
+                    </ul>
+                </div>
+            </div>
+        </body>
+    </html>
     `;
 
         try {
-            const { uri } = await Print.printToFileAsync({ html, fileName: 'Progress Summary' }); // Set the file name
+            const { uri } = await Print.printToFileAsync({ html, fileName: 'Progress Summary' });
             await Sharing.shareAsync(uri);
         } catch (error) {
             console.error("Error generating or sharing PDF: ", error);
         }
     };
+
+
 
     return (
         <ScrollView style={styles.container} accessible={true}>
@@ -222,6 +266,17 @@ const ProgressSummary = () => {
                 accessibilityRole="button"
             >
                 <Text style={styles.buttonText}>Generate PDF</Text>
+
+            </TouchableOpacity>
+            {/* Navigation Button */}
+            <TouchableOpacity
+                style={styles.button1}
+                onPress={handleViewProgress}
+                accessibilityLabel="View Detailed Progress"
+                accessibilityHint="Navigates to the page where you can view detailed student progress"
+                accessibilityRole="button"
+            >
+                <Text style={styles.buttonText}>View Detailed Progress</Text>
             </TouchableOpacity>
             {/* Overall Statistics */}
             <View style={styles.section}>
@@ -299,21 +354,12 @@ const ProgressSummary = () => {
                 )}
             </View>
 
-            {/* Navigation Button */}
-            <TouchableOpacity
-                style={styles.button}
-                onPress={handleViewProgress}
-                accessibilityLabel="View Detailed Progress"
-                accessibilityHint="Navigates to the page where you can view detailed student progress"
-                accessibilityRole="button"
-            >
-                <Text style={styles.buttonText}>View Detailed Progress</Text>
-            </TouchableOpacity>
+
         </ScrollView>
     );
 };
 
-// Helper function to capitalize subject names (optional, already handled by getSubjectDisplayName)
+// Helper function to capitalize subject names
 const capitalize = (s) => {
     if (typeof s !== 'string') return '';
     return s.charAt(0).toUpperCase() + s.slice(1);
@@ -322,83 +368,100 @@ const capitalize = (s) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#ffffff',
         padding: 20,
-        backgroundColor: '#f2f2f2',
     },
     title: {
         fontSize: 28,
-        fontWeight: 'bold',
-        color: '#000',
-        marginBottom: 20,
+        fontWeight: '700',
+        color: '#333333',
+        marginBottom: 30,
+        marginTop: 40,
         textAlign: 'center',
-        paddingTop: 30,
     },
     section: {
         marginBottom: 30,
-        padding: 15,
-        backgroundColor: '#fff',
-        borderRadius: 15,
-        shadowColor: '#000',
+        padding: 20,
+        backgroundColor: '#ffffff',
+        borderRadius: 12,
+        shadowColor: '#000000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 5,
+        shadowRadius: 4,
         elevation: 3,
     },
     sectionTitle: {
         fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#333',
+        fontWeight: '600',
+        color: '#1a8e5f',
+        marginBottom: 15,
     },
     statText: {
         fontSize: 16,
-        color: '#555',
-        marginBottom: 5,
+        color: '#333333',
+        marginBottom: 8,
     },
     listItem: {
-        paddingVertical: 10,
+        paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
+        borderBottomColor: '#e0e0e0',
     },
     listText: {
         fontSize: 16,
-        color: '#555',
+        color: '#333333',
+        marginBottom: 4,
     },
     noDataText: {
         fontSize: 16,
-        color: '#999',
+        color: '#999999',
         fontStyle: 'italic',
     },
     button: {
-        backgroundColor: '#80AF81',
+        backgroundColor: '#1a8e5f',
         paddingVertical: 15,
         paddingHorizontal: 20,
-        borderRadius: 25,
+        borderRadius: 8,
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: '#000000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
         elevation: 3,
         marginBottom: 20,
-    },pdfButton: {
-        backgroundColor: '#80AF81',
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        borderRadius: 25,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        elevation: 3,
-        marginBottom: 20,
-    buttonText: {
-        fontSize: 18,
-        color: '#fff',
-        fontWeight: 'bold',
-        textAlign: 'center',
     },
-}});
+    button1: {
+        backgroundColor: '#000000',
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        alignItems: 'center',
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+        marginBottom: 20,
+    },
+    pdfButton: {
+        backgroundColor: '#1a8e5f',
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#1a8e5f',
+        marginBottom: 20,
+    },
+    buttonText: {
+        fontSize: 16,
+        color: '#ffffff',
+        fontWeight: '600',
+    },
+    pdfButtonText: {
+        fontSize: 16,
+        color: '#1a8e5f',
+        fontWeight: '600',
+    },
+});
 
 export default ProgressSummary;

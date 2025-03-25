@@ -1,16 +1,18 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {Tabs, useRouter} from 'expo-router';
-import {FontAwesome5, FontAwesome6, Ionicons, MaterialCommunityIcons, MaterialIcons} from "@expo/vector-icons";
+import {FontAwesome5, MaterialIcons} from "@expo/vector-icons";
 import React, {useEffect, useState} from "react";
 
 export default function TabLayout() {
-    const[currentTab, setCurrentTab] = useState(0);
+    const [currentTab, setCurrentTab] = useState(0); // Track current tab
     const router = useRouter();
 
+    // Define the available tab routes
     const tabRoutes = ['index', 'teacher', 'quiz', 'gesture', 'progress'];
 
-    /*useEffect(() => {
-        const ws = new WebSocket('ws://192.168.1.4:8765'); // Replace with your WebSocket address
+    // Function to handle WebSocket-based gesture detection
+    useEffect(() => {
+        const ws = new WebSocket('ws://192.168.1.6:8765'); // Replace with your WebSocket address
 
         ws.onopen = () => {
             console.log('WebSocket connection established');
@@ -18,7 +20,7 @@ export default function TabLayout() {
 
         ws.onmessage = (event) => {
             const { gesture } = JSON.parse(event.data);
-            handleGesture(gesture);
+            handleGesture(gesture); // Handle the received gesture
         };
 
         ws.onclose = () => {
@@ -28,16 +30,18 @@ export default function TabLayout() {
         return () => {
             ws.close();
         };
-    }, [currentTab]);
+    }, [currentTab]); // Include `currentTab` as a dependency to keep it updated
 
+    // Function to handle gestures and navigate between tabs
     const handleGesture = (gesture) => {
         if (gesture === 'Next Tab') {
-            navigateToNextTab();
+            navigateToNextTab(); // Navigate forward
         } else if (gesture === 'Previous Tab') {
-            navigateToPreviousTab();
+            navigateToPreviousTab(); // Navigate backward
         }
     };
 
+    // Navigate to the next tab
     const navigateToNextTab = () => {
         if (currentTab < tabRoutes.length - 1) {
             const nextTab = currentTab + 1;
@@ -46,18 +50,17 @@ export default function TabLayout() {
         }
     };
 
+    // Navigate to the previous tab
     const navigateToPreviousTab = () => {
         if (currentTab > 0) {
             const previousTab = currentTab - 1;
             setCurrentTab(previousTab);
             router.push(`/${tabRoutes[previousTab]}`); // Navigate to the previous tab
         }
-    };*/
+    };
 
     return (
-        <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}
-              /*initialRouteName={tabRoutes[currentTab]}*/
-        >
+        <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
             <Tabs.Screen
                 name="index"
                 options={{
@@ -101,6 +104,3 @@ export default function TabLayout() {
         </Tabs>
     );
 }
-
-
-
