@@ -48,12 +48,6 @@ const Quiz = ({ quiz, onComplete }) => {
         };
     }, []);
 
-    useEffect(() => {
-        readQuestionAndAnswers();
-        setAttemptCount(0); // Reset attempt count for new question
-        setQuestionMarks(0); // Reset the question-specific marks for each question
-    }, [currentQuestionIndex]);
-
     useFocusEffect(
         React.useCallback(() => {
             // WebSocket connection starts when the page is focused
@@ -81,6 +75,14 @@ const Quiz = ({ quiz, onComplete }) => {
             };
         }, [currentQuestionIndex])
     );
+
+    useEffect(() => {
+        readQuestionAndAnswers();
+        setAttemptCount(0); // Reset attempt count for new question
+        setQuestionMarks(0); // Reset the question-specific marks for each question
+    }, [currentQuestionIndex]);
+
+
 
     /*const handleAnswerSelection = (answer) => {
         setSelectedAnswer(answer);

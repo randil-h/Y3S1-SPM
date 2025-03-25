@@ -111,41 +111,58 @@ const QuizPage = () => {
             totalQuestionsSum += attempt.totalQuestions;
 
             return `
-                <h3>Attempt ${index + 1}</h3>
-                <p>Timestamp: ${new Date(attempt.timestamp).toLocaleString()}</p>
-                <p>Total Marks: ${attempt.totalMarks}</p>
-                <p>Total Questions: ${attempt.totalQuestions}</p>
-            `;
+            <tr>
+                <td>${index + 1}</td>
+                <td>${new Date(attempt.timestamp).toLocaleString()}</td>
+                <td>${attempt.totalMarks}</td>
+                <td>${attempt.totalQuestions}</td>
+            </tr>
+        `;
         }).join('');
 
         const averageMarks = totalMarksSum / attempts.length;
         const averageQuestions = totalQuestionsSum / attempts.length;
 
         return `
-            <html>
-            <head>
-                <style>
-                    body { font-family: Arial, sans-serif; }
-                    h1 { color: #4CAF50; }
-                    h2 { color: #2196F3; }
-                    .summary { background-color: #f2f2f2; padding: 10px; border-radius: 5px; }
-                </style>
-            </head>
-            <body>
-                <h1>Report for Quiz: ${quiz.quizName}</h1>
-                <p>Total Attempts: ${attempts.length}</p>
-                
-                <h2>Attempts Details</h2>
-                ${attemptsHTML}
-                
+        <html>
+        <head>
+            <style>
+                body { font-family: Inter,sans-serif; }
+                h1 { color: #4CAF50; }
+                h2 { color: #2196F3; }
+                table { border-collapse: collapse; width: 100%; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                .summary { background-color: #f2f2f2; padding: 10px; border-radius: 5px; margin-top: 20px; }
+            </style>
+        </head>
+        <body>
+            <h1>Report for Quiz: ${quiz.quizName}</h1>
+            <p>Total Attempts: ${attempts.length}</p>
+            
+            <h2>Attempts Details</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Attempt #</th>
+                        <th>Timestamp</th>
+                        <th>Total Marks</th>
+                        <th>Total Questions Attempted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${attemptsHTML}
+                </tbody>
+            </table>
+            
+            <div class="summary">
                 <h2>Summary</h2>
-                <div class="summary">
-                    <p>Average Marks: ${averageMarks.toFixed(2)}</p>
-                    <p>Average Questions: ${averageQuestions.toFixed(2)}</p>
-                </div>
-            </body>
-            </html>
-        `;
+                <p>Average Marks: ${averageMarks.toFixed(2)}</p>
+                <p>Average Questions: ${averageQuestions.toFixed(2)}</p>
+            </div>
+        </body>
+        </html>
+    `;
     };
 
     const shareReport = async (fileUri, filename) => {

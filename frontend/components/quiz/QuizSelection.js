@@ -78,7 +78,7 @@ const QuizSelection = ({ onQuizSelect }) => {
                 // Add a delay of 5 seconds before navigating
                 setTimeout(() => {
                     onQuizSelect(item);
-                }, 5000); // 5000ms = 5 seconds
+                }, 3000); // 3000ms = 3 seconds
             }
         });
     };
